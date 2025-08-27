@@ -206,7 +206,7 @@ export default function Auth() {
           <form onSubmit={onSubmit} className="space-y-4">
             {isSignUp && (
               <label className="block">
-                <span className="text-sm text-slate-700">Nama</span>
+                <span className="text-sm text-slate-700">Name</span>
                 <input
                   type="text"
                   name="name"
@@ -219,20 +219,20 @@ export default function Auth() {
             )}
 
             <label className="block">
-              <span className="text-sm text-slate-600">Email</span>
+              <span className="text-sm text-slate-700">Email</span>
               <input
                 type="email"
                 name="email"
-                placeholder="nama@email.com"
+                placeholder="example@gmail.com"
                 value={form.email}
                 onChange={onChange}
                 required
-                className="mt-1 w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-brand-gold/60"
+                className="field mt-1"
               />
             </label>
 
             <label className="block">
-              <span className="text-sm text-slate-600">Password</span>
+              <span className="text-sm text-slate-700">Password</span>
               <div className="mt-1 relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -241,15 +241,13 @@ export default function Auth() {
                   value={form.password}
                   onChange={onChange}
                   required
-                  className="w-full border rounded-lg p-3 pr-12 outline-none focus:ring-2 focus:ring-brand-gold/60"
+                  className="field pr-12"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 text-sm px-2"
-                  aria-label={
-                    showPassword ? "Sembunyikan password" : "Tampilkan password"
-                  }
+                  aria-label={showPassword ? "Hide Password" : "Show Password"}
                 >
                   {showPassword ? "🙈" : "👁️"}
                 </button>
@@ -258,7 +256,7 @@ export default function Auth() {
 
             {!isSignUp && (
               <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 text-slate-600 select-none">
+                <label className="flex items-center gap-2 text-slate-700 select-none">
                   <input
                     type="checkbox"
                     className="rounded border-slate-300"
@@ -270,9 +268,9 @@ export default function Auth() {
                 <button
                   type="button"
                   onClick={handleForgot}
-                  className="text-brand-dark hover:underline"
+                  className="text-olive hover:text-brick transition-colors"
                 >
-                  Lupa password?
+                  Forget Password?
                 </button>
               </div>
             )}
@@ -280,35 +278,37 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-brand-gold text-white px-4 py-3 rounded-lg hover:opacity-90 disabled:opacity-50"
+              className="btn-brand w-full"
             >
-              {loading ? "Memproses..." : isSignUp ? "Daftar" : "Log In"}
+              {loading ? "Processing..." : isSignUp ? "Sign Up" : "Log In"}
             </button>
           </form>
 
           {/* Resend hint setelah sign up */}
           {isSignUp && emailSent && (
-            <div className="mt-3 text-sm text-slate-600">
-              Belum menerima email verifikasi?{" "}
+            <div className="mt-3 text-sm text-slate-700">
+              Not receiving verification email?{" "}
               <button
                 onClick={handleResend}
-                className="text-brand-dark underline"
+                className="text-olive hover:text-brick underline"
               >
-                Kirim ulang
+                Resend
               </button>
             </div>
           )}
 
           <div className="mt-6 text-center text-sm">
-            {isSignUp ? "Sudah punya akun?" : "Belum punya akun?"}{" "}
+            {isSignUp
+              ? "Already have an account?"
+              : "Don't have an account yet?"}{" "}
             <button
               onClick={() => {
                 setIsSignUp(!isSignUp);
                 setNotice("");
               }}
-              className="text-brand-dark underline"
+              className="text-olive hover:text-brick underline transition-colors font-[1000]"
             >
-              {isSignUp ? "Login di sini" : "Daftar di sini"}
+              {isSignUp ? "Login here" : "Sign up here"}
             </button>
           </div>
         </div>
