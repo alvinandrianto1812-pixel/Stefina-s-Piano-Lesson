@@ -16,3 +16,4 @@ If you are developing a production application, we recommend using TypeScript wi
 - install node js and npm
 - also do npm install
 - to run npm run dev
+  -testtttt
