@@ -2,7 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default function Event() {
+export default function Events() {
   return (
     <div className="font-sans text-brand-dark">
       {/* HERO – samakan nuansa dengan LandingPage */}

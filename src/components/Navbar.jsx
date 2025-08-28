@@ -95,8 +95,8 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-2">
             {[
               { to: "/", label: "Home" },
-              { to: "/Event", label: "Event" },
-              { to: "/Registration", label: "Registration", hash: true },
+              { to: "/Events", label: "Event" },
+              { to: "/Questionnaire", label: "Registration", hash: true },
               { to: "/OurTeachers", label: "Our Teachers" },
               { to: "/AboutUs", label: "About Us", hash: true },
               { to: "/ContactUs", label: "Contact Us", hash: true },
@@ -192,43 +192,62 @@ export default function Navbar() {
             >
               Home
             </Link>
+
             <Link
-              to="/Event"
-              onClick={() => setMenuOpen(false)}
-              className="block rounded-lg px-3 py-2 text-slate-700 hover:bg-[#F8F6ED]"
-            >
-              Event
-            </Link>
-            <Link
-              to="/Registration"
+              to="/Events"
               onClick={() => setMenuOpen(false)}
               className={`block rounded-lg px-3 py-2 ${
-                isActive("/Registration")
+                isActive("/Events")
+                  ? "text-brand-gold"
+                  : "text-slate-700 hover:bg-[#F8F6ED]"
+              }`}
+            >
+              Events
+            </Link>
+            <Link
+              to="/Questionnaire"
+              onClick={() => setMenuOpen(false)}
+              className={`block rounded-lg px-3 py-2 ${
+                isActive("/Questionnaire")
                   ? "text-brand-gold"
                   : "text-slate-700 hover:bg-[#F8F6ED]"
               }`}
             >
               Registration
             </Link>
+
             <Link
               to="/OurTeachers"
               onClick={() => setMenuOpen(false)}
-              className="block rounded-lg px-3 py-2 text-slate-700 hover:bg-[#F8F6ED]"
+              className={`block rounded-lg px-3 py-2 ${
+                isActive("/OurTeachers")
+                  ? "text-brand-gold"
+                  : "text-slate-700 hover:bg-[#F8F6ED]"
+              }`}
             >
               Our Teachers
             </Link>
+
             <Link
               to="/AboutUs"
               onClick={() => setMenuOpen(false)}
-              className="block rounded-lg px-3 py-2 text-slate-700 hover:bg-[#F8F6ED]"
+              className={`block rounded-lg px-3 py-2 ${
+                isActive("/AboutUs")
+                  ? "text-brand-gold"
+                  : "text-slate-700 hover:bg-[#F8F6ED]"
+              }`}
             >
               About Us
             </Link>
 
             <Link
-              to="/Contact Us"
+              to="/ContactUs"
               onClick={() => setMenuOpen(false)}
-              className="block rounded-lg px-3 py-2 text-slate-700 hover:bg-[#F8F6ED]"
+              className={`block rounded-lg px-3 py-2 ${
+                isActive("/ContactUs")
+                  ? "text-brand-gold"
+                  : "text-slate-700 hover:bg-[#F8F6ED]"
+              }`}
             >
               Contact Us
             </Link>

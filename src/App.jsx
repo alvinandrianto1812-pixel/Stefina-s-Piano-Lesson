@@ -71,7 +71,8 @@ import Questionnaire from "./pages/Questionnaire";
 import Admin from "./pages/Admin";
 import Logout from "./pages/Logout";
 import Pricing from "./pages/pricing";
-import Event from "./pages/Event";
+import Events from "./pages/Events";
+import OurTeachers from "./pages/OurTeachers";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
@@ -90,7 +91,8 @@ export default function App() {
           <Route path="/register" element={<Navigate to="/auth" replace />} />
 
           <Route path="/pricing" element={<Pricing />} />
-          <Route path="/Event" element={<Event />} />
+          <Route path="/Events" element={<Events />} />
+          <Route path="/OurTeachers" element={<OurTeachers />} />
 
           <Route
             path="/questionnaire"
