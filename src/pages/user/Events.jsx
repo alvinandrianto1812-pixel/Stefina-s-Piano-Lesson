@@ -16,6 +16,15 @@ export default function Events() {
           }}
         />
         <div className="max-w-7xl mx-auto px-4 pt-24 pb-12 text-center">
+          <h1 className="font-display text-4xl md:text-5xl leading-tight">
+            Discover Music Events with{" "}
+            <img
+              src="/brand/gurunada_final_green-03.png"
+              alt="GuruNada"
+              className="h-10 md:h-12 lg:h-24 inline-block"
+              draggable={false}
+            />
+          </h1>
           <p className="mt-4 text-lg text-slate-700">
             Join concerts, workshops, and recitals —{" "}
             <span className="font-semibold">
