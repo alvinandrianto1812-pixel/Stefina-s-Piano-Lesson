@@ -1,9 +1,9 @@
 // src/pages/LandingPage.jsx
-import TypingText from "../components/TypingText";
+import TypingText from "../../components/TypingText";
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from "../../lib/supabaseClient";
 import { useNavigate, useLocation } from "react-router-dom";
-import Footer from "../components/Footer";
+import Footer from "../../components/Footer";
 
 export default function LandingPage() {
   const navigate = useNavigate();

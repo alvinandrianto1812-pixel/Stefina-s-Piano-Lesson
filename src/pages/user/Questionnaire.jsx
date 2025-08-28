@@ -2,7 +2,7 @@
 // Tweaks: remove placeholders for Gender/Day/Time, auto defaults, modern UI
 
 import React, { useEffect, useMemo, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 
 const ADMIN_WA = import.meta.env.VITE_WA_PHONE || "6281234567890";
