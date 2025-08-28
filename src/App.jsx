@@ -71,6 +71,7 @@ import Questionnaire from "./pages/Questionnaire";
 import Admin from "./pages/Admin";
 import Logout from "./pages/Logout";
 import Pricing from "./pages/pricing";
+import Event from "./pages/Event";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
@@ -89,6 +90,7 @@ export default function App() {
           <Route path="/register" element={<Navigate to="/auth" replace />} />
 
           <Route path="/pricing" element={<Pricing />} />
+          <Route path="/Event" element={<Event />} />
 
           <Route
             path="/questionnaire"
@@ -117,7 +119,6 @@ export default function App() {
             path="*"
             element={<div className="p-6">Halaman tidak ditemukan.</div>}
           />
-
         </Routes>
       </main>
     </>

@@ -95,10 +95,11 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-2">
             {[
               { to: "/", label: "Home" },
-              { to: "/#features", label: "Fitur", hash: true },
-              { to: "/pricing", label: "Pricing" },
-              { to: "/#schedule", label: "Jadwal", hash: true },
-              { to: "/#testimonials", label: "Testimoni", hash: true },
+              { to: "/Event", label: "Event" },
+              { to: "/Registration", label: "Registration", hash: true },
+              { to: "/OurTeachers", label: "Our Teachers" },
+              { to: "/AboutUs", label: "About Us", hash: true },
+              { to: "/ContactUs", label: "Contact Us", hash: true },
             ].map((item) => {
               const active = isActive(item.to);
               return (
@@ -192,36 +193,44 @@ export default function Navbar() {
               Home
             </Link>
             <Link
-              to="/#features"
+              to="/Event"
               onClick={() => setMenuOpen(false)}
               className="block rounded-lg px-3 py-2 text-slate-700 hover:bg-[#F8F6ED]"
             >
-              Fitur
+              Event
             </Link>
             <Link
-              to="/pricing"
+              to="/Registration"
               onClick={() => setMenuOpen(false)}
               className={`block rounded-lg px-3 py-2 ${
-                isActive("/pricing")
+                isActive("/Registration")
                   ? "text-brand-gold"
                   : "text-slate-700 hover:bg-[#F8F6ED]"
               }`}
             >
-              Pricing
+              Registration
             </Link>
             <Link
-              to="/#schedule"
+              to="/OurTeachers"
               onClick={() => setMenuOpen(false)}
               className="block rounded-lg px-3 py-2 text-slate-700 hover:bg-[#F8F6ED]"
             >
-              Jadwal
+              Our Teachers
             </Link>
             <Link
-              to="/#testimonials"
+              to="/AboutUs"
               onClick={() => setMenuOpen(false)}
               className="block rounded-lg px-3 py-2 text-slate-700 hover:bg-[#F8F6ED]"
             >
-              Testimoni
+              About Us
+            </Link>
+
+            <Link
+              to="/Contact Us"
+              onClick={() => setMenuOpen(false)}
+              className="block rounded-lg px-3 py-2 text-slate-700 hover:bg-[#F8F6ED]"
+            >
+              Contact Us
             </Link>
 
             {isAdmin && (
