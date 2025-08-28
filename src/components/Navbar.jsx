@@ -95,10 +95,11 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-2">
             {[
               { to: "/", label: "Home" },
-              { to: "/#features", label: "Fitur", hash: true },
-              { to: "/pricing", label: "Pricing" },
-              { to: "/#schedule", label: "Jadwal", hash: true },
-              { to: "/#testimonials", label: "Testimoni", hash: true },
+              { to: "/Events", label: "Event" },
+              { to: "/Questionnaire", label: "Registration" },
+              { to: "/OurTeachers", label: "Our Teachers" },
+              { to: "/AboutUs", label: "About Us" },
+              { to: "/ContactUs", label: "Contact Us" },
             ].map((item) => {
               const active = isActive(item.to);
               return (
@@ -191,37 +192,64 @@ export default function Navbar() {
             >
               Home
             </Link>
+
             <Link
-              to="/#features"
-              onClick={() => setMenuOpen(false)}
-              className="block rounded-lg px-3 py-2 text-slate-700 hover:bg-[#F8F6ED]"
-            >
-              Fitur
-            </Link>
-            <Link
-              to="/pricing"
+              to="/Events"
               onClick={() => setMenuOpen(false)}
               className={`block rounded-lg px-3 py-2 ${
-                isActive("/pricing")
+                isActive("/Events")
                   ? "text-brand-gold"
                   : "text-slate-700 hover:bg-[#F8F6ED]"
               }`}
             >
-              Pricing
+              Events
             </Link>
             <Link
-              to="/#schedule"
+              to="/Questionnaire"
               onClick={() => setMenuOpen(false)}
-              className="block rounded-lg px-3 py-2 text-slate-700 hover:bg-[#F8F6ED]"
+              className={`block rounded-lg px-3 py-2 ${
+                isActive("/Questionnaire")
+                  ? "text-brand-gold"
+                  : "text-slate-700 hover:bg-[#F8F6ED]"
+              }`}
             >
-              Jadwal
+              Registration
             </Link>
+
             <Link
-              to="/#testimonials"
+              to="/OurTeachers"
               onClick={() => setMenuOpen(false)}
-              className="block rounded-lg px-3 py-2 text-slate-700 hover:bg-[#F8F6ED]"
+              className={`block rounded-lg px-3 py-2 ${
+                isActive("/OurTeachers")
+                  ? "text-brand-gold"
+                  : "text-slate-700 hover:bg-[#F8F6ED]"
+              }`}
             >
-              Testimoni
+              Our Teachers
+            </Link>
+
+            <Link
+              to="/AboutUs"
+              onClick={() => setMenuOpen(false)}
+              className={`block rounded-lg px-3 py-2 ${
+                isActive("/AboutUs")
+                  ? "text-brand-gold"
+                  : "text-slate-700 hover:bg-[#F8F6ED]"
+              }`}
+            >
+              About Us
+            </Link>
+
+            <Link
+              to="/ContactUs"
+              onClick={() => setMenuOpen(false)}
+              className={`block rounded-lg px-3 py-2 ${
+                isActive("/ContactUs")
+                  ? "text-brand-gold"
+                  : "text-slate-700 hover:bg-[#F8F6ED]"
+              }`}
+            >
+              Contact Us
             </Link>
 
             {isAdmin && (

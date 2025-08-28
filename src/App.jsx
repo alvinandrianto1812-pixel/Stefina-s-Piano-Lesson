@@ -71,6 +71,10 @@ import Questionnaire from "./pages/Questionnaire";
 import Admin from "./pages/Admin";
 import Logout from "./pages/Logout";
 import Pricing from "./pages/pricing";
+import Events from "./pages/Events";
+import OurTeachers from "./pages/OurTeachers";
+import AboutUs from "./pages/AboutUs";
+import ContactUs from "./pages/ContactUs";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
@@ -89,9 +93,13 @@ export default function App() {
           <Route path="/register" element={<Navigate to="/auth" replace />} />
 
           <Route path="/pricing" element={<Pricing />} />
+          <Route path="/Events" element={<Events />} />
+          <Route path="/OurTeachers" element={<OurTeachers />} />
+          <Route path="/AboutUs" element={<AboutUs />} />
+          <Route path="/ContactUs" element={<ContactUs />} />
 
           <Route
-            path="/questionnaire"
+            path="/Questionnaire"
             element={
               <ProtectedRoute>
                 <Questionnaire />
@@ -117,7 +125,6 @@ export default function App() {
             path="*"
             element={<div className="p-6">Halaman tidak ditemukan.</div>}
           />
-
         </Routes>
       </main>
     </>

@@ -333,7 +333,7 @@ export default function Questionnaire() {
     <div className="max-w-5xl mx-auto p-6 md:p-10 space-y-8">
       <header className="space-y-2">
         <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
-          Student Questionnaire & Booking
+          Student Registration & Booking
         </h1>
         <p className="text-slate-600">
           Please fill in the information below to help us understand your needs
