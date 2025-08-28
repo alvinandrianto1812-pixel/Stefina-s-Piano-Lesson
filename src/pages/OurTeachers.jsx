@@ -5,38 +5,38 @@ const TEACHERS = [
   {
     name: "Alya Pramudita",
     role: "Piano (Classical)",
-    exp: "10+ tahun",
-    blurb: "Spesialis teknik dasar & interpretasi era Romantik.",
+    exp: "10+ years",
+    blurb: "Specialist in fundamentals & Romantic era interpretation.",
   },
   {
     name: "Rizky Mahendra",
     role: "Guitar (Acoustic/Pop)",
-    exp: "7+ tahun",
-    blurb: "Fokus pada chord voicing & improvisasi pemula-menengah.",
+    exp: "7+ years",
+    blurb: "Focus on chord voicing & beginner–intermediate improvisation.",
   },
   {
     name: "Nadine Salsabila",
     role: "Vocal (Pop/Jazz)",
-    exp: "8+ tahun",
-    blurb: "Latihan pernapasan, range building, dan stage presence.",
+    exp: "8+ years",
+    blurb: "Breathing techniques, range building, and stage presence.",
   },
   {
     name: "Fajar Wicaksono",
     role: "Drums (Rock/Funk)",
-    exp: "9+ tahun",
-    blurb: "Groove, rudiment, dan koordinasi untuk perform live.",
+    exp: "9+ years",
+    blurb: "Groove, rudiments, and live performance coordination.",
   },
   {
     name: "Keisha Putri",
     role: "Violin (Beginner–Intermediate)",
-    exp: "6+ tahun",
-    blurb: "Intonasi, bowing, dan reading untuk orkestra sekolah.",
+    exp: "6+ years",
+    blurb: "Intonation, bowing, and reading for school orchestra.",
   },
   {
     name: "Arka Setiadi",
     role: "Music Theory",
-    exp: "10+ tahun",
-    blurb: "Harmoni, ear training, dan persiapan ujian teori.",
+    exp: "10+ years",
+    blurb: "Harmony, ear training, and exam preparation.",
   },
 ];
 
@@ -55,16 +55,16 @@ export default function OurTeachers() {
         />
         <div className="max-w-7xl mx-auto px-4 pt-24 pb-12 text-center">
           <h1 className="font-display text-4xl md:text-5xl leading-tight">
-            Kenali <span className="font-bold">Pengajar</span> Kami
+            Meet Our <span className="font-bold">Teachers</span>
           </h1>
           <p className="mt-4 text-lg text-slate-700">
-            Tim musisi berpengalaman yang siap menginspirasi perjalanan
-            belajarmu.
+            A team of experienced musicians ready to inspire your learning
+            journey.
           </p>
         </div>
       </section>
 
-      {/* GRID TEACHERS */}
+      {/* TEACHER GRID */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -77,7 +77,7 @@ export default function OurTeachers() {
                 <div className="font-semibold text-lg">{t.name}</div>
                 <div className="text-sm text-slate-600 mt-1">{t.role}</div>
                 <div className="text-sm text-slate-600">
-                  Pengalaman: {t.exp}
+                  Experience: {t.exp}
                 </div>
                 <p className="text-sm text-slate-700 mt-3">{t.blurb}</p>
               </div>
@@ -86,38 +86,35 @@ export default function OurTeachers() {
         </div>
       </section>
 
-      {/* NILAI PENGAJARAN */}
+      {/* TEACHING VALUES */}
       <section className="py-16 bg-gradient-to-b from-white to-brand-soft/40">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="font-display text-3xl text-center mb-10">
-            Nilai Pengajaran
+            Our Teaching Values
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
                 t: "Personalized Learning",
-                d: "Materi disesuaikan target dan gaya belajar tiap siswa.",
+                d: "Tailored material for each student's goals and style.",
               },
               {
                 t: "Performance Mindset",
-                d: "Latihan berorientasi panggung & kepercayaan diri.",
+                d: "Training focused on stage confidence.",
               },
               {
-                t: "Solid Fundamentals",
-                d: "Teknik & teori dasar ditanamkan sejak awal.",
+                t: "Strong Fundamentals",
+                d: "Solid technique & theory from the start.",
               },
               {
                 t: "Progress Tracking",
-                d: "Catatan perkembangan tiap pertemuan yang terukur.",
+                d: "Measured development after every session.",
               },
               {
                 t: "Creative Exploration",
-                d: "Dorongan untuk berimprovisasi dan bereksperimen.",
+                d: "Encouraging improvisation and experimentation.",
               },
-              {
-                t: "Community",
-                d: "Lingkungan inklusif yang saling mendukung.",
-              },
+              { t: "Community", d: "An inclusive and supportive environment." },
             ].map((f, i) => (
               <div
                 key={i}

@@ -1,11 +1,11 @@
-// src/pages/Event.jsx
+// src/pages/Events.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 
 export default function Events() {
   return (
     <div className="font-sans text-brand-dark">
-      {/* HERO – samakan nuansa dengan LandingPage */}
+      {/* HERO */}
       <section className="relative">
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-brand-soft to-white"></div>
         <div
@@ -17,53 +17,58 @@ export default function Events() {
         />
         <div className="max-w-7xl mx-auto px-4 pt-24 pb-12 text-center">
           <h1 className="font-display text-4xl md:text-5xl leading-tight">
-            Temukan <span className="font-bold">Event Musik</span> bersama
-            GuruNada
+            Discover Music Events with{" "}
+            <img
+              src="/brand/gurunada_final_green-03.png"
+              alt="GuruNada"
+              className="h-10 md:h-12 lg:h-24 inline-block"
+              draggable={false}
+            />
           </h1>
           <p className="mt-4 text-lg text-slate-700">
-            Ikuti konser, workshop, dan recital spesial —{" "}
+            Join concerts, workshops, and recitals —{" "}
             <span className="font-semibold">
-              jadilah bagian dari momen istimewa
+              be part of our special moments
             </span>
             .
           </p>
         </div>
       </section>
 
-      {/* KARTU EVENT UTAMA */}
+      {/* MAIN EVENT CARD */}
       <section className="relative">
         <div className="max-w-4xl mx-auto px-4">
           <div className="rounded-2xl bg-white/90 backdrop-blur border border-white/60 shadow-luxe p-6 md:p-8">
             <div className="grid md:grid-cols-2 gap-6 items-center">
-              {/* Kolom kiri: info event */}
               <div className="text-left">
                 <div className="text-3xl md:text-4xl font-bold">
-                  Konser Akhir Tahun 2025
+                  Year-End Concert 2025
                 </div>
-                <div className="text-slate-600">Sabtu, 20 Desember 2025</div>
+                <div className="text-slate-600">
+                  Saturday, December 20, 2025
+                </div>
                 <div className="mt-3 text-slate-600 text-sm">
-                  Lokasi: Aula Musik Jakarta
+                  Venue: Jakarta Music Hall
                 </div>
 
                 <Link
                   to="/questionnaire"
                   className="inline-flex mt-6 px-5 py-3 rounded-full bg-brand-gold text-white hover:opacity-90 shadow-luxe"
                 >
-                  Daftar Sekarang
+                  Register Now
                 </Link>
               </div>
 
-              {/* Kolom kanan: highlight event */}
               <div className="text-left md:text-right">
                 <label className="block text-sm text-slate-600 mb-2">
-                  Tema Acara:
+                  Theme:
                 </label>
                 <div className="text-xl font-semibold">
-                  "Melodi Untuk Negeri"
+                  "Melodies for the Nation"
                 </div>
                 <p className="mt-3 text-slate-700">
-                  Performa spesial dari siswa, pengajar, dan bintang tamu dalam
-                  satu malam penuh harmoni.
+                  A special performance by our students, teachers, and guest
+                  stars in one night of harmony.
                 </p>
               </div>
             </div>
@@ -71,35 +76,35 @@ export default function Events() {
         </div>
       </section>
 
-      {/* RANGKAIAN EVENT */}
+      {/* EVENT LINEUP */}
       <section className="py-16 bg-gradient-to-b from-white to-brand-soft/40">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="font-display text-3xl text-center mb-10">
-            Rangkaian Acara
+            Event Highlights
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                t: "Workshop Piano",
-                d: "Belajar teknik & improvisasi dari pengajar berpengalaman.",
+                t: "Piano Workshop",
+                d: "Learn techniques & improvisation from experienced instructors.",
               },
               {
-                t: "Recital Siswa",
-                d: "Penampilan spesial dari siswa GuruNada.",
+                t: "Student Recital",
+                d: "Special performances by gurunada students.",
               },
               {
-                t: "Konser Utama",
-                d: "Persembahan kolaborasi pengajar & bintang tamu.",
+                t: "Main Concert",
+                d: "A collaboration between teachers and guest stars.",
               },
               {
                 t: "Meet & Greet",
-                d: "Kesempatan bertemu langsung dengan musisi.",
+                d: "A chance to meet the musicians in person.",
               },
               {
-                t: "Sesi Foto",
-                d: "Abadikan momen bersama keluarga & sahabat.",
+                t: "Photo Session",
+                d: "Capture the moments with family and friends.",
               },
-              { t: "Closing Ceremony", d: "Penutup acara penuh kejutan." },
+              { t: "Closing Ceremony", d: "A finale full of surprises." },
             ].map((f, i) => (
               <div
                 key={i}
@@ -114,32 +119,32 @@ export default function Events() {
         </div>
       </section>
 
-      {/* FAQ sederhana */}
+      {/* FAQ */}
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4 space-y-6">
           <details className="rounded-xl border bg-white p-4">
             <summary className="font-medium cursor-pointer">
-              Apakah acara ini terbuka untuk umum?
+              Is this event open to the public?
             </summary>
             <p className="mt-2 text-slate-600 text-sm">
-              Ya, semua bisa hadir dengan melakukan registrasi terlebih dahulu.
+              Yes, everyone is welcome by registering first.
             </p>
           </details>
           <details className="rounded-xl border bg-white p-4">
             <summary className="font-medium cursor-pointer">
-              Apakah ada biaya tiket?
+              Is there a ticket fee?
             </summary>
             <p className="mt-2 text-slate-600 text-sm">
-              Untuk workshop ada biaya pendaftaran, sedangkan recital & konser
-              utama gratis bagi keluarga siswa.
+              Workshops require a registration fee, while recitals and the main
+              concert are free for students' families.
             </p>
           </details>
           <details className="rounded-xl border bg-white p-4">
             <summary className="font-medium cursor-pointer">
-              Bagaimana cara mendaftar?
+              How do I register?
             </summary>
             <p className="mt-2 text-slate-600 text-sm">
-              Klik tombol “Daftar Sekarang” dan isi formulir yang tersedia.
+              Click the “Register Now” button and fill out the form.
             </p>
           </details>
         </div>

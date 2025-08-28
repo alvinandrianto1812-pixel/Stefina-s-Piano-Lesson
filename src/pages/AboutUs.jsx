@@ -16,54 +16,60 @@ export default function AboutUs() {
         />
         <div className="max-w-7xl mx-auto px-4 pt-24 pb-12 text-center">
           <h1 className="font-display text-4xl md:text-5xl leading-tight">
-            Tentang <span className="font-bold">Guru</span>Nada
+            About{" "}
+            <img
+              src="/brand/gurunada_final_green-03.png"
+              alt="GuruNada"
+              className="h-10 md:h-12 lg:h-24 inline-block"
+              draggable={false}
+            />
           </h1>
           <p className="mt-4 text-lg text-slate-700">
-            Misi kami: membuat pembelajaran musik yang elegan, terstruktur, dan
-            menyenangkan.
+            Our mission: to make music learning structured, elegant, and
+            enjoyable.
           </p>
         </div>
       </section>
 
-      {/* MISI & VISI */}
+      {/* MISSION & VISION */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-6">
           <div className="rounded-2xl p-6 border bg-white">
             <div className="text-brand-gold text-2xl mb-2">★</div>
-            <h2 className="font-semibold text-xl mb-2">Misi</h2>
+            <h2 className="font-semibold text-xl mb-2">Mission</h2>
             <p className="text-slate-700 text-sm">
-              Menghadirkan ekosistem belajar musik yang berfokus pada fondasi
-              teknik, pemahaman teori, dan kepercayaan diri panggung—berbasis
-              kurikulum yang dapat ditelusuri progresnya.
+              To create a learning ecosystem focused on solid technique,
+              theoretical understanding, and performance confidence — all guided
+              by a clear and trackable curriculum.
             </p>
           </div>
           <div className="rounded-2xl p-6 border bg-white">
             <div className="text-brand-gold text-2xl mb-2">★</div>
-            <h2 className="font-semibold text-xl mb-2">Visi</h2>
+            <h2 className="font-semibold text-xl mb-2">Vision</h2>
             <p className="text-slate-700 text-sm">
-              Menjadi partner perjalanan musik keluarga Indonesia dengan standar
-              pengajaran modern, teknologi yang membantu, dan komunitas yang
-              suportif.
+              To become the trusted partner for families in Indonesia on their
+              music journey — supported by modern teaching standards, helpful
+              technology, and a nurturing community.
             </p>
           </div>
         </div>
       </section>
 
-      {/* CERITA & PENDekatan */}
+      {/* STORY & APPROACH */}
       <section className="py-16 bg-gradient-to-b from-white to-brand-soft/40">
         <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-3 gap-6">
           {[
             {
-              t: "Cerita Kami",
-              d: "Berawal dari kelas privat kecil, berkembang menjadi platform pembelajaran dengan pengajar lintas instrumen.",
+              t: "Our Story",
+              d: "Started as a small private class, growing into a platform with teachers across instruments.",
             },
             {
-              t: "Pendekatan",
-              d: "Kombinasi teknik, teori, dan perform—dibungkus target mingguan yang jelas dan terukur.",
+              t: "Our Approach",
+              d: "A mix of technique, theory, and performance — packaged into weekly measurable goals.",
             },
             {
-              t: "Komitmen Kualitas",
-              d: "Kurasi pengajar, review berkala, dan materi yang selalu diperbarui.",
+              t: "Commitment to Quality",
+              d: "Curated teachers, regular reviews, and constantly updated materials.",
             },
           ].map((f, i) => (
             <div
@@ -78,24 +84,25 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* FAQ SINGKAT */}
+      {/* FAQ */}
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4 space-y-6">
           <details className="rounded-xl border bg-white p-4">
             <summary className="font-medium cursor-pointer">
-              Apa yang membedakan GuruNada?
+              What makes gurunada different?
             </summary>
             <p className="mt-2 text-slate-600 text-sm">
-              Kurikulum progresif, tracking perkembangan, dan kesempatan tampil
-              rutin.
+              A progressive curriculum, measurable tracking, and regular
+              performance opportunities.
             </p>
           </details>
           <details className="rounded-xl border bg-white p-4">
             <summary className="font-medium cursor-pointer">
-              Apakah tersedia kelas online dan offline?
+              Do you offer both online and offline classes?
             </summary>
             <p className="mt-2 text-slate-600 text-sm">
-              Tersedia keduanya sesuai jadwal dan instrumen.
+              Yes, both options are available depending on the instrument and
+              schedule.
             </p>
           </details>
         </div>
