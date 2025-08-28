@@ -96,10 +96,10 @@ export default function Navbar() {
             {[
               { to: "/", label: "Home" },
               { to: "/Events", label: "Event" },
-              { to: "/Questionnaire", label: "Registration", hash: true },
+              { to: "/Questionnaire", label: "Registration" },
               { to: "/OurTeachers", label: "Our Teachers" },
-              { to: "/AboutUs", label: "About Us", hash: true },
-              { to: "/ContactUs", label: "Contact Us", hash: true },
+              { to: "/AboutUs", label: "About Us" },
+              { to: "/ContactUs", label: "Contact Us" },
             ].map((item) => {
               const active = isActive(item.to);
               return (
