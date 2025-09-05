@@ -302,38 +302,6 @@ export default function Admin() {
           </table>
         </div>
       </section>
-
-      {/* Slot */}
-      <section>
-        <h2 className="text-xl font-semibold mb-3">Semua Slot</h2>
-        <div className="overflow-x-auto border rounded-lg">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-100">
-              <tr>
-                <th className="p-2 border">Waktu</th>
-                <th className="p-2 border">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {slots.map((s) => (
-                <tr key={s.id} className="odd:bg-white even:bg-slate-50">
-                  <td className="p-2 border">{fmtWaktu(s.slot_datetime)}</td>
-                  <td className="p-2 border">
-                    {s.is_booked ? "Sudah Dibooking" : "Tersedia"}
-                  </td>
-                </tr>
-              ))}
-              {slots.length === 0 && (
-                <tr>
-                  <td colSpan={2} className="p-4 text-center text-slate-500">
-                    Belum ada slot.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
     </div>
   );
 }
