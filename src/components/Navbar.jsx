@@ -95,10 +95,10 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-2">
             {[
               { to: "/", label: "Home" },
-              { to: "/Events", label: "Event" },
-              { to: "/Questionnaire", label: "Registration" },
-              { to: "/OurTeachers", label: "Our Teachers" },
               { to: "/AboutUs", label: "About Us" },
+              { to: "/OurTeachers", label: "Our Teachers" },
+              { to: "/Questionnaire", label: "Registration" },
+              { to: "/Events", label: "Event" },
               { to: "/ContactUs", label: "Contact Us" },
             ].map((item) => {
               const active = isActive(item.to);
