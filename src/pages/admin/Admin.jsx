@@ -24,6 +24,7 @@ export default function Admin() {
       }
       setMe(user);
 
+      // Cek role admin
       let role = null;
       if (user.email) {
         const { data } = await supabase
@@ -41,7 +42,6 @@ export default function Admin() {
           .maybeSingle();
         role = data?.role || null;
       }
-
       if (role !== "admin") {
         alert("Anda bukan admin.");
         navigate("/");
@@ -66,6 +66,7 @@ export default function Admin() {
           .from("available_slots")
           .select("*")
           .order("slot_datetime", { ascending: true }),
+        // Pastikan tabel questionnaire sudah punya: father_name, mother_name, student_full_name, instrument
         supabase.from("questionnaire").select("*"),
       ]);
     setPayments(pmt || []);
@@ -75,27 +76,60 @@ export default function Admin() {
     setLoading(false);
   };
 
+  // Map: booking id -> booking
   const bookingsById = useMemo(() => {
     const m = new Map();
     bookings.forEach((b) => m.set(b.id, b));
     return m;
   }, [bookings]);
 
+  // Map: slot id -> slot
   const slotById = useMemo(() => {
     const m = new Map();
     slots.forEach((s) => m.set(s.id, s));
     return m;
   }, [slots]);
 
-  const questionnaireByUser = useMemo(() => {
+  // Simpan SEMUA questionnaire per user (diurutkan terbaru -> terlama)
+  const questionnairesByUser = useMemo(() => {
     const map = new Map();
-    questionnaires
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-      .forEach((q) => {
-        if (!map.has(q.user_id)) map.set(q.user_id, q);
-      });
+    const sorted = [...questionnaires].sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
+    for (const q of sorted) {
+      const arr = map.get(q.user_id) || [];
+      arr.push(q);
+      map.set(q.user_id, arr);
+    }
     return map;
   }, [questionnaires]);
+
+  // Pilih questionnaire yg paling relevan utk 1 baris pembayaran
+  const pickQuestionnaire = (userId, booking, payment) => {
+    const arr = questionnairesByUser.get(userId);
+    if (!arr || arr.length === 0) return null;
+
+    // 1) Cocokkan preferred_slot_id dengan slot booking (jika pengisian form memilih slot)
+    if (booking?.slot_id) {
+      const matchBySlot = arr.find(
+        (q) => q.preferred_slot_id && q.preferred_slot_id === booking.slot_id
+      );
+      if (matchBySlot) return matchBySlot;
+    }
+
+    // 2) Ambil questionnaire terakhir yang dibuat SEBELUM/SAAT payment
+    const cutoff =
+      (payment?.created_at && new Date(payment.created_at)) ||
+      (booking?.created_at && new Date(booking.created_at)) ||
+      null;
+    if (cutoff) {
+      const asOf = arr.find((q) => new Date(q.created_at) <= cutoff);
+      if (asOf) return asOf;
+    }
+
+    // 3) Fallback: paling baru
+    return arr[0];
+  };
 
   const fmtWaktu = (iso) =>
     new Date(iso).toLocaleString("id-ID", {
@@ -193,6 +227,7 @@ export default function Admin() {
                 <th className="p-2 border">Tanggal</th>
                 <th className="p-2 border">Orang Tua</th>
                 <th className="p-2 border">Anak</th>
+                <th className="p-2 border">Instrumen</th>
                 <th className="p-2 border">Jadwal</th>
                 <th className="p-2 border">Nominal</th>
                 <th className="p-2 border">Status</th>
@@ -203,7 +238,7 @@ export default function Admin() {
             <tbody>
               {payments.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="p-4 text-center text-slate-500">
+                  <td colSpan={9} className="p-4 text-center text-slate-500">
                     Belum ada pembayaran.
                   </td>
                 </tr>
@@ -211,27 +246,50 @@ export default function Admin() {
                 payments.map((p) => {
                   const b = bookingsById.get(p.booking_id);
                   const s = b ? slotById.get(b.slot_id) : null;
-                  const q = questionnaireByUser.get(p.user_id);
+
+                  // Pilih questionnaire yg tepat utk baris ini
+                  const q = pickQuestionnaire(p.user_id, b, p);
+
+                  // Gabungkan ayah + ibu
+                  const parentName =
+                    [q?.father_name, q?.mother_name]
+                      .filter(Boolean)
+                      .join(" & ") || "-";
+
                   return (
                     <tr key={p.id} className="odd:bg-white even:bg-slate-50">
+                      {/* Tanggal dari payments.created_at */}
                       <td className="p-2 border align-top">
                         {new Date(p.created_at).toLocaleString("id-ID")}
                       </td>
+
+                      {/* Orang tua: Ayah & Ibu */}
+                      <td className="p-2 border align-top">{parentName}</td>
+
+                      {/* Anak: student_full_name */}
                       <td className="p-2 border align-top">
-                        {q?.parent_name || "-"}
+                        {q?.student_full_name || "-"}
                       </td>
+
+                      {/* Instrumen */}
                       <td className="p-2 border align-top">
-                        {q?.child_name || "-"}
+                        {q?.instrument || "-"}
                       </td>
+
+                      {/* Jadwal dari slot.slot_datetime via booking.slot_id */}
                       <td className="p-2 border align-top">
                         {s ? fmtWaktu(s.slot_datetime) : "-"}
                         <div className="text-xs text-slate-500">
                           Booking: {b?.status || "-"}
                         </div>
                       </td>
+
+                      {/* Nominal dari payments.amount */}
                       <td className="p-2 border align-top">
                         Rp {Number(p.amount || 0).toLocaleString("id-ID")}
                       </td>
+
+                      {/* Status pembayaran */}
                       <td className="p-2 border align-top">
                         <span
                           className={
@@ -246,6 +304,8 @@ export default function Admin() {
                           {p.status}
                         </span>
                       </td>
+
+                      {/* Bukti */}
                       <td className="p-2 border align-top">
                         {p.proof_url ? (
                           <a
@@ -260,6 +320,8 @@ export default function Admin() {
                           "-"
                         )}
                       </td>
+
+                      {/* Aksi */}
                       <td className="p-2 border align-top space-x-2">
                         <button
                           disabled={
