@@ -53,29 +53,50 @@ export default function Admin() {
 
   const fetchAll = async () => {
     setLoading(true);
-    const [{ data: pmt }, { data: qst }] = await Promise.all([
-      supabase
-        .from("payments")
-        .select("*")
-        .order("created_at", { ascending: false }),
-      // ambil semua field yg dibutuhkan dari questionnaire
-      supabase.from("questionnaire").select("*"),
-    ]);
+    const [{ data: pmt, error: e1 }, { data: qst, error: e2 }] =
+      await Promise.all([
+        supabase
+          .from("payments")
+          .select("*")
+          .order("created_at", { ascending: false }),
+        supabase.from("questionnaire").select("*"),
+      ]);
+
+    if (e1) console.error("payments error:", e1);
+    if (e2) console.error("questionnaire error:", e2);
+
     setPayments(pmt || []);
     setQuestionnaires(qst || []);
     setLoading(false);
   };
 
-  // Ambil questionnaire TERBARU per user (biar konsisten)
-  const questionnaireByUser = useMemo(() => {
-    const map = new Map();
+  // Map: questionnaire id -> questionnaire
+  const questionnaireById = useMemo(() => {
+    const m = new Map();
+    questionnaires.forEach((q) => m.set(q.id, q));
+    return m;
+  }, [questionnaires]);
+
+  // (Opsional) fallback: kumpulkan questionnaire per user (terbaru → terlama)
+  const questionnairesByUserSorted = useMemo(() => {
+    const g = new Map();
     [...questionnaires]
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
       .forEach((q) => {
-        if (!map.has(q.user_id)) map.set(q.user_id, q);
+        const arr = g.get(q.user_id) || [];
+        arr.push(q);
+        g.set(q.user_id, arr);
       });
-    return map;
+    return g;
   }, [questionnaires]);
+
+  // Fallback memilih questionnaire "as-of" waktu payment (jika p.questionnaire_id null)
+  const pickQAsOf = (userId, paidAt) => {
+    const arr = questionnairesByUserSorted.get(userId);
+    if (!arr) return null;
+    const cutoff = new Date(paidAt);
+    return arr.find((q) => new Date(q.created_at) <= cutoff) || arr[0] || null;
+  };
 
   // Format prefered_day + prefered_time
   const fmtPreferredSchedule = (dayRaw, timeRaw) => {
@@ -108,7 +129,7 @@ export default function Admin() {
     const hari = mapHari[(day || "").toLowerCase()] || day || "";
     const parts = [];
     if (hari) parts.push(hari);
-    if (time) parts.push(time); // contoh: "13:00–14:00"
+    if (time) parts.push(time); // contoh: "13:00"
     return parts.join(", ");
   };
 
@@ -180,11 +201,19 @@ export default function Admin() {
                 </tr>
               ) : (
                 payments.map((p) => {
-                  const q = questionnaireByUser.get(p.user_id); // langsung dari questionnaire
+                  // Ambil questionnaire via questionnaire_id (utama)
+                  let q = p.questionnaire_id
+                    ? questionnaireById.get(p.questionnaire_id)
+                    : null;
+
+                  // Fallback (untuk data lama yg belum link): as-of payment time
+                  if (!q) q = pickQAsOf(p.user_id, p.created_at);
+
                   const parentName =
                     [q?.father_name, q?.mother_name]
                       .filter(Boolean)
                       .join(" & ") || "-";
+
                   const preferred = q
                     ? fmtPreferredSchedule(q.preferred_day, q.preferred_time)
                     : "";
@@ -197,7 +226,14 @@ export default function Admin() {
                       </td>
 
                       {/* Orang tua */}
-                      <td className="p-2 border align-top">{parentName}</td>
+                      <td className="p-2 border align-top">
+                        {parentName}
+                        {!p.questionnaire_id && (
+                          <div className="text-[10px] text-slate-500">
+                            (not linked)
+                          </div>
+                        )}
+                      </td>
 
                       {/* Anak */}
                       <td className="p-2 border align-top">
@@ -209,7 +245,7 @@ export default function Admin() {
                         {q?.instrument || "-"}
                       </td>
 
-                      {/* Jadwal dari questionnaire.prefered_day + prefered_time */}
+                      {/* Jadwal dari questionnaire.preferred_day/time */}
                       <td className="p-2 border align-top">
                         {preferred || "-"}
                       </td>
@@ -275,7 +311,6 @@ export default function Admin() {
                         >
                           Tolak
                         </button>
-                        {/* Tidak ada tombol Batalkan karena tidak pakai bookings/slots */}
                       </td>
                     </tr>
                   );

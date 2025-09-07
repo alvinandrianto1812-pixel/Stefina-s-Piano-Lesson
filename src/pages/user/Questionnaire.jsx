@@ -282,6 +282,7 @@ export default function Questionnaire() {
         },
       };
 
+      // 1) insert questionnaire
       const { data: q, error: qErr } = await supabase
         .from("questionnaire")
         .insert([payload])
@@ -289,26 +290,11 @@ export default function Questionnaire() {
         .single();
       if (qErr) throw qErr;
 
-      // Optional booking request
-      const { data: booking, error: bErr } = await supabase
-        .from("bookings")
-        .insert([
-          {
-            user_id: user.id,
-            status: "pending",
-            requested_day: form.preferred_day,
-            requested_time: form.preferred_time,
-          },
-        ])
-        .select()
-        .single();
-      if (bErr)
-        console.warn("[Optional] booking insert warning:", bErr.message);
-
+      // 3) insert payment + TAUTKAN questionnaire_id
       const { error: pErr } = await supabase.from("payments").insert([
         {
           user_id: user.id,
-          booking_id: booking?.id || null,
+          questionnaire_id: q.id, // atau 'questionare_id' kalau kolommu namanya itu
           amount: 500000,
           proof_url: proofUrl,
           status: "pending",
@@ -316,6 +302,7 @@ export default function Questionnaire() {
       ]);
       if (pErr) throw pErr;
 
+      // Redirect WA
       const msg =
         `Hello Admin, I have completed the questionnaire and uploaded the payment proof.\n` +
         `Student: ${form.student_full_name} (Age ${form.student_age})\n` +
