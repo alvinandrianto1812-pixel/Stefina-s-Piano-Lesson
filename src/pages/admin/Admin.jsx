@@ -9,8 +9,6 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
 
   const [payments, setPayments] = useState([]);
-  const [bookings, setBookings] = useState([]);
-  const [slots, setSlots] = useState([]);
   const [questionnaires, setQuestionnaires] = useState([]);
 
   useEffect(() => {
@@ -24,7 +22,7 @@ export default function Admin() {
       }
       setMe(user);
 
-      // Cek role admin
+      // cek role admin
       let role = null;
       if (user.email) {
         const { data } = await supabase
@@ -55,117 +53,75 @@ export default function Admin() {
 
   const fetchAll = async () => {
     setLoading(true);
-    const [{ data: pmt }, { data: bkg }, { data: slt }, { data: qst }] =
-      await Promise.all([
-        supabase
-          .from("payments")
-          .select("*")
-          .order("created_at", { ascending: false }),
-        supabase.from("bookings").select("*"),
-        supabase
-          .from("available_slots")
-          .select("*")
-          .order("slot_datetime", { ascending: true }),
-        // Pastikan tabel questionnaire sudah punya: father_name, mother_name, student_full_name, instrument
-        supabase.from("questionnaire").select("*"),
-      ]);
+    const [{ data: pmt }, { data: qst }] = await Promise.all([
+      supabase
+        .from("payments")
+        .select("*")
+        .order("created_at", { ascending: false }),
+      // ambil semua field yg dibutuhkan dari questionnaire
+      supabase.from("questionnaire").select("*"),
+    ]);
     setPayments(pmt || []);
-    setBookings(bkg || []);
-    setSlots(slt || []);
     setQuestionnaires(qst || []);
     setLoading(false);
   };
 
-  // Map: booking id -> booking
-  const bookingsById = useMemo(() => {
-    const m = new Map();
-    bookings.forEach((b) => m.set(b.id, b));
-    return m;
-  }, [bookings]);
-
-  // Map: slot id -> slot
-  const slotById = useMemo(() => {
-    const m = new Map();
-    slots.forEach((s) => m.set(s.id, s));
-    return m;
-  }, [slots]);
-
-  // Simpan SEMUA questionnaire per user (diurutkan terbaru -> terlama)
-  const questionnairesByUser = useMemo(() => {
+  // Ambil questionnaire TERBARU per user (biar konsisten)
+  const questionnaireByUser = useMemo(() => {
     const map = new Map();
-    const sorted = [...questionnaires].sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at)
-    );
-    for (const q of sorted) {
-      const arr = map.get(q.user_id) || [];
-      arr.push(q);
-      map.set(q.user_id, arr);
-    }
+    [...questionnaires]
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .forEach((q) => {
+        if (!map.has(q.user_id)) map.set(q.user_id, q);
+      });
     return map;
   }, [questionnaires]);
 
-  // Pilih questionnaire yg paling relevan utk 1 baris pembayaran
-  const pickQuestionnaire = (userId, booking, payment) => {
-    const arr = questionnairesByUser.get(userId);
-    if (!arr || arr.length === 0) return null;
+  // Format prefered_day + prefered_time
+  const fmtPreferredSchedule = (dayRaw, timeRaw) => {
+    const day = (dayRaw ?? "").toString().trim();
+    const time = (timeRaw ?? "").toString().trim();
 
-    // 1) Cocokkan preferred_slot_id dengan slot booking (jika pengisian form memilih slot)
-    if (booking?.slot_id) {
-      const matchBySlot = arr.find(
-        (q) => q.preferred_slot_id && q.preferred_slot_id === booking.slot_id
-      );
-      if (matchBySlot) return matchBySlot;
-    }
-
-    // 2) Ambil questionnaire terakhir yang dibuat SEBELUM/SAAT payment
-    const cutoff =
-      (payment?.created_at && new Date(payment.created_at)) ||
-      (booking?.created_at && new Date(booking.created_at)) ||
-      null;
-    if (cutoff) {
-      const asOf = arr.find((q) => new Date(q.created_at) <= cutoff);
-      if (asOf) return asOf;
-    }
-
-    // 3) Fallback: paling baru
-    return arr[0];
+    const mapHari = {
+      mon: "Senin",
+      monday: "Senin",
+      senin: "Senin",
+      tue: "Selasa",
+      tuesday: "Selasa",
+      selasa: "Selasa",
+      wed: "Rabu",
+      wednesday: "Rabu",
+      rabu: "Rabu",
+      thu: "Kamis",
+      thursday: "Kamis",
+      kamis: "Kamis",
+      fri: "Jumat",
+      friday: "Jumat",
+      jumat: "Jumat",
+      sat: "Sabtu",
+      saturday: "Sabtu",
+      sabtu: "Sabtu",
+      sun: "Minggu",
+      sunday: "Minggu",
+      minggu: "Minggu",
+    };
+    const hari = mapHari[(day || "").toLowerCase()] || day || "";
+    const parts = [];
+    if (hari) parts.push(hari);
+    if (time) parts.push(time); // contoh: "13:00–14:00"
+    return parts.join(", ");
   };
 
-  const fmtWaktu = (iso) =>
-    new Date(iso).toLocaleString("id-ID", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-
-  const verifyPayment = async (paymentId, bookingId, slotId) => {
-    if (!bookingId || !slotId) {
-      alert("Data booking/slot tidak lengkap.");
-      return;
-    }
+  const verifyPayment = async (paymentId) => {
     if (!confirm("Verifikasi pembayaran ini?")) return;
-
-    const results = await Promise.all([
-      supabase
-        .from("payments")
-        .update({ status: "verified" })
-        .eq("id", paymentId),
-      supabase
-        .from("bookings")
-        .update({ status: "confirmed" })
-        .eq("id", bookingId),
-      supabase
-        .from("available_slots")
-        .update({ is_booked: true })
-        .eq("id", slotId),
-    ]);
-    const err = results.find((r) => r.error)?.error;
-    if (err) alert("Gagal verifikasi: " + err.message);
+    const { error } = await supabase
+      .from("payments")
+      .update({ status: "verified" })
+      .eq("id", paymentId);
+    if (error) alert("Gagal verifikasi: " + error.message);
     else {
       await fetchAll();
-      alert("Pembayaran terverifikasi & booking dikonfirmasi.");
+      alert("Pembayaran terverifikasi.");
     }
   };
 
@@ -179,26 +135,6 @@ export default function Admin() {
     else {
       await fetchAll();
       alert("Pembayaran ditolak.");
-    }
-  };
-
-  const cancelBooking = async (bookingId, slotId) => {
-    if (!confirm("Batalkan booking ini dan buka kembali slot?")) return;
-    const results = await Promise.all([
-      supabase
-        .from("bookings")
-        .update({ status: "cancelled" })
-        .eq("id", bookingId),
-      supabase
-        .from("available_slots")
-        .update({ is_booked: false })
-        .eq("id", slotId),
-    ]);
-    const err = results.find((r) => r.error)?.error;
-    if (err) alert("Gagal membatalkan: " + err.message);
-    else {
-      await fetchAll();
-      alert("Booking dibatalkan & slot dibuka.");
     }
   };
 
@@ -244,17 +180,14 @@ export default function Admin() {
                 </tr>
               ) : (
                 payments.map((p) => {
-                  const b = bookingsById.get(p.booking_id);
-                  const s = b ? slotById.get(b.slot_id) : null;
-
-                  // Pilih questionnaire yg tepat utk baris ini
-                  const q = pickQuestionnaire(p.user_id, b, p);
-
-                  // Gabungkan ayah + ibu
+                  const q = questionnaireByUser.get(p.user_id); // langsung dari questionnaire
                   const parentName =
                     [q?.father_name, q?.mother_name]
                       .filter(Boolean)
                       .join(" & ") || "-";
+                  const preferred = q
+                    ? fmtPreferredSchedule(q.preferred_day, q.preferred_time)
+                    : "";
 
                   return (
                     <tr key={p.id} className="odd:bg-white even:bg-slate-50">
@@ -263,10 +196,10 @@ export default function Admin() {
                         {new Date(p.created_at).toLocaleString("id-ID")}
                       </td>
 
-                      {/* Orang tua: Ayah & Ibu */}
+                      {/* Orang tua */}
                       <td className="p-2 border align-top">{parentName}</td>
 
-                      {/* Anak: student_full_name */}
+                      {/* Anak */}
                       <td className="p-2 border align-top">
                         {q?.student_full_name || "-"}
                       </td>
@@ -276,12 +209,9 @@ export default function Admin() {
                         {q?.instrument || "-"}
                       </td>
 
-                      {/* Jadwal dari slot.slot_datetime via booking.slot_id */}
+                      {/* Jadwal dari questionnaire.prefered_day + prefered_time */}
                       <td className="p-2 border align-top">
-                        {s ? fmtWaktu(s.slot_datetime) : "-"}
-                        <div className="text-xs text-slate-500">
-                          Booking: {b?.status || "-"}
-                        </div>
+                        {preferred || "-"}
                       </td>
 
                       {/* Nominal dari payments.amount */}
@@ -324,12 +254,10 @@ export default function Admin() {
                       {/* Aksi */}
                       <td className="p-2 border align-top space-x-2">
                         <button
-                          disabled={
-                            p.status === "verified" || !b?.id || !b?.slot_id
-                          }
-                          onClick={() => verifyPayment(p.id, b?.id, b?.slot_id)}
+                          disabled={p.status === "verified"}
+                          onClick={() => verifyPayment(p.id)}
                           className={`px-2 py-1 rounded ${
-                            p.status === "verified" || !b?.id || !b?.slot_id
+                            p.status === "verified"
                               ? "bg-slate-200 text-slate-500 cursor-not-allowed"
                               : "bg-green-500 text-white hover:bg-green-600"
                           }`}
@@ -347,14 +275,7 @@ export default function Admin() {
                         >
                           Tolak
                         </button>
-                        {b && (
-                          <button
-                            onClick={() => cancelBooking(b.id, b.slot_id)}
-                            className="px-2 py-1 rounded bg-amber-500 text-white hover:bg-amber-600"
-                          >
-                            Batalkan
-                          </button>
-                        )}
+                        {/* Tidak ada tombol Batalkan karena tidak pakai bookings/slots */}
                       </td>
                     </tr>
                   );
