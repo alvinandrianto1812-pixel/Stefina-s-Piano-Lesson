@@ -33,7 +33,7 @@ export default function LandingPage() {
     }
   }, [location]);
 
-  const handleBook = () => navigate("/questionnaire");
+  const handleBook = () => navigate("/Questionnaire");
 
   return (
     // Dasar halaman: cream (agar tidak “menabrak” navbar)

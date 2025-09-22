@@ -9,8 +9,6 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
 
   const [payments, setPayments] = useState([]);
-  const [bookings, setBookings] = useState([]);
-  const [slots, setSlots] = useState([]);
   const [questionnaires, setQuestionnaires] = useState([]);
 
   useEffect(() => {
@@ -24,6 +22,7 @@ export default function Admin() {
       }
       setMe(user);
 
+      // cek role admin
       let role = null;
       if (user.email) {
         const { data } = await supabase
@@ -41,7 +40,6 @@ export default function Admin() {
           .maybeSingle();
         role = data?.role || null;
       }
-
       if (role !== "admin") {
         alert("Anda bukan admin.");
         navigate("/");
@@ -55,83 +53,96 @@ export default function Admin() {
 
   const fetchAll = async () => {
     setLoading(true);
-    const [{ data: pmt }, { data: bkg }, { data: slt }, { data: qst }] =
+    const [{ data: pmt, error: e1 }, { data: qst, error: e2 }] =
       await Promise.all([
         supabase
           .from("payments")
           .select("*")
           .order("created_at", { ascending: false }),
-        supabase.from("bookings").select("*"),
-        supabase
-          .from("available_slots")
-          .select("*")
-          .order("slot_datetime", { ascending: true }),
         supabase.from("questionnaire").select("*"),
       ]);
+
+    if (e1) console.error("payments error:", e1);
+    if (e2) console.error("questionnaire error:", e2);
+
     setPayments(pmt || []);
-    setBookings(bkg || []);
-    setSlots(slt || []);
     setQuestionnaires(qst || []);
     setLoading(false);
   };
 
-  const bookingsById = useMemo(() => {
+  // Map: questionnaire id -> questionnaire
+  const questionnaireById = useMemo(() => {
     const m = new Map();
-    bookings.forEach((b) => m.set(b.id, b));
+    questionnaires.forEach((q) => m.set(q.id, q));
     return m;
-  }, [bookings]);
-
-  const slotById = useMemo(() => {
-    const m = new Map();
-    slots.forEach((s) => m.set(s.id, s));
-    return m;
-  }, [slots]);
-
-  const questionnaireByUser = useMemo(() => {
-    const map = new Map();
-    questionnaires
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-      .forEach((q) => {
-        if (!map.has(q.user_id)) map.set(q.user_id, q);
-      });
-    return map;
   }, [questionnaires]);
 
-  const fmtWaktu = (iso) =>
-    new Date(iso).toLocaleString("id-ID", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  // (Opsional) fallback: kumpulkan questionnaire per user (terbaru → terlama)
+  const questionnairesByUserSorted = useMemo(() => {
+    const g = new Map();
+    [...questionnaires]
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .forEach((q) => {
+        const arr = g.get(q.user_id) || [];
+        arr.push(q);
+        g.set(q.user_id, arr);
+      });
+    return g;
+  }, [questionnaires]);
 
-  const verifyPayment = async (paymentId, bookingId, slotId) => {
-    if (!bookingId || !slotId) {
-      alert("Data booking/slot tidak lengkap.");
-      return;
-    }
+  // Fallback memilih questionnaire "as-of" waktu payment (jika p.questionnaire_id null)
+  const pickQAsOf = (userId, paidAt) => {
+    const arr = questionnairesByUserSorted.get(userId);
+    if (!arr) return null;
+    const cutoff = new Date(paidAt);
+    return arr.find((q) => new Date(q.created_at) <= cutoff) || arr[0] || null;
+  };
+
+  // Format prefered_day + prefered_time
+  const fmtPreferredSchedule = (dayRaw, timeRaw) => {
+    const day = (dayRaw ?? "").toString().trim();
+    const time = (timeRaw ?? "").toString().trim();
+
+    const mapHari = {
+      mon: "Senin",
+      monday: "Senin",
+      senin: "Senin",
+      tue: "Selasa",
+      tuesday: "Selasa",
+      selasa: "Selasa",
+      wed: "Rabu",
+      wednesday: "Rabu",
+      rabu: "Rabu",
+      thu: "Kamis",
+      thursday: "Kamis",
+      kamis: "Kamis",
+      fri: "Jumat",
+      friday: "Jumat",
+      jumat: "Jumat",
+      sat: "Sabtu",
+      saturday: "Sabtu",
+      sabtu: "Sabtu",
+      sun: "Minggu",
+      sunday: "Minggu",
+      minggu: "Minggu",
+    };
+    const hari = mapHari[(day || "").toLowerCase()] || day || "";
+    const parts = [];
+    if (hari) parts.push(hari);
+    if (time) parts.push(time); // contoh: "13:00"
+    return parts.join(", ");
+  };
+
+  const verifyPayment = async (paymentId) => {
     if (!confirm("Verifikasi pembayaran ini?")) return;
-
-    const results = await Promise.all([
-      supabase
-        .from("payments")
-        .update({ status: "verified" })
-        .eq("id", paymentId),
-      supabase
-        .from("bookings")
-        .update({ status: "confirmed" })
-        .eq("id", bookingId),
-      supabase
-        .from("available_slots")
-        .update({ is_booked: true })
-        .eq("id", slotId),
-    ]);
-    const err = results.find((r) => r.error)?.error;
-    if (err) alert("Gagal verifikasi: " + err.message);
+    const { error } = await supabase
+      .from("payments")
+      .update({ status: "verified" })
+      .eq("id", paymentId);
+    if (error) alert("Gagal verifikasi: " + error.message);
     else {
       await fetchAll();
-      alert("Pembayaran terverifikasi & booking dikonfirmasi.");
+      alert("Pembayaran terverifikasi.");
     }
   };
 
@@ -145,26 +156,6 @@ export default function Admin() {
     else {
       await fetchAll();
       alert("Pembayaran ditolak.");
-    }
-  };
-
-  const cancelBooking = async (bookingId, slotId) => {
-    if (!confirm("Batalkan booking ini dan buka kembali slot?")) return;
-    const results = await Promise.all([
-      supabase
-        .from("bookings")
-        .update({ status: "cancelled" })
-        .eq("id", bookingId),
-      supabase
-        .from("available_slots")
-        .update({ is_booked: false })
-        .eq("id", slotId),
-    ]);
-    const err = results.find((r) => r.error)?.error;
-    if (err) alert("Gagal membatalkan: " + err.message);
-    else {
-      await fetchAll();
-      alert("Booking dibatalkan & slot dibuka.");
     }
   };
 
@@ -193,6 +184,7 @@ export default function Admin() {
                 <th className="p-2 border">Tanggal</th>
                 <th className="p-2 border">Orang Tua</th>
                 <th className="p-2 border">Anak</th>
+                <th className="p-2 border">Instrumen</th>
                 <th className="p-2 border">Jadwal</th>
                 <th className="p-2 border">Nominal</th>
                 <th className="p-2 border">Status</th>
@@ -203,35 +195,67 @@ export default function Admin() {
             <tbody>
               {payments.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="p-4 text-center text-slate-500">
+                  <td colSpan={9} className="p-4 text-center text-slate-500">
                     Belum ada pembayaran.
                   </td>
                 </tr>
               ) : (
                 payments.map((p) => {
-                  const b = bookingsById.get(p.booking_id);
-                  const s = b ? slotById.get(b.slot_id) : null;
-                  const q = questionnaireByUser.get(p.user_id);
+                  // Ambil questionnaire via questionnaire_id (utama)
+                  let q = p.questionnaire_id
+                    ? questionnaireById.get(p.questionnaire_id)
+                    : null;
+
+                  // Fallback (untuk data lama yg belum link): as-of payment time
+                  if (!q) q = pickQAsOf(p.user_id, p.created_at);
+
+                  const parentName =
+                    [q?.father_name, q?.mother_name]
+                      .filter(Boolean)
+                      .join(" & ") || "-";
+
+                  const preferred = q
+                    ? fmtPreferredSchedule(q.preferred_day, q.preferred_time)
+                    : "";
+
                   return (
                     <tr key={p.id} className="odd:bg-white even:bg-slate-50">
+                      {/* Tanggal dari payments.created_at */}
                       <td className="p-2 border align-top">
                         {new Date(p.created_at).toLocaleString("id-ID")}
                       </td>
+
+                      {/* Orang tua */}
                       <td className="p-2 border align-top">
-                        {q?.parent_name || "-"}
+                        {parentName}
+                        {!p.questionnaire_id && (
+                          <div className="text-[10px] text-slate-500">
+                            (not linked)
+                          </div>
+                        )}
                       </td>
+
+                      {/* Anak */}
                       <td className="p-2 border align-top">
-                        {q?.child_name || "-"}
+                        {q?.student_full_name || "-"}
                       </td>
+
+                      {/* Instrumen */}
                       <td className="p-2 border align-top">
-                        {s ? fmtWaktu(s.slot_datetime) : "-"}
-                        <div className="text-xs text-slate-500">
-                          Booking: {b?.status || "-"}
-                        </div>
+                        {q?.instrument || "-"}
                       </td>
+
+                      {/* Jadwal dari questionnaire.preferred_day/time */}
+                      <td className="p-2 border align-top">
+                        {preferred || "-"}
+                      </td>
+
+                      {/* Nominal dari payments.amount */}
                       <td className="p-2 border align-top">
                         Rp {Number(p.amount || 0).toLocaleString("id-ID")}
                       </td>
+
+                      {/* Status pembayaran */}
                       <td className="p-2 border align-top">
                         <span
                           className={
@@ -246,6 +270,8 @@ export default function Admin() {
                           {p.status}
                         </span>
                       </td>
+
+                      {/* Bukti */}
                       <td className="p-2 border align-top">
                         {p.proof_url ? (
                           <a
@@ -260,14 +286,14 @@ export default function Admin() {
                           "-"
                         )}
                       </td>
+
+                      {/* Aksi */}
                       <td className="p-2 border align-top space-x-2">
                         <button
-                          disabled={
-                            p.status === "verified" || !b?.id || !b?.slot_id
-                          }
-                          onClick={() => verifyPayment(p.id, b?.id, b?.slot_id)}
+                          disabled={p.status === "verified"}
+                          onClick={() => verifyPayment(p.id)}
                           className={`px-2 py-1 rounded ${
-                            p.status === "verified" || !b?.id || !b?.slot_id
+                            p.status === "verified"
                               ? "bg-slate-200 text-slate-500 cursor-not-allowed"
                               : "bg-green-500 text-white hover:bg-green-600"
                           }`}
@@ -285,50 +311,10 @@ export default function Admin() {
                         >
                           Tolak
                         </button>
-                        {b && (
-                          <button
-                            onClick={() => cancelBooking(b.id, b.slot_id)}
-                            className="px-2 py-1 rounded bg-amber-500 text-white hover:bg-amber-600"
-                          >
-                            Batalkan
-                          </button>
-                        )}
                       </td>
                     </tr>
                   );
                 })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      {/* Slot */}
-      <section>
-        <h2 className="text-xl font-semibold mb-3">Semua Slot</h2>
-        <div className="overflow-x-auto border rounded-lg">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-100">
-              <tr>
-                <th className="p-2 border">Waktu</th>
-                <th className="p-2 border">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {slots.map((s) => (
-                <tr key={s.id} className="odd:bg-white even:bg-slate-50">
-                  <td className="p-2 border">{fmtWaktu(s.slot_datetime)}</td>
-                  <td className="p-2 border">
-                    {s.is_booked ? "Sudah Dibooking" : "Tersedia"}
-                  </td>
-                </tr>
-              ))}
-              {slots.length === 0 && (
-                <tr>
-                  <td colSpan={2} className="p-4 text-center text-slate-500">
-                    Belum ada slot.
-                  </td>
-                </tr>
               )}
             </tbody>
           </table>

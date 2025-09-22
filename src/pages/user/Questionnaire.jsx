@@ -1,6 +1,5 @@
-// src/pages/Questionnaire.jsx (English version with Day/Time selectors)
-// Tweaks: remove placeholders for Gender/Day/Time, auto defaults, modern UI
-
+// src/pages/Questionnaire.jsx
+// English version with Day/Time selectors
 import React, { useEffect, useMemo, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +17,6 @@ const DAYS = [
 ];
 
 // ---------- UI ----------
-// Field putih murni + border 2px + shadow lembut + ring saat fokus
 const fieldInput =
   "w-full rounded-xl bg-white border-2 border-slate-200/80 px-4 py-3 " +
   "placeholder-slate-400 shadow-[0_1px_2px_rgba(0,0,0,0.04)] " +
@@ -30,12 +28,10 @@ const fieldSelect =
   "shadow-[0_1px_2px_rgba(0,0,0,0.04)] focus:outline-none " +
   "focus:border-amber-400 focus:ring-4 focus:ring-amber-200/60 transition";
 
-// Panel (card) untuk tiap section agar kontras jelas
 const panelClass =
   "rounded-2xl bg-[#FFF7EC] ring-1 ring-[#E8E0CC] " +
   "shadow-[0_8px_24px_rgba(16,24,40,0.06)] p-6 md:p-8";
 
-// Label yang lebih tegas & rapi
 const labelClass = "block text-sm font-medium text-slate-700 mb-1.5";
 
 const formatIDRDisplay = (n) => {
@@ -50,11 +46,11 @@ function timeOptions(day) {
   const slots = [];
   let startHour, endHour;
   if (day === "saturday") {
-    startHour = 9; // 09:00
-    endHour = 14; // 14:00
+    startHour = 9;
+    endHour = 14;
   } else {
-    startHour = 13; // 13:00
-    endHour = 18; // 18:00
+    startHour = 13;
+    endHour = 18;
   }
   for (let h = startHour; h <= endHour; h++) {
     const hh = String(h).padStart(2, "0");
@@ -76,9 +72,9 @@ export default function Questionnaire() {
   const [form, setForm] = useState({
     // Student
     student_full_name: "",
-    student_gender: "male", // default (no placeholder)
+    student_gender: "male",
     student_dob: "",
-    student_age: "", // auto computed
+    student_age: "",
     student_address: "",
     student_phone: "",
     student_email: "",
@@ -94,17 +90,17 @@ export default function Questionnaire() {
 
     // Instrument & schedule
     instrument: "Piano",
-    preferred_day: "monday", // default (no placeholder)
-    preferred_time: "", // will be set based on day
-    learned_before: "no", // yes/no
-    learned_duration: "", // NEW: will hold dropdown value
-    took_exam_before: "no", // yes/no
-    exam_type: "", // NEW: auto when took_exam_before=yes
-    exam_grade: "", // NEW: auto when took_exam_before=yes
+    preferred_day: "monday",
+    preferred_time: "",
+    learned_before: "no", // "yes" | "no" (UI)
+    learned_duration: "",
+    took_exam_before: "no", // "yes" | "no" (UI)
+    exam_type: "",
+    exam_grade: "",
 
-    // Payment
-    teacher_type: "junior", // NEW: junior | senior
-    amount: "1000000", // NEW: auto by teacher_type (readOnly)
+    // Payment (UI disembunyikan, tetap kirim ke DB)
+    teacher_type: "junior",
+    amount: "500000",
   });
 
   // Load auth
@@ -116,13 +112,12 @@ export default function Questionnaire() {
     })();
   }, [navigate]);
 
-  // Initialize preferred_time based on default day; keep it in sync when day changes
+  // Time options + default time per day
   const timeOpts = useMemo(
     () => timeOptions(form.preferred_day),
     [form.preferred_day]
   );
   useEffect(() => {
-    // if current time not valid or empty, set to first slot of the day
     if (
       !form.preferred_time ||
       !timeOpts.some((t) => t.value === form.preferred_time)
@@ -132,7 +127,7 @@ export default function Questionnaire() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.preferred_day, timeOpts]);
 
-  // Auto compute age from dob
+  // Auto compute age
   useEffect(() => {
     if (!form.student_dob) return;
     const dob = new Date(form.student_dob);
@@ -144,17 +139,23 @@ export default function Questionnaire() {
     setForm((s) => ({ ...s, student_age: String(Math.max(age, 0)) }));
   }, [form.student_dob]);
 
-  // NEW: default for learned_duration when user has learned before
+  // Learned before default/reset
   useEffect(() => {
     if (form.learned_before === "yes" && !form.learned_duration) {
       setForm((s) => ({ ...s, learned_duration: "< 6 months" }));
     }
     if (form.learned_before === "no") {
-      setForm((s) => ({ ...s, learned_duration: "" }));
+      setForm((s) => ({
+        ...s,
+        learned_duration: "",
+        took_exam_before: "no",
+        exam_type: "",
+        exam_grade: "",
+      }));
     }
   }, [form.learned_before]);
 
-  // NEW: default exam board/grade when user has taken exam before
+  // Exam default/reset
   useEffect(() => {
     if (form.took_exam_before === "yes") {
       setForm((s) => ({
@@ -167,10 +168,9 @@ export default function Questionnaire() {
     }
   }, [form.took_exam_before]);
 
-  // NEW: keep amount synced with teacher_type
+  // Keep amount fixed 500k
   useEffect(() => {
-    const price = form.teacher_type === "senior" ? 2000000 : 1000000;
-    setForm((s) => ({ ...s, amount: String(price) }));
+    setForm((s) => ({ ...s, amount: "500000" }));
   }, [form.teacher_type]);
 
   const isValid = useMemo(() => {
@@ -223,6 +223,7 @@ export default function Questionnaire() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (submitting) return; // guard anti double click
     if (!user) return navigate("/auth");
     if (!isValid)
       return alert(
@@ -233,15 +234,17 @@ export default function Questionnaire() {
     try {
       const proofUrl = await uploadProof(user.id);
 
-      // Store extended answers in questionnaire.extra (JSONB)
-      // Store answers persis ke kolom baru di tabel `questionnaire`
+      // Konversi ke boolean + fallback teks '-'
+      const learnedYes = form.learned_before === "yes";
+      const examYes = form.took_exam_before === "yes";
+
       const payload = {
         user_id: user.id,
 
         // Student
         student_full_name: form.student_full_name,
-        student_gender: form.student_gender, // "male" | "female"
-        student_dob: form.student_dob, // YYYY-MM-DD
+        student_gender: form.student_gender,
+        student_dob: form.student_dob,
         student_address: form.student_address || null,
         student_phone: form.student_phone,
         student_email: form.student_email || null,
@@ -257,24 +260,29 @@ export default function Questionnaire() {
 
         // Instrument & Schedule
         instrument: form.instrument,
-        preferred_day: form.preferred_day, // "monday" | ... | "saturday"
-        preferred_time: form.preferred_time, // "13:00" dst
-        learned_before: form.learned_before === "yes", // -> boolean
-        learned_duration: form.learned_duration || null, // "< 6 months" | "1–3 years" | "> 3 years" | null
-        took_exam_before: form.took_exam_before === "yes",
-        exam_type: form.took_exam_before === "yes" ? form.exam_type : null,
-        exam_grade: form.took_exam_before === "yes" ? form.exam_grade : null,
+        preferred_day: form.preferred_day,
+        preferred_time: form.preferred_time,
 
-        // Payment info (hanya untuk catatan di questionnaire; pembayaran tetap dicatat di tabel payments)
-        teacher_type: form.teacher_type, // "junior" | "senior"
-        amount: Number(form.amount),
+        // === BOOLEANS ===
+        learned_before: learnedYes,
+        took_exam_before: examYes,
 
-        // OPTIONAL: hapus `extra` kalau tidak ingin simpan JSON
+        // === TEXT dependents: '-' bila tidak relevan ===
+        learned_duration: learnedYes ? form.learned_duration : "-",
+        exam_type: examYes ? form.exam_type : "-",
+        exam_grade: examYes ? form.exam_grade : "-",
+
+        // Payment (disembunyikan di UI)
+        teacher_type: "junior",
+        amount: 500000,
+
+        // Optional JSON trail
         extra: {
           preferred: { day: form.preferred_day, time: form.preferred_time },
         },
       };
 
+      // 1) insert questionnaire
       const { data: q, error: qErr } = await supabase
         .from("questionnaire")
         .insert([payload])
@@ -282,40 +290,25 @@ export default function Questionnaire() {
         .single();
       if (qErr) throw qErr;
 
-      // Optional booking request (requested_day/time columns are optional)
-      const { data: booking, error: bErr } = await supabase
-        .from("bookings")
-        .insert([
-          {
-            user_id: user.id,
-            status: "pending",
-            requested_day: form.preferred_day,
-            requested_time: form.preferred_time,
-          },
-        ])
-        .select()
-        .single();
-      if (bErr)
-        console.warn("[Optional] booking insert warning:", bErr.message);
-
+      // 3) insert payment + TAUTKAN questionnaire_id
       const { error: pErr } = await supabase.from("payments").insert([
         {
           user_id: user.id,
-          booking_id: booking?.id || null,
-          amount: Number(form.amount), // fixed by teacher_type
+          questionnaire_id: q.id, // atau 'questionare_id' kalau kolommu namanya itu
+          amount: 500000,
           proof_url: proofUrl,
           status: "pending",
         },
       ]);
       if (pErr) throw pErr;
 
+      // Redirect WA
       const msg =
         `Hello Admin, I have completed the questionnaire and uploaded the payment proof.\n` +
         `Student: ${form.student_full_name} (Age ${form.student_age})\n` +
         `Instrument: ${form.instrument}\n` +
         `Preferred schedule: ${form.preferred_day}, ${form.preferred_time}\n` +
-        `Teacher: ${form.teacher_type === "senior" ? "Senior" : "Junior"}\n` + // NEW
-        `Amount: ${formatIDRDisplay(form.amount)}\n` +
+        `Amount: ${formatIDRDisplay(500000)}\n` +
         `Proof: ${proofUrl}`;
 
       window.location.href = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(
@@ -340,6 +333,7 @@ export default function Questionnaire() {
           and schedule your lessons.
         </p>
       </header>
+
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Student Info */}
         <section className={panelClass}>
@@ -349,7 +343,7 @@ export default function Questionnaire() {
               <label className={labelClass}>Student's Full Name</label>
               <input
                 name="student_full_name"
-                className={fieldInput} // UPDATED
+                className={fieldInput}
                 value={form.student_full_name}
                 onChange={onChange}
                 required
@@ -359,12 +353,11 @@ export default function Questionnaire() {
               <label className={labelClass}>Gender</label>
               <select
                 name="student_gender"
-                className={fieldSelect} // UPDATED
+                className={fieldSelect}
                 value={form.student_gender}
                 onChange={onChange}
                 required
               >
-                {/* no placeholder; defaults to male */}
                 <option value="male">Male</option>
                 <option value="female">Female</option>
               </select>
@@ -374,7 +367,7 @@ export default function Questionnaire() {
               <input
                 type="date"
                 name="student_dob"
-                className={fieldInput} // UPDATED
+                className={fieldInput}
                 value={form.student_dob}
                 onChange={onChange}
                 required
@@ -384,7 +377,7 @@ export default function Questionnaire() {
               <label className={labelClass}>Age (auto)</label>
               <input
                 readOnly
-                className={`${fieldInput} bg-gray-50`} // UPDATED
+                className={`${fieldInput} bg-gray-50`}
                 value={form.student_age}
               />
             </div>
@@ -392,7 +385,7 @@ export default function Questionnaire() {
               <label className={labelClass}>Address</label>
               <input
                 name="student_address"
-                className={fieldInput} // UPDATED
+                className={fieldInput}
                 value={form.student_address}
                 onChange={onChange}
               />
@@ -401,7 +394,7 @@ export default function Questionnaire() {
               <label className={labelClass}>Phone Number</label>
               <input
                 name="student_phone"
-                className={fieldInput} // UPDATED
+                className={fieldInput}
                 value={form.student_phone}
                 onChange={onChange}
                 required
@@ -412,7 +405,7 @@ export default function Questionnaire() {
               <input
                 type="email"
                 name="student_email"
-                className={fieldInput} // UPDATED
+                className={fieldInput}
                 value={form.student_email}
                 onChange={onChange}
               />
@@ -421,7 +414,7 @@ export default function Questionnaire() {
               <label className={labelClass}>Instagram</label>
               <input
                 name="student_instagram"
-                className={fieldInput} // UPDATED
+                className={fieldInput}
                 value={form.student_instagram}
                 onChange={onChange}
               />
@@ -437,7 +430,7 @@ export default function Questionnaire() {
               <label className={labelClass}>Father's Name</label>
               <input
                 name="father_name"
-                className={fieldInput} // UPDATED
+                className={fieldInput}
                 value={form.father_name}
                 onChange={onChange}
               />
@@ -446,7 +439,7 @@ export default function Questionnaire() {
               <label className={labelClass}>Father's Contact Number</label>
               <input
                 name="father_phone"
-                className={fieldInput} // UPDATED
+                className={fieldInput}
                 value={form.father_phone}
                 onChange={onChange}
               />
@@ -455,7 +448,7 @@ export default function Questionnaire() {
               <label className={labelClass}>Mother's Name</label>
               <input
                 name="mother_name"
-                className={fieldInput} // UPDATED
+                className={fieldInput}
                 value={form.mother_name}
                 onChange={onChange}
               />
@@ -464,7 +457,7 @@ export default function Questionnaire() {
               <label className={labelClass}>Mother's Contact Number</label>
               <input
                 name="mother_phone"
-                className={fieldInput} // UPDATED
+                className={fieldInput}
                 value={form.mother_phone}
                 onChange={onChange}
               />
@@ -474,7 +467,7 @@ export default function Questionnaire() {
               <input
                 type="email"
                 name="parents_email"
-                className={fieldInput} // UPDATED
+                className={fieldInput}
                 value={form.parents_email}
                 onChange={onChange}
               />
@@ -483,7 +476,7 @@ export default function Questionnaire() {
               <label className={labelClass}>Parent's Instagram</label>
               <input
                 name="parents_instagram"
-                className={fieldInput} // UPDATED
+                className={fieldInput}
                 value={form.parents_instagram}
                 onChange={onChange}
               />
@@ -499,7 +492,7 @@ export default function Questionnaire() {
               <label className={labelClass}>Instrument</label>
               <select
                 name="instrument"
-                className={fieldSelect} // UPDATED
+                className={fieldSelect}
                 value={form.instrument}
                 onChange={onChange}
               >
@@ -521,12 +514,11 @@ export default function Questionnaire() {
               <label className={labelClass}>Preferable Day</label>
               <select
                 name="preferred_day"
-                className={fieldSelect} // UPDATED
+                className={fieldSelect}
                 value={form.preferred_day}
                 onChange={onChange}
                 required
               >
-                {/* no placeholder; defaults to monday */}
                 {DAYS.map((d) => (
                   <option key={d.value} value={d.value}>
                     {d.label}
@@ -538,12 +530,11 @@ export default function Questionnaire() {
               <label className={labelClass}>Preferable Time</label>
               <select
                 name="preferred_time"
-                className={fieldSelect} // UPDATED
+                className={fieldSelect}
                 value={form.preferred_time}
                 onChange={onChange}
                 required
               >
-                {/* no placeholder; auto-filled based on day */}
                 {timeOpts.map((t) => (
                   <option key={t.value} value={t.value}>
                     {t.label}
@@ -558,7 +549,7 @@ export default function Questionnaire() {
               <label className={labelClass}>Have you learned before?</label>
               <select
                 name="learned_before"
-                className={fieldSelect} // UPDATED
+                className={fieldSelect}
                 value={form.learned_before}
                 onChange={onChange}
               >
@@ -569,7 +560,6 @@ export default function Questionnaire() {
             {form.learned_before === "yes" && (
               <div>
                 <label className={labelClass}>If yes, how long?</label>
-                {/* NEW: dropdown instead of free text */}
                 <select
                   name="learned_duration"
                   className={fieldSelect}
@@ -582,52 +572,59 @@ export default function Questionnaire() {
                 </select>
               </div>
             )}
-            <div>
-              <label className={labelClass}>
-                Have you taken an exam before?
-              </label>
-              <select
-                name="took_exam_before"
-                className={fieldSelect} // UPDATED
-                value={form.took_exam_before}
-                onChange={onChange}
-              >
-                <option value="no">No</option>
-                <option value="yes">Yes</option>
-              </select>
-            </div>
-            {form.took_exam_before === "yes" && (
+
+            {/* Exam section only when learned_before = yes */}
+            {form.learned_before === "yes" && (
               <>
                 <div>
-                  <label className={labelClass}>Which exam?</label>
+                  <label className={labelClass}>
+                    Have you taken an exam before?
+                  </label>
                   <select
-                    name="exam_type"
-                    className={fieldSelect} // UPDATED: no placeholder
-                    value={form.exam_type}
+                    name="took_exam_before"
+                    className={fieldSelect}
+                    value={form.took_exam_before}
                     onChange={onChange}
                   >
-                    {EXAM_TYPES.map((b) => (
-                      <option key={b} value={b}>
-                        {b}
-                      </option>
-                    ))}
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
                   </select>
                 </div>
-                <div>
-                  <label className={labelClass}>Exam Grade</label>
-                  <select
-                    name="exam_grade"
-                    className={fieldSelect} // UPDATED: no placeholder
-                    value={form.exam_grade}
-                    onChange={onChange}
-                  >
-                    {EXAM_GRADES.map((g) => (
-                      <option key={g} value={g}>
-                        {g}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+
+                {form.took_exam_before === "yes" && (
+                  <>
+                    <div>
+                      <label className={labelClass}>Which exam?</label>
+                      <select
+                        name="exam_type"
+                        className={fieldSelect}
+                        value={form.exam_type}
+                        onChange={onChange}
+                      >
+                        {EXAM_TYPES.map((b) => (
+                          <option key={b} value={b}>
+                            {b}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className={labelClass}>Exam Grade</label>
+                      <select
+                        name="exam_grade"
+                        className={fieldSelect}
+                        value={form.exam_grade}
+                        onChange={onChange}
+                      >
+                        {EXAM_GRADES.map((g) => (
+                          <option key={g} value={g}>
+                            {g}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </>
+                )}
               </>
             )}
           </div>
@@ -636,36 +633,6 @@ export default function Questionnaire() {
         {/* Payment & Proof */}
         <section className={panelClass}>
           <h2 className="text-xl font-medium mb-4">Payment</h2>
-
-          {/* NEW: Choose teacher type */}
-          <div className="mb-4">
-            <label className={labelClass}>Choose Teacher</label>
-            <div className="flex flex-wrap gap-6 md:justify-center">
-              <label className="inline-flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="teacher_type"
-                  value="junior"
-                  checked={form.teacher_type === "junior"}
-                  onChange={onChange}
-                  className="radio"
-                />
-                <span>Junior Teacher (Rp1.000.000)</span>
-              </label>
-              <label className="inline-flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="teacher_type"
-                  value="senior"
-                  checked={form.teacher_type === "senior"}
-                  onChange={onChange}
-                  className="radio"
-                />
-                <span>Senior Teacher (Rp2.000.000)</span>
-              </label>
-            </div>
-          </div>
-
           <div className="grid md:grid-cols-2 md:items-center gap-6">
             <div>
               <label className="block text-sm mb-1">Amount (IDR)</label>
@@ -676,9 +643,7 @@ export default function Questionnaire() {
                 value={formatIDRDisplay(form.amount)}
                 readOnly
               />
-              <p className="text-xs text-slate-500 mt-1">
-                Amount is set automatically based on teacher selection.
-              </p>
+              <p className="text-xs text-slate-500 mt-1">Fixed amount.</p>
             </div>
             <div>
               <label className={labelClass}>
@@ -689,10 +654,10 @@ export default function Questionnaire() {
                 accept="image/*,application/pdf"
                 onChange={onFile}
                 className="file-input file-input-bordered file-input-lg 
-             border-2 border-slate-200/80 bg-white
-             shadow-[0_1px_2px_rgba(0,0,0,0.04)]
-             focus:outline-none focus:border-amber-400
-             focus:ring-4 focus:ring-amber-200/60"
+                  border-2 border-slate-200/80 bg-white
+                  shadow-[0_1px_2px_rgba(0,0,0,0.04)]
+                  focus:outline-none focus:border-amber-400
+                  focus:ring-4 focus:ring-amber-200/60"
               />
             </div>
           </div>
@@ -702,20 +667,12 @@ export default function Questionnaire() {
           <button
             type="submit"
             disabled={submitting}
-            className="
-      inline-flex items-center justify-center
-      px-10 py-3 rounded-full
-      bg-gradient-to-r from-amber-500 to-amber-600
-      text-white font-semibold tracking-wide
-      shadow-[0_10px_20px_rgba(217,119,6,0.25)]
-      ring-1 ring-amber-400/40
-      hover:from-amber-600 hover:to-amber-700
-      hover:shadow-[0_14px_28px_rgba(217,119,6,0.35)]
-      active:scale-[0.98]
-      focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-300
-      disabled:opacity-70 disabled:cursor-not-allowed
-      transition
-    "
+            className="inline-flex items-center justify-center px-10 py-3 rounded-full
+                       bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold tracking-wide
+                       shadow-[0_10px_20px_rgba(217,119,6,0.25)] ring-1 ring-amber-400/40
+                       hover:from-amber-600 hover:to-amber-700 hover:shadow-[0_14px_28px_rgba(217,119,6,0.35)]
+                       active:scale-[0.98] focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-300
+                       disabled:opacity-70 disabled:cursor-not-allowed transition"
             title={!isValid ? "Please complete all required fields first." : ""}
           >
             {submitting ? "Submitting…" : "Submit Forms"}
