@@ -149,7 +149,7 @@ export default function Navbar() {
                 to="/auth"
                 className="ml-2 px-4 py-2 rounded-full bg-brand-gold text-white hover:opacity-90 shadow-luxe"
               >
-                Masuk / Daftar
+                Login / Register
               </Link>
             )}
           </div>

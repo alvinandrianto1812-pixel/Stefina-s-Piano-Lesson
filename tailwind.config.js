@@ -7,14 +7,14 @@ export default {
       // Tambahkan font brand di depan fallback lama
       fontFamily: {
         sans: [
-          "Creato Display",         // font body brand
+          "Creato Display", // font body brand
           "Inter",
           "ui-sans-serif",
           "system-ui",
           "sans-serif",
         ],
         display: [
-          "Rockdale FREE",          // font heading brand
+          "Rockdale FREE", // font heading brand
           "Playfair Display",
           "serif",
         ],
@@ -25,16 +25,16 @@ export default {
         brand: {
           // warna yang sudah ada — biarkan agar tidak merusak komponen lama
           gold: "#D4AF37",
-          dark: "#0F172A",   // BIARKAN. Jika ingin selaras total, ganti ke "#272925".
+          dark: "#0F172A", // BIARKAN. Jika ingin selaras total, ganti ke "#272925".
           soft: "#F7F3E8",
           ivory: "#FFFBF3",
 
           // 🎨 palette baru (tidak menimpa yang lama)
           cream: "#F8F6ED",
-          blush: "#D1A799",
+          gold: "#D1A799",
           olive: "#50553C",
-          brick: "#683730",
-          charcoal: "#272925", // alias untuk “dark” versi palette
+          wine: "#683730",
+          coal: "#272925", // alias untuk “dark” versi palette
         },
       },
 

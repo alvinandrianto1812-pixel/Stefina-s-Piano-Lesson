@@ -19,7 +19,7 @@ export default function Footer() {
             <span className="sr-only">GuruNada</span>
           </Link>
           <p className="text-sm opacity-80 leading-snug">
-            Belajar piano dari nol hingga mahir
+            Learn piano from scratch to mastery with our expert teachers.
           </p>
         </div>
 

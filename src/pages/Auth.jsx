@@ -60,7 +60,7 @@ export default function Auth() {
     if (q.get("confirmed") === "1") {
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session) navigate("/");
-        else setNotice("Email kamu sudah terverifikasi. Silakan login.");
+        else setNotice("Your email has been verified. Please log in.");
       });
     }
   }, [location.search, navigate]);
@@ -99,7 +99,7 @@ export default function Auth() {
           navigate("/");
         } else {
           setEmailSent(true);
-          alert("Akun dibuat! Cek email verifikasi, lalu login.");
+          alert("Account created! Check your verification email, then log in.");
         }
         return; // penting: stop di sini
       } else {
@@ -111,7 +111,7 @@ export default function Auth() {
         if (error) {
           if (/email not confirmed/i.test(error.message)) {
             alert(
-              "Email belum terverifikasi. Cek inbox/spam kamu, lalu klik link verifikasi."
+              "Your email has not been verified. Check your inbox/spam folder, then click the verification link."
             );
           } else {
             alert(error.message);
@@ -132,29 +132,29 @@ export default function Auth() {
         navigate("/");
       }
     } catch (err) {
-      alert(err.message || "Terjadi kesalahan");
+      alert(err.message || "An error occurred");
     } finally {
       setLoading(false);
     }
   };
 
   const handleResend = async () => {
-    if (!form.email) return alert("Isi email dulu.");
+    if (!form.email) return alert("Fill in the email first.");
     const { error } = await supabase.auth.resend({
       type: "signup",
       email: form.email,
     });
     if (error) return alert(error.message);
-    alert("Email verifikasi dikirim ulang. Cek inbox/spam.");
+    alert("Verification email resent. Check your inbox/spam folder.");
   };
 
   const handleForgot = async () => {
-    if (!form.email) return alert("Isi email yang terdaftar dahulu.");
+    if (!form.email) return alert("Fill in the registered email first.");
     const { error } = await supabase.auth.resetPasswordForEmail(form.email, {
       redirectTo: `${window.location.origin}/auth?reset=1`,
     });
     if (error) return alert(error.message);
-    alert("Tautan reset password telah dikirim ke email kamu.");
+    alert("Password reset link has been sent to your email.");
   };
 
   return (
@@ -195,12 +195,12 @@ export default function Auth() {
             </div>
           )}
           <h1 className="text-2xl mb-1">
-            {isSignUp ? "Buat Akun" : "Welcome back!"}
+            {isSignUp ? "Create Account" : "Welcome back!"}
           </h1>
           <p className="text-slate-600 mb-6">
             {isSignUp
-              ? "Daftar untuk mulai booking kelas."
-              : "Masuk untuk mengelola jadwal & booking."}
+              ? "Sign up to start booking classes."
+              : "Log in to manage your schedule & bookings."}
           </p>
 
           <form onSubmit={onSubmit} className="space-y-4">
