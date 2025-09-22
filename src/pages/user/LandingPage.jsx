@@ -27,14 +27,19 @@ export default function LandingPage() {
   return (
     // Base page: cream (so it doesn't clash with the navbar)
     <div
-      className="text-brand-coal bg-brand-cream"
+      className="text-brand-dark bg-[#F8F6ED]"
       style={{
         fontFamily:
           '"Creato Display", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial',
       }}
     >
       {/* HERO — cream → white gradient + subtle blush highlight */}
-      <section className="relative min-h-[68vh] flex items-center bg-gradient-to-b from-brand-cream to-white">
+      <section
+        className="relative min-h-[68vh] flex items-center"
+        style={{
+          background: "linear-gradient(180deg, #F8F6ED 0%, #FFFFFF 100%)",
+        }}
+      >
         <div
           className="absolute inset-0 -z-10"
           style={{

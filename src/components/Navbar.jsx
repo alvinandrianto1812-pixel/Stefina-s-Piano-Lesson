@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
+import NavAnimation from "./NavAnimation";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -75,23 +76,31 @@ export default function Navbar() {
           isHome && !scrolled ? "" : "brand-nav--solid"
         }`}
       >
-        {/* h-16 -> h-20 agar muat logo + wordmark */}
+        {/* ============== CONTAINER UTAMA ============== */}
         <div className="w-full max-w-[1400px] mx-auto px-3 md:px-4 h-30 flex items-center justify-between">
-          <Link
-            to="/"
-            className="flex items-center shrink-0"
-            aria-label="GuruNada Home"
-          >
-            <img
-              src="/brand/gurunada_final_charcoal-03.png" // <- horizontal: logo + tulisan
-              srcSet="/brand/gurunada_final_charcoal-03.png 1x, /brand/gurunada_final_charcoal-03.png 2x"
-              alt="gurunada"
-              className="h-14 md:h-16 lg:h-[100px] w-auto select-none -ml-1"
-              draggable={false}
-            />
-          </Link>
+          {/* KIRI: logo + animasi kecil */}
+          <div className="flex items-center gap-3">
+            <Link
+              to="/"
+              className="flex items-center shrink-0"
+              aria-label="GuruNada Home"
+            >
+              <img
+                src="/brand/gurunada_final_charcoal-03.png"
+                srcSet="/brand/gurunada_final_charcoal-03.png 1x, /brand/gurunada_final_charcoal-03.png 2x"
+                alt="gurunada"
+                className="h-14 md:h-16 lg:h-[100px] w-auto select-none -ml-1"
+                draggable={false}
+              />
+            </Link>
 
-          {/* Desktop */}
+            {/* animasi tipis — tampil md+ */}
+            <div className="hidden md:block opacity-70">
+              <NavAnimation className="w-[140px]" />
+            </div>
+          </div>
+
+          {/* TENGAH/KANAN: menu desktop */}
           <div className="hidden md:flex items-center gap-2">
             {[
               { to: "/", label: "Home" },
@@ -117,8 +126,7 @@ export default function Navbar() {
             {isAdmin && (
               <Link
                 to="/admin"
-                className={`group relative px-3 py-2 text-[15px] transition-colors
-                ${
+                className={`group relative px-3 py-2 text-[15px] transition-colors ${
                   isActive("/admin")
                     ? "text-brand-gold"
                     : "text-slate-700 hover:text-brand-gold"
@@ -126,12 +134,11 @@ export default function Navbar() {
               >
                 Admin
                 <span
-                  className={`pointer-events-none absolute left-3 right-3 -bottom-0.5 h-0.5 origin-left rounded-full bg-brand-gold transition-transform
-                ${
-                  isActive("/admin")
-                    ? "scale-x-100"
-                    : "scale-x-0 group-hover:scale-x-100"
-                }`}
+                  className={`pointer-events-none absolute left-3 right-3 -bottom-0.5 h-0.5 origin-left rounded-full bg-brand-gold transition-transform ${
+                    isActive("/admin")
+                      ? "scale-x-100"
+                      : "scale-x-0 group-hover:scale-x-100"
+                  }`}
                 />
               </Link>
             )}
@@ -139,8 +146,7 @@ export default function Navbar() {
             {user ? (
               <button
                 onClick={handleLogout}
-                className="ml-2 px-4 py-2 rounded-full border border-brand-gold text-brand-dark/90
-                         hover:bg-brand-gold hover:text-white transition shadow-luxe"
+                className="ml-2 px-4 py-2 rounded-full border border-brand-gold text-brand-dark/90 hover:bg-brand-gold hover:text-white transition shadow-luxe"
               >
                 Logout
               </button>
@@ -154,13 +160,12 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile toggle */}
+          {/* UJUNG KANAN: toggle mobile */}
           <button
             className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-slate-700 hover:text-brand-gold"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle Menu"
           >
-            {/* icon hamburger */}
             <svg
               width="24"
               height="24"
@@ -177,6 +182,7 @@ export default function Navbar() {
             </svg>
           </button>
         </div>
+        {/* ============ /CONTAINER UTAMA ============ */}
 
         {/* Mobile menu */}
         {menuOpen && (
@@ -204,6 +210,7 @@ export default function Navbar() {
             >
               Events
             </Link>
+
             <Link
               to="/Questionnaire"
               onClick={() => setMenuOpen(false)}
