@@ -9,22 +9,6 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [slots, setSlots] = useState([]);
-  const [loadingSlots, setLoadingSlots] = useState(true);
-
-  // Load slot jadwal
-  useEffect(() => {
-    (async () => {
-      const { data } = await supabase
-        .from("available_slots")
-        .select("*")
-        .order("slot_datetime", { ascending: true })
-        .limit(12);
-      setSlots(data || []);
-      setLoadingSlots(false);
-    })();
-  }, []);
-
   // Auto-scroll saat URL punya #hash (/#features, /#schedule, /#testimonials)
   useEffect(() => {
     if (location.hash) {
@@ -171,84 +155,6 @@ export default function LandingPage() {
                 <p className="text-sm text-slate-600 mt-1">{f.desc}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* SCHEDULE — gradien putih → blush tipis agar bloknya jelas */}
-      <section
-        id="schedule"
-        className="py-16 scroll-mt-24"
-        style={{
-          background:
-            "linear-gradient(180deg, #FFFFFF 0%, rgba(209,167,153,0.10) 100%)",
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-end justify-between mb-6">
-            <h2 className="headline text-3xl text-[#50553C]">
-              Jadwal Piano Lesson
-            </h2>
-            <button
-              onClick={handleBook}
-              className="hidden md:inline-block px-4 py-2 rounded-full border border-brand-gold hover:bg-brand-gold hover:text-white"
-            >
-              Isi Kuisioner & Booking
-            </button>
-          </div>
-
-          {loadingSlots ? (
-            <div className="text-slate-600">Memuat slot...</div>
-          ) : slots.length === 0 ? (
-            <div className="text-slate-600">Tidak ada slot tersedia.</div>
-          ) : (
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {slots.map((s) => {
-                const date = new Date(s.slot_datetime);
-                const readable = date.toLocaleString("id-ID", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                });
-                return (
-                  <div
-                    key={s.id}
-                    className={`rounded-xl border bg-white p-4 flex flex-col justify-between ${
-                      s.is_booked ? "opacity-50" : ""
-                    }`}
-                  >
-                    <div>
-                      <div className="text-sm text-slate-500">
-                        Slot 45 menit
-                      </div>
-                      <div className="font-semibold">{readable}</div>
-                    </div>
-                    <button
-                      disabled={s.is_booked}
-                      onClick={handleBook}
-                      className={`mt-4 px-4 py-2 rounded-lg ${
-                        s.is_booked
-                          ? "bg-slate-200 text-slate-500 cursor-not-allowed"
-                          : "bg-brand-gold text-white hover:opacity-90"
-                      }`}
-                    >
-                      {s.is_booked ? "Sudah Dibooking" : "Pilih Slot"}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          <div className="mt-6 md:hidden">
-            <button
-              onClick={handleBook}
-              className="w-full px-4 py-3 rounded-full bg-brand-gold text-white"
-            >
-              Isi Kuisioner & Booking
-            </button>
           </div>
         </div>
       </section>
