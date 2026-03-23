@@ -11,6 +11,10 @@ export default function Admin() {
   const [payments, setPayments] = useState([]);
   const [questionnaires, setQuestionnaires] = useState([]);
 
+  // State untuk Fitur Tambahan (Filter & Pencarian)
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+
   useEffect(() => {
     (async () => {
       const {
@@ -70,14 +74,12 @@ export default function Admin() {
     setLoading(false);
   };
 
-  // Map: questionnaire id -> questionnaire
   const questionnaireById = useMemo(() => {
     const m = new Map();
     questionnaires.forEach((q) => m.set(q.id, q));
     return m;
   }, [questionnaires]);
 
-  // (Opsional) fallback: kumpulkan questionnaire per user (terbaru → terlama)
   const questionnairesByUserSorted = useMemo(() => {
     const g = new Map();
     [...questionnaires]
@@ -90,7 +92,6 @@ export default function Admin() {
     return g;
   }, [questionnaires]);
 
-  // Fallback memilih questionnaire "as-of" waktu payment (jika p.questionnaire_id null)
   const pickQAsOf = (userId, paidAt) => {
     const arr = questionnairesByUserSorted.get(userId);
     if (!arr) return null;
@@ -98,7 +99,6 @@ export default function Admin() {
     return arr.find((q) => new Date(q.created_at) <= cutoff) || arr[0] || null;
   };
 
-  // Format prefered_day + prefered_time
   const fmtPreferredSchedule = (dayRaw, timeRaw) => {
     const day = (dayRaw ?? "").toString().trim();
     const time = (timeRaw ?? "").toString().trim();
@@ -129,7 +129,7 @@ export default function Admin() {
     const hari = mapHari[(day || "").toLowerCase()] || day || "";
     const parts = [];
     if (hari) parts.push(hari);
-    if (time) parts.push(time); // contoh: "13:00"
+    if (time) parts.push(time);
     return parts.join(", ");
   };
 
@@ -159,54 +159,173 @@ export default function Admin() {
     }
   };
 
+  // --- LOGIKA FILTER & PENCARIAN ---
+  const filteredPayments = useMemo(() => {
+    return payments.filter((p) => {
+      // Filter Status
+      if (filterStatus !== "all" && p.status !== filterStatus) return false;
+
+      // Filter Pencarian (Nama Anak, Orang Tua, Instrumen)
+      if (searchQuery) {
+        let q = p.questionnaire_id
+          ? questionnaireById.get(p.questionnaire_id)
+          : pickQAsOf(p.user_id, p.created_at);
+
+        const parentName = [q?.father_name, q?.mother_name]
+          .filter(Boolean)
+          .join(" & ")
+          .toLowerCase();
+        const studentName = (q?.student_full_name || "").toLowerCase();
+        const instrument = (q?.instrument || "").toLowerCase();
+        const query = searchQuery.toLowerCase();
+
+        if (
+          !parentName.includes(query) &&
+          !studentName.includes(query) &&
+          !instrument.includes(query)
+        ) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [payments, filterStatus, searchQuery, questionnaireById]);
+
+  // --- LOGIKA EXPORT CSV ---
+  const exportToCSV = () => {
+    if (filteredPayments.length === 0) {
+      alert("Tidak ada data untuk diekspor");
+      return;
+    }
+
+    const headers = [
+      "Tanggal",
+      "Orang Tua",
+      "Anak",
+      "Instrumen",
+      "Jadwal",
+      "Nominal",
+      "Status",
+    ];
+
+    const rows = filteredPayments.map((p) => {
+      let q = p.questionnaire_id
+        ? questionnaireById.get(p.questionnaire_id)
+        : pickQAsOf(p.user_id, p.created_at);
+
+      const parentName =
+        [q?.father_name, q?.mother_name].filter(Boolean).join(" & ") || "-";
+      const studentName = q?.student_full_name || "-";
+      const instrument = q?.instrument || "-";
+      const schedule = q
+        ? fmtPreferredSchedule(q.preferred_day, q.preferred_time)
+        : "-";
+      const date = new Date(p.created_at).toLocaleString("id-ID");
+
+      // Gunakan kutipan (quotes) agar data yang mengandung koma tidak merusak format CSV
+      return [
+        `"${date}"`,
+        `"${parentName}"`,
+        `"${studentName}"`,
+        `"${instrument}"`,
+        `"${schedule}"`,
+        p.amount || 0,
+        p.status,
+      ].join(",");
+    });
+
+    const csvContent = [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute(
+      "download",
+      `Data_Pembayaran_${new Date().toISOString().slice(0, 10)}.csv`,
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (loading) return <div className="p-6">Loading…</div>;
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
-      <h1 className="text-2xl font-bold">Dashboard Admin</h1>
+      <h1 className="text-2xl font-bold text-slate-800">Dashboard Admin</h1>
 
-      {/* Pembayaran */}
-      <section>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-xl font-semibold">Pembayaran</h2>
-          <button
-            onClick={fetchAll}
-            className="px-3 py-1.5 rounded border hover:bg-slate-50"
-          >
-            Refresh
-          </button>
+      <section className="space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-lg border shadow-sm">
+          <div className="flex flex-col md:flex-row gap-4 flex-1">
+            {/* Input Pencarian */}
+            <input
+              type="text"
+              placeholder="Cari nama, instrumen..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brand-gold w-full md:w-64 text-sm"
+            />
+
+            {/* Dropdown Filter Status */}
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brand-gold text-sm bg-white"
+            >
+              <option value="all">Semua Status</option>
+              <option value="pending">Pending</option>
+              <option value="verified">Verified</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              onClick={exportToCSV}
+              className="px-4 py-2 rounded border bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 text-sm font-medium transition"
+            >
+              Export CSV
+            </button>
+            <button
+              onClick={fetchAll}
+              className="px-4 py-2 rounded border bg-slate-50 hover:bg-slate-100 text-sm font-medium transition"
+            >
+              Refresh Data
+            </button>
+          </div>
         </div>
 
-        <div className="overflow-x-auto border rounded-lg">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-100">
+        <div className="overflow-x-auto border rounded-lg bg-white shadow-sm">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-slate-50 border-b">
               <tr>
-                <th className="p-2 border">Tanggal</th>
-                <th className="p-2 border">Orang Tua</th>
-                <th className="p-2 border">Anak</th>
-                <th className="p-2 border">Instrumen</th>
-                <th className="p-2 border">Jadwal</th>
-                <th className="p-2 border">Nominal</th>
-                <th className="p-2 border">Status</th>
-                <th className="p-2 border">Bukti</th>
-                <th className="p-2 border">Aksi</th>
+                <th className="p-3 font-semibold text-slate-700">Tanggal</th>
+                <th className="p-3 font-semibold text-slate-700">Orang Tua</th>
+                <th className="p-3 font-semibold text-slate-700">Anak</th>
+                <th className="p-3 font-semibold text-slate-700">Instrumen</th>
+                <th className="p-3 font-semibold text-slate-700">Jadwal</th>
+                <th className="p-3 font-semibold text-slate-700">Nominal</th>
+                <th className="p-3 font-semibold text-slate-700">Status</th>
+                <th className="p-3 font-semibold text-slate-700">Bukti</th>
+                <th className="p-3 font-semibold text-slate-700 text-center">
+                  Aksi
+                </th>
               </tr>
             </thead>
-            <tbody>
-              {payments.length === 0 ? (
+            <tbody className="divide-y">
+              {filteredPayments.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="p-4 text-center text-slate-500">
-                    Belum ada pembayaran.
+                  <td colSpan={9} className="p-8 text-center text-slate-500">
+                    Tidak ada data pembayaran yang sesuai.
                   </td>
                 </tr>
               ) : (
-                payments.map((p) => {
-                  // Ambil questionnaire via questionnaire_id (utama)
+                filteredPayments.map((p) => {
                   let q = p.questionnaire_id
                     ? questionnaireById.get(p.questionnaire_id)
                     : null;
 
-                  // Fallback (untuk data lama yg belum link): as-of payment time
                   if (!q) q = pickQAsOf(p.user_id, p.created_at);
 
                   const parentName =
@@ -219,98 +338,82 @@ export default function Admin() {
                     : "";
 
                   return (
-                    <tr key={p.id} className="odd:bg-white even:bg-slate-50">
-                      {/* Tanggal dari payments.created_at */}
-                      <td className="p-2 border align-top">
-                        {new Date(p.created_at).toLocaleString("id-ID")}
+                    <tr key={p.id} className="hover:bg-slate-50/50">
+                      <td className="p-3 align-top whitespace-nowrap">
+                        {new Date(p.created_at).toLocaleString("id-ID", {
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        })}
                       </td>
-
-                      {/* Orang tua */}
-                      <td className="p-2 border align-top">
+                      <td className="p-3 align-top">
                         {parentName}
                         {!p.questionnaire_id && (
-                          <div className="text-[10px] text-slate-500">
+                          <div className="text-[10px] text-slate-500 mt-1">
                             (not linked)
                           </div>
                         )}
                       </td>
-
-                      {/* Anak */}
-                      <td className="p-2 border align-top">
+                      <td className="p-3 align-top font-medium text-slate-900">
                         {q?.student_full_name || "-"}
                       </td>
-
-                      {/* Instrumen */}
-                      <td className="p-2 border align-top">
-                        {q?.instrument || "-"}
-                      </td>
-
-                      {/* Jadwal dari questionnaire.preferred_day/time */}
-                      <td className="p-2 border align-top">
-                        {preferred || "-"}
-                      </td>
-
-                      {/* Nominal dari payments.amount */}
-                      <td className="p-2 border align-top">
+                      <td className="p-3 align-top">{q?.instrument || "-"}</td>
+                      <td className="p-3 align-top">{preferred || "-"}</td>
+                      <td className="p-3 align-top whitespace-nowrap">
                         Rp {Number(p.amount || 0).toLocaleString("id-ID")}
                       </td>
-
-                      {/* Status pembayaran */}
-                      <td className="p-2 border align-top">
+                      <td className="p-3 align-top">
                         <span
                           className={
-                            "inline-block px-2 py-0.5 rounded text-xs " +
+                            "inline-block px-2.5 py-1 rounded-full text-xs font-medium " +
                             (p.status === "verified"
-                              ? "bg-green-100 text-green-700"
+                              ? "bg-green-100 text-green-700 border border-green-200"
                               : p.status === "rejected"
-                              ? "bg-red-100 text-red-700"
-                              : "bg-yellow-100 text-yellow-700")
+                                ? "bg-red-100 text-red-700 border border-red-200"
+                                : "bg-yellow-100 text-yellow-700 border border-yellow-200")
                           }
                         >
-                          {p.status}
+                          {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
                         </span>
                       </td>
-
-                      {/* Bukti */}
-                      <td className="p-2 border align-top">
+                      <td className="p-3 align-top">
                         {p.proof_url ? (
                           <a
                             href={p.proof_url}
                             target="_blank"
                             rel="noreferrer"
-                            className="text-blue-600 underline"
+                            className="text-blue-600 hover:text-blue-800 underline text-xs"
                           >
                             Lihat Bukti
                           </a>
                         ) : (
-                          "-"
+                          <span className="text-slate-400 text-xs">-</span>
                         )}
                       </td>
-
-                      {/* Aksi */}
-                      <td className="p-2 border align-top space-x-2">
-                        <button
-                          disabled={p.status === "verified"}
-                          onClick={() => verifyPayment(p.id)}
-                          className={`px-2 py-1 rounded ${
-                            p.status === "verified"
-                              ? "bg-slate-200 text-slate-500 cursor-not-allowed"
-                              : "bg-green-500 text-white hover:bg-green-600"
-                          }`}
-                        >
-                          Verifikasi
-                        </button>
-                        <button
-                          disabled={p.status !== "pending"}
-                          onClick={() => rejectPayment(p.id)}
-                          className={`px-2 py-1 rounded ${
-                            p.status !== "pending"
-                              ? "bg-slate-200 text-slate-500 cursor-not-allowed"
-                              : "bg-red-500 text-white hover:bg-red-600"
-                          }`}
-                        >
-                          Tolak
-                        </button>
+                      <td className="p-3 align-top text-center">
+                        <div className="flex justify-center gap-2">
+                          <button
+                            disabled={p.status === "verified"}
+                            onClick={() => verifyPayment(p.id)}
+                            className={`px-3 py-1.5 rounded text-xs font-medium transition ${
+                              p.status === "verified"
+                                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                                : "bg-green-600 text-white hover:bg-green-700 shadow-sm"
+                            }`}
+                          >
+                            Verifikasi
+                          </button>
+                          <button
+                            disabled={p.status !== "pending"}
+                            onClick={() => rejectPayment(p.id)}
+                            className={`px-3 py-1.5 rounded text-xs font-medium transition ${
+                              p.status !== "pending"
+                                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                                : "bg-red-600 text-white hover:bg-red-700 shadow-sm"
+                            }`}
+                          >
+                            Tolak
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
