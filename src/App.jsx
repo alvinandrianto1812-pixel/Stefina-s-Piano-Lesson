@@ -14,6 +14,8 @@ import Events from "./pages/user/Events";
 import OurTeachers from "./pages/user/OurTeachers";
 import AboutUs from "./pages/user/AboutUs";
 import ContactUs from "./pages/user/ContactUs";
+import OurPolicy from "./pages/user/OurPolicy";
+import OurServices from "./pages/user/OurServices";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
@@ -36,6 +38,11 @@ export default function App() {
           <Route path="/AboutUs" element={<AboutUs />} />
           <Route path="/ContactUs" element={<ContactUs />} />
 
+          {/* Studio Policy — wajib dibaca sebelum registrasi */}
+          <Route path="/OurPolicy" element={<OurPolicy />} />
+          <Route path="/OurServices" element={<OurServices />} />
+
+          {/* Questionnaire: user harus lewat OurPolicy dulu (logic ada di OurPolicy.jsx) */}
           <Route
             path="/Questionnaire"
             element={
@@ -54,9 +61,9 @@ export default function App() {
             }
           />
 
-          {/* Rute logout: paksa putus sesi & reset UI */}
+          {/* Rute logout */}
           <Route path="/logout" element={<Logout />} />
-          {/* untuk callback agar tidka auto login ke websitenya */}
+          {/* Auth callback */}
           <Route path="/auth/callback" element={<AuthCallback />} />
 
           <Route

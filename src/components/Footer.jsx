@@ -28,11 +28,11 @@ export default function Footer() {
           <Link to="/" className="transition hover:opacity-90">
             Home
           </Link>
-          <Link to="/about" className="transition hover:opacity-90">
-            About
+          <Link to="/OurTeachers" className="transition hover:opacity-90">
+            Our Teachers
           </Link>
-          <Link to="/questionnaire" className="transition hover:opacity-90">
-            Kuisioner
+          <Link to="/Events" className="transition hover:opacity-90">
+            Events
           </Link>
         </nav>
 

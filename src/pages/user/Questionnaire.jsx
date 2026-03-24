@@ -1,11 +1,11 @@
 // src/pages/Questionnaire.jsx
-// English version with Day/Time selectors
 import React, { useEffect, useMemo, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 
 const ADMIN_WA = import.meta.env.VITE_WA_PHONE || "6281234567890";
 const BUCKET = "proofs";
+const POLICY_KEY = "gurunada_policy_accepted";
 
 const DAYS = [
   { value: "monday", label: "Monday" },
@@ -103,19 +103,24 @@ export default function Questionnaire() {
     amount: "500000",
   });
 
-  // Load auth
+  // Load auth + cek policy
   useEffect(() => {
     (async () => {
       const { data } = await supabase.auth.getUser();
       if (!data?.user) return navigate("/auth");
       setUser(data.user);
+
+      // Harus sudah menyetujui OurPolicy di sesi ini
+      if (sessionStorage.getItem(POLICY_KEY) !== "true") {
+        navigate("/OurPolicy", { replace: true });
+      }
     })();
   }, [navigate]);
 
   // Time options + default time per day
   const timeOpts = useMemo(
     () => timeOptions(form.preferred_day),
-    [form.preferred_day]
+    [form.preferred_day],
   );
   useEffect(() => {
     if (
@@ -227,7 +232,7 @@ export default function Questionnaire() {
     if (!user) return navigate("/auth");
     if (!isValid)
       return alert(
-        "Please complete all required fields and upload the proof of payment."
+        "Please complete all required fields and upload the proof of payment.",
       );
 
     setSubmitting(true);
@@ -312,7 +317,7 @@ export default function Questionnaire() {
         `Proof: ${proofUrl}`;
 
       window.location.href = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(
-        msg
+        msg,
       )}`;
     } catch (err) {
       console.error(err);

@@ -1,5 +1,6 @@
 // src/pages/AboutUs.jsx
 import React from "react";
+import Footer from "../../components/Footer";
 
 export default function AboutUs() {
   return (
@@ -107,6 +108,8 @@ export default function AboutUs() {
           </details>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }

@@ -4,7 +4,6 @@ export default {
   content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
-      // Tambahkan font brand di depan fallback lama
       fontFamily: {
         sans: [
           "Creato Display", // font body brand
@@ -20,21 +19,17 @@ export default {
         ],
       },
 
-      // Tambahkan warna dari palette temanmu
       colors: {
         brand: {
-          // warna yang sudah ada — biarkan agar tidak merusak komponen lama
           gold: "#D4AF37",
           dark: "#0F172A", // BIARKAN. Jika ingin selaras total, ganti ke "#272925".
           soft: "#F7F3E8",
           ivory: "#FFFBF3",
-
-          // 🎨 palette baru (tidak menimpa yang lama)
           cream: "#F8F6ED",
           gold: "#D1A799",
           olive: "#50553C",
           wine: "#683730",
-          coal: "#272925", // alias untuk “dark” versi palette
+          coal: "#272925",
         },
       },
 

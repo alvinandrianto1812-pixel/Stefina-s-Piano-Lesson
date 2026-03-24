@@ -4,11 +4,6 @@ import { supabase } from "../lib/supabaseClient";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthProvider";
 
-/**
- * Pastikan baris di public.users ada & sinkron dengan auth.uid()
- * - Jika belum ada: insert (id, email, name)
- * - Jika sudah ada tapi id beda (warisan data lama): update id
- */
 async function ensureUserRow(sb, { id, email }, name) {
   const payload = { id, email };
   if (name && name.trim()) payload.name = name.trim();
