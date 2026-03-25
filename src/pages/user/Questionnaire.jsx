@@ -316,9 +316,10 @@ export default function Questionnaire() {
         `Amount: ${formatIDRDisplay(500000)}\n` +
         `Proof: ${proofUrl}`;
 
-      window.location.href = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(
-        msg,
-      )}`;
+      window.open(
+        `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(msg)}`,
+        "_blank",
+      );
     } catch (err) {
       console.error(err);
       alert(err.message || "Submit failed. Please try again.");

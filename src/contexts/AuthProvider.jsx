@@ -20,8 +20,7 @@ export function AuthProvider({ children }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      // Jika loading belum false, set false setelah event pertama
-      if (loading) setLoading(false);
+      setLoading(false);
     });
 
     // Cleanup listener saat komponen di-unmount

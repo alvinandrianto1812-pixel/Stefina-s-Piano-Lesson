@@ -36,29 +36,6 @@ export default function Admin() {
         return;
       }
 
-      let role = null;
-      if (user.email) {
-        const { data } = await supabase
-          .from("users")
-          .select("role")
-          .eq("email", user.email)
-          .maybeSingle();
-        role = data?.role || null;
-      }
-      if (!role) {
-        const { data } = await supabase
-          .from("users")
-          .select("role")
-          .eq("id", user.id)
-          .maybeSingle();
-        role = data?.role || null;
-      }
-      if (role !== "admin") {
-        alert("Anda bukan admin.");
-        navigate("/");
-        return;
-      }
-
       await fetchAll();
       await fetchMedia();
       setLoading(false);

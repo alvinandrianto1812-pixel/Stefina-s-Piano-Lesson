@@ -1,6 +1,8 @@
 // src/pages/user/Events.jsx
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import Footer from "../../components/Footer";
+import { useAuth } from "../../contexts/AuthProvider";
 
 // ─── EVENT DATA ────────────────────────────────────────────────────────────────
 const EVENTS = [
@@ -89,8 +91,19 @@ const MONTH_MAP = {
   DEC: "12",
 };
 
-function EventItem({ ev, isLast }) {
+// Returns true jika tanggal event sudah lewat dari hari ini
+function isEventPast(ev) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const eventDate = new Date(
+    `${ev.year}-${MONTH_MAP[ev.month]}-${ev.day}T00:00:00`,
+  );
+  return eventDate < today;
+}
+
+function EventItem({ ev, isLast, user }) {
   const [expanded, setExpanded] = useState(false);
+  const isPast = isEventPast(ev);
 
   return (
     <div
@@ -101,6 +114,8 @@ function EventItem({ ev, isLast }) {
         display: "flex",
         gap: "36px",
         alignItems: "flex-start",
+        opacity: isPast ? 0.72 : 1,
+        transition: "opacity 0.2s",
       }}
     >
       {/* DATE BADGE */}
@@ -108,7 +123,11 @@ function EventItem({ ev, isLast }) {
         <div
           style={{
             borderRadius: "10px 10px 0 0",
-            background: ev.highlight ? "#272925" : "#50553C",
+            background: isPast
+              ? "#94A3B8"
+              : ev.highlight
+                ? "#272925"
+                : "#50553C",
             color: "#F8F6ED",
             textAlign: "center",
             fontSize: "11px",
@@ -122,15 +141,23 @@ function EventItem({ ev, isLast }) {
         <div
           style={{
             borderRadius: "0 0 10px 10px",
-            background: ev.highlight
-              ? "rgba(39,41,37,0.07)"
-              : "rgba(80,85,60,0.06)",
-            border: `1px solid ${ev.highlight ? "rgba(39,41,37,0.15)" : "rgba(80,85,60,0.13)"}`,
+            background: isPast
+              ? "rgba(148,163,184,0.1)"
+              : ev.highlight
+                ? "rgba(39,41,37,0.07)"
+                : "rgba(80,85,60,0.06)",
+            border: `1px solid ${
+              isPast
+                ? "rgba(148,163,184,0.2)"
+                : ev.highlight
+                  ? "rgba(39,41,37,0.15)"
+                  : "rgba(80,85,60,0.13)"
+            }`,
             borderTop: "none",
             textAlign: "center",
             fontSize: "28px",
             fontWeight: "800",
-            color: ev.highlight ? "#272925" : "#50553C",
+            color: isPast ? "#94A3B8" : ev.highlight ? "#272925" : "#50553C",
             padding: "8px 4px 10px",
             lineHeight: 1,
           }}
@@ -148,6 +175,24 @@ function EventItem({ ev, isLast }) {
         >
           {ev.year}
         </div>
+        {isPast && (
+          <div
+            style={{
+              marginTop: "8px",
+              textAlign: "center",
+              fontSize: "10px",
+              fontWeight: "600",
+              letterSpacing: "0.07em",
+              color: "#94A3B8",
+              background: "rgba(148,163,184,0.12)",
+              border: "1px solid rgba(148,163,184,0.2)",
+              borderRadius: "6px",
+              padding: "3px 4px",
+            }}
+          >
+            PAST
+          </div>
+        )}
       </div>
 
       {/* CONTENT */}
@@ -170,9 +215,21 @@ function EventItem({ ev, isLast }) {
                 fontSize: "11px",
                 fontWeight: "600",
                 letterSpacing: "0.04em",
-                background: ev.highlight ? "#272925" : "#F0EDE4",
-                color: ev.highlight ? "#F8F6ED" : "#50553C",
-                border: ev.highlight ? "none" : "1px solid rgba(80,85,60,0.15)",
+                background: isPast
+                  ? "rgba(148,163,184,0.12)"
+                  : ev.highlight
+                    ? "#272925"
+                    : "#F0EDE4",
+                color: isPast
+                  ? "#94A3B8"
+                  : ev.highlight
+                    ? "#F8F6ED"
+                    : "#50553C",
+                border: isPast
+                  ? "1px solid rgba(148,163,184,0.2)"
+                  : ev.highlight
+                    ? "none"
+                    : "1px solid rgba(80,85,60,0.15)",
               }}
             >
               {tag}
@@ -185,7 +242,7 @@ function EventItem({ ev, isLast }) {
           style={{
             fontSize: "clamp(17px, 2.2vw, 21px)",
             fontWeight: "700",
-            color: "#272925",
+            color: isPast ? "#64748B" : "#272925",
             margin: "0 0 4px",
             lineHeight: 1.3,
             fontFamily: '"Rockdale FREE", "Playfair Display", serif',
@@ -220,7 +277,7 @@ function EventItem({ ev, isLast }) {
             <svg
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#D1A799"
+              stroke={isPast ? "#94A3B8" : "#D1A799"}
               strokeWidth="1.8"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -240,7 +297,7 @@ function EventItem({ ev, isLast }) {
             <svg
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#D1A799"
+              stroke={isPast ? "#94A3B8" : "#D1A799"}
               strokeWidth="1.8"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -340,32 +397,111 @@ function EventItem({ ev, isLast }) {
               📍 {ev.location}
               {ev.location_detail && `, ${ev.location_detail}`} · {ev.city}
             </p>
-            <a
-              href={`https://www.google.com/calendar/event?action=TEMPLATE&text=${encodeURIComponent(ev.title)}&dates=${ev.year}${MONTH_MAP[ev.month]}${ev.day}&location=${encodeURIComponent(ev.city)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "8px 16px",
-                borderRadius: "999px",
-                fontSize: "12px",
-                fontWeight: "600",
-                background: "#272925",
-                color: "#F8F6ED",
-                textDecoration: "none",
-                transition: "background 0.2s",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "#50553C")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "#272925")
-              }
-            >
-              + Add to Google Calendar
-            </a>
+
+            {/* ── Google Calendar: 3 kondisi ── */}
+            {isPast ? (
+              // Event sudah lewat — tidak bisa tambah ke kalender
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "7px",
+                  padding: "8px 16px",
+                  borderRadius: "999px",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  background: "rgba(148,163,184,0.1)",
+                  color: "#94A3B8",
+                  border: "1px solid rgba(148,163,184,0.2)",
+                }}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ width: "14px", height: "14px" }}
+                >
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+                This event has ended
+              </div>
+            ) : user ? (
+              // Login + event upcoming — tampilkan tombol kalender
+              <a
+                href={`https://www.google.com/calendar/event?action=TEMPLATE&text=${encodeURIComponent(ev.title)}&dates=${ev.year}${MONTH_MAP[ev.month]}${ev.day}&location=${encodeURIComponent(ev.city)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "8px 16px",
+                  borderRadius: "999px",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  background: "#272925",
+                  color: "#F8F6ED",
+                  textDecoration: "none",
+                  transition: "background 0.2s",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background = "#50553C")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background = "#272925")
+                }
+              >
+                + Add to Google Calendar
+              </a>
+            ) : (
+              // Belum login + event upcoming — ajak login
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "10px 14px",
+                  borderRadius: "12px",
+                  background: "rgba(80,85,60,0.06)",
+                  border: "1px solid rgba(80,85,60,0.14)",
+                }}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#50553C"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ width: "16px", height: "16px", flexShrink: 0 }}
+                >
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+                <span style={{ fontSize: "12px", color: "#475569" }}>
+                  <Link
+                    to="/auth"
+                    style={{
+                      color: "#272925",
+                      fontWeight: "700",
+                      textDecoration: "underline",
+                      textUnderlineOffset: "2px",
+                    }}
+                  >
+                    Log in
+                  </Link>{" "}
+                  to save this event to Google Calendar.
+                </span>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -374,6 +510,8 @@ function EventItem({ ev, isLast }) {
 }
 
 export default function Events() {
+  const { user } = useAuth();
+
   return (
     <div
       className="-mt-[6.5rem] md:-mt-28 lg:-mt-[7.5rem]"
@@ -393,7 +531,6 @@ export default function Events() {
           minHeight: "420px",
         }}
       >
-        {/* Layer 1: Warm charcoal sweep */}
         <div
           style={{
             position: "absolute",
@@ -403,7 +540,6 @@ export default function Events() {
             pointerEvents: "none",
           }}
         />
-        {/* Layer 2: Blush shimmer */}
         <div
           style={{
             position: "absolute",
@@ -413,7 +549,6 @@ export default function Events() {
             pointerEvents: "none",
           }}
         />
-        {/* Layer 3: Olive warmth */}
         <div
           style={{
             position: "absolute",
@@ -423,7 +558,6 @@ export default function Events() {
             pointerEvents: "none",
           }}
         />
-        {/* Layer 4: Deep vignette */}
         <div
           style={{
             position: "absolute",
@@ -493,7 +627,12 @@ export default function Events() {
             </div>
           ) : (
             EVENTS.map((ev, i) => (
-              <EventItem key={ev.id} ev={ev} isLast={i === EVENTS.length - 1} />
+              <EventItem
+                key={ev.id}
+                ev={ev}
+                isLast={i === EVENTS.length - 1}
+                user={user}
+              />
             ))
           )}
         </div>
