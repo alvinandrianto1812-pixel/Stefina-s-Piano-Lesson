@@ -22,7 +22,7 @@ export default function AuthCallback() {
       }
       // Non auto-login
       await supabase.auth.signOut();
-      nav("/login?verified=1", { replace: true });
+      nav("/auth?confirmed=1", { replace: true });
     })();
   }, [nav]);
 

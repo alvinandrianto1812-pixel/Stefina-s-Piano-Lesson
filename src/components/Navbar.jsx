@@ -22,7 +22,7 @@ const DROPDOWN_GROUPS = [
     label: "Programs",
     items: [
       { to: "/Events", label: "Events", desc: "Concerts & workshops" },
-      ,
+      { to: "/Media", label: "Media", desc: "Photos & videos gallery" },
     ],
   },
 ];
