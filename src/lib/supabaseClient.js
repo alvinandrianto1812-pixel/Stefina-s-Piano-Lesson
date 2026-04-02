@@ -10,8 +10,21 @@ const customStorageAdapter = {
     // Cek apakah 'rememberMe' di localStorage diset ke 'true'
     // Jika ya, gunakan localStorage. Jika tidak, gunakan sessionStorage.
     const remember = window.localStorage.getItem("rememberMe") === "true";
-    const storage = remember ? window.localStorage : window.sessionStorage;
-    return storage.getItem(key);
+    const primary   = remember ? window.localStorage : window.sessionStorage;
+    const secondary = remember ? window.sessionStorage : window.localStorage;
+
+    // Coba baca dari storage yang sesuai preferensi saat ini
+    const value = primary.getItem(key);
+    if (value !== null) return value;
+
+    // Jika tidak ada, cek storage lama (migrasi saat preferensi berubah)
+    const migrated = secondary.getItem(key);
+    if (migrated !== null) {
+      // Pindahkan token ke storage yang sekarang aktif, hapus dari yang lama
+      primary.setItem(key, migrated);
+      secondary.removeItem(key);
+    }
+    return migrated;
   },
   setItem: (key, value) => {
     // Logika yang sama saat menyimpan item
@@ -20,10 +33,9 @@ const customStorageAdapter = {
     storage.setItem(key, value);
   },
   removeItem: (key) => {
-    // Logika yang sama saat menghapus item
-    const remember = window.localStorage.getItem("rememberMe") === "true";
-    const storage = remember ? window.localStorage : window.sessionStorage;
-    storage.removeItem(key);
+    // Hapus dari kedua storage untuk memastikan logout bersih
+    window.localStorage.removeItem(key);
+    window.sessionStorage.removeItem(key);
   },
 };
 

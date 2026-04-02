@@ -16,6 +16,7 @@ import AboutUs from "./pages/user/AboutUs";
 import ContactUs from "./pages/user/ContactUs";
 import OurPolicy from "./pages/user/OurPolicy";
 import OurServices from "./pages/user/OurServices";
+import Media from "./pages/user/Media";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/register" element={<Navigate to="/auth" replace />} />
 
           <Route path="/Events" element={<Events />} />
+          <Route path="/Media" element={<Media />} />
           <Route path="/OurTeachers" element={<OurTeachers />} />
           <Route path="/AboutUs" element={<AboutUs />} />
           <Route path="/ContactUs" element={<ContactUs />} />
