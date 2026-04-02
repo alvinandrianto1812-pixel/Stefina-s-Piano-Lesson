@@ -307,14 +307,25 @@ export default function Questionnaire() {
       ]);
       if (pErr) throw pErr;
 
-      // Redirect WA
+      // Redirect WA — pesan registrasi resmi
+      const hasExperience = form.has_experience ? "Yes" : "No";
+      const experienceNote = form.has_experience && form.experience_detail
+        ? `\n*) ${form.experience_detail}`
+        : "";
       const msg =
-        `Hello Admin, I have completed the questionnaire and uploaded the payment proof.\n` +
-        `Student: ${form.student_full_name} (Age ${form.student_age})\n` +
-        `Instrument: ${form.instrument}\n` +
-        `Preferred schedule: ${form.preferred_day}, ${form.preferred_time}\n` +
-        `Amount: ${formatIDRDisplay(500000)}\n` +
-        `Proof: ${proofUrl}`;
+        `REGISTRATION:\n` +
+        `Thank you for your registration with Guru Nada. Your information has been received.\n\n` +
+        `*Student's Full Name:* ${form.student_full_name}\n` +
+        `*Student's Age:* ${form.student_age}\n` +
+        `*Instrument of Interest:* ${form.instrument}\n` +
+        `*Any Previous Musical Experience:* ${hasExperience}${experienceNote}\n` +
+        `*Preferred Day and Time:* ${form.preferred_day}, ${form.preferred_time}\n\n` +
+        `To complete your registration, please:\n` +
+        `1. Sign the Parent Agreement: [Insert Link to Agreement]\n` +
+        `2. Reply to this chat with your payment confirmation screenshot.\n\n` +
+        `Our admin will process your registration and confirm your lesson schedule soon.\n\n` +
+        `Thank you,\n` +
+        `Guru Nada`;
 
       window.open(`https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(msg)}`, "_blank");
     } catch (err) {

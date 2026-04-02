@@ -6,7 +6,9 @@ import Footer from "../../components/Footer";
 // ─── LIGHTBOX ──────────────────────────────────────────────────────────────────
 function Lightbox({ item, onClose }) {
   useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     return () => {
@@ -31,10 +33,58 @@ function Lightbox({ item, onClose }) {
       }}
     >
       {/* Decorative corner accents */}
-      <div style={{ position: "absolute", top: "28px", left: "28px", width: "32px", height: "32px", borderTop: "1.5px solid rgba(209,167,153,0.4)", borderLeft: "1.5px solid rgba(209,167,153,0.4)", borderRadius: "2px 0 0 0", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", top: "28px", right: "72px", width: "32px", height: "32px", borderTop: "1.5px solid rgba(209,167,153,0.4)", borderRight: "1.5px solid rgba(209,167,153,0.4)", borderRadius: "0 2px 0 0", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: "28px", left: "28px", width: "32px", height: "32px", borderBottom: "1.5px solid rgba(209,167,153,0.4)", borderLeft: "1.5px solid rgba(209,167,153,0.4)", borderRadius: "0 0 0 2px", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: "28px", right: "28px", width: "32px", height: "32px", borderBottom: "1.5px solid rgba(209,167,153,0.4)", borderRight: "1.5px solid rgba(209,167,153,0.4)", borderRadius: "0 0 2px 0", pointerEvents: "none" }} />
+      <div
+        style={{
+          position: "absolute",
+          top: "28px",
+          left: "28px",
+          width: "32px",
+          height: "32px",
+          borderTop: "1.5px solid rgba(209,167,153,0.4)",
+          borderLeft: "1.5px solid rgba(209,167,153,0.4)",
+          borderRadius: "2px 0 0 0",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: "28px",
+          right: "72px",
+          width: "32px",
+          height: "32px",
+          borderTop: "1.5px solid rgba(209,167,153,0.4)",
+          borderRight: "1.5px solid rgba(209,167,153,0.4)",
+          borderRadius: "0 2px 0 0",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          bottom: "28px",
+          left: "28px",
+          width: "32px",
+          height: "32px",
+          borderBottom: "1.5px solid rgba(209,167,153,0.4)",
+          borderLeft: "1.5px solid rgba(209,167,153,0.4)",
+          borderRadius: "0 0 0 2px",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          bottom: "28px",
+          right: "28px",
+          width: "32px",
+          height: "32px",
+          borderBottom: "1.5px solid rgba(209,167,153,0.4)",
+          borderRight: "1.5px solid rgba(209,167,153,0.4)",
+          borderRadius: "0 0 2px 0",
+          pointerEvents: "none",
+        }}
+      />
 
       {/* Close button */}
       <button
@@ -71,7 +121,14 @@ function Lightbox({ item, onClose }) {
 
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth: "90vw", maxHeight: "88vh", display: "flex", flexDirection: "column", gap: "14px", alignItems: "center" }}
+        style={{
+          maxWidth: "90vw",
+          maxHeight: "88vh",
+          display: "flex",
+          flexDirection: "column",
+          gap: "14px",
+          alignItems: "center",
+        }}
       >
         {item.type === "photo" ? (
           <img
@@ -82,7 +139,8 @@ function Lightbox({ item, onClose }) {
               maxHeight: "80vh",
               objectFit: "contain",
               borderRadius: "4px",
-              boxShadow: "0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(209,167,153,0.15)",
+              boxShadow:
+                "0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(209,167,153,0.15)",
             }}
           />
         ) : (
@@ -94,12 +152,22 @@ function Lightbox({ item, onClose }) {
               maxWidth: "90vw",
               maxHeight: "80vh",
               borderRadius: "4px",
-              boxShadow: "0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(209,167,153,0.15)",
+              boxShadow:
+                "0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(209,167,153,0.15)",
             }}
           />
         )}
         {item.title && (
-          <p style={{ color: "rgba(209,167,153,0.85)", fontSize: "13px", textAlign: "center", margin: 0, letterSpacing: "0.06em", fontStyle: "italic" }}>
+          <p
+            style={{
+              color: "rgba(209,167,153,0.85)",
+              fontSize: "13px",
+              textAlign: "center",
+              margin: 0,
+              letterSpacing: "0.06em",
+              fontStyle: "italic",
+            }}
+          >
             {item.title}
           </p>
         )}
@@ -128,8 +196,11 @@ function MediaCard({ item, onClick }) {
         boxShadow: hovered
           ? "0 0 0 1px rgba(209,167,153,0.6), 0 0 0 4px rgba(209,167,153,0.08), 0 24px 48px rgba(15,17,16,0.35)"
           : "0 0 0 1px rgba(39,41,37,0.12), 0 0 0 4px rgba(39,41,37,0.03), 0 8px 24px rgba(15,17,16,0.12)",
-        transform: hovered ? "translateY(-6px) scale(1.01)" : "translateY(0) scale(1)",
-        transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s cubic-bezier(0.22,1,0.36,1)",
+        transform: hovered
+          ? "translateY(-6px) scale(1.01)"
+          : "translateY(0) scale(1)",
+        transition:
+          "transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s cubic-bezier(0.22,1,0.36,1)",
       }}
     >
       {item.type === "photo" ? (
@@ -143,19 +214,39 @@ function MediaCard({ item, onClick }) {
               height: "100%",
               objectFit: "cover",
               display: "block",
-              transition: "transform 0.5s cubic-bezier(0.22,1,0.36,1), filter 0.35s",
+              transition:
+                "transform 0.5s cubic-bezier(0.22,1,0.36,1), filter 0.35s",
               transform: hovered ? "scale(1.06)" : "scale(1)",
               filter: hovered ? "brightness(0.82)" : "brightness(1)",
             }}
           />
         ) : (
-          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#F0EDE4", color: "#94A3B8", fontSize: "13px" }}>
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#F0EDE4",
+              color: "#94A3B8",
+              fontSize: "13px",
+            }}
+          >
             Image unavailable
           </div>
         )
       ) : (
         /* ── VIDEO CARD — premium treatment ── */
-        <div style={{ width: "100%", height: "100%", position: "relative", background: "#0a0b0a", overflow: "hidden" }}>
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            position: "relative",
+            background: "#0a0b0a",
+            overflow: "hidden",
+          }}
+        >
           {/* Film grain texture overlay */}
           <div
             style={{
@@ -180,7 +271,8 @@ function MediaCard({ item, onClick }) {
                 objectFit: "cover",
                 display: "block",
                 opacity: hovered ? 0.65 : 0.75,
-                transition: "opacity 0.35s, transform 0.5s cubic-bezier(0.22,1,0.36,1)",
+                transition:
+                  "opacity 0.35s, transform 0.5s cubic-bezier(0.22,1,0.36,1)",
                 transform: hovered ? "scale(1.06)" : "scale(1)",
               }}
             />
@@ -198,8 +290,32 @@ function MediaCard({ item, onClick }) {
           )}
 
           {/* Cinematic letterbox lines (top & bottom) */}
-          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "18px", background: "rgba(8,9,8,0.7)", zIndex: 3, transition: "opacity 0.3s", opacity: hovered ? 0 : 1 }} />
-          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "18px", background: "rgba(8,9,8,0.7)", zIndex: 3, transition: "opacity 0.3s", opacity: hovered ? 0 : 1 }} />
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "18px",
+              background: "rgba(8,9,8,0.7)",
+              zIndex: 3,
+              transition: "opacity 0.3s",
+              opacity: hovered ? 0 : 1,
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "18px",
+              background: "rgba(8,9,8,0.7)",
+              zIndex: 3,
+              transition: "opacity 0.3s",
+              opacity: hovered ? 0 : 1,
+            }}
+          />
 
           {/* Vignette overlay */}
           <div
@@ -207,7 +323,8 @@ function MediaCard({ item, onClick }) {
               position: "absolute",
               inset: 0,
               zIndex: 3,
-              background: "radial-gradient(ellipse at center, transparent 40%, rgba(8,9,8,0.6) 100%)",
+              background:
+                "radial-gradient(ellipse at center, transparent 40%, rgba(8,9,8,0.6) 100%)",
               pointerEvents: "none",
             }}
           />
@@ -230,7 +347,8 @@ function MediaCard({ item, onClick }) {
                 width: "80px",
                 height: "80px",
                 borderRadius: "50%",
-                background: "radial-gradient(circle, rgba(209,167,153,0.2) 0%, transparent 70%)",
+                background:
+                  "radial-gradient(circle, rgba(209,167,153,0.2) 0%, transparent 70%)",
                 transform: hovered ? "scale(1.4)" : "scale(1)",
                 opacity: hovered ? 1 : 0,
                 transition: "all 0.4s cubic-bezier(0.22,1,0.36,1)",
@@ -296,10 +414,29 @@ function MediaCard({ item, onClick }) {
               gap: "5px",
             }}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="rgba(209,167,153,0.8)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: "10px", height: "10px" }}>
-              <polygon points="5,3 19,12 5,21" fill="rgba(209,167,153,0.8)" stroke="none" />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="rgba(209,167,153,0.8)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: "10px", height: "10px" }}
+            >
+              <polygon
+                points="5,3 19,12 5,21"
+                fill="rgba(209,167,153,0.8)"
+                stroke="none"
+              />
             </svg>
-            <span style={{ fontSize: "10px", fontWeight: "600", color: "rgba(209,167,153,0.9)", letterSpacing: "0.06em" }}>
+            <span
+              style={{
+                fontSize: "10px",
+                fontWeight: "600",
+                color: "rgba(209,167,153,0.9)",
+                letterSpacing: "0.06em",
+              }}
+            >
               VIDEO
             </span>
           </div>
@@ -315,13 +452,22 @@ function MediaCard({ item, onClick }) {
             left: 0,
             right: 0,
             padding: "40px 16px 16px",
-            background: "linear-gradient(to top, rgba(10,11,10,0.82), transparent)",
+            background:
+              "linear-gradient(to top, rgba(10,11,10,0.82), transparent)",
             opacity: hovered ? 1 : 0,
             transition: "opacity 0.3s",
             zIndex: 5,
           }}
         >
-          <p style={{ color: "#F8F6ED", fontSize: "12px", fontWeight: "600", margin: 0, letterSpacing: "0.04em" }}>
+          <p
+            style={{
+              color: "#F8F6ED",
+              fontSize: "12px",
+              fontWeight: "600",
+              margin: 0,
+              letterSpacing: "0.04em",
+            }}
+          >
             {item.title}
           </p>
         </div>
@@ -336,11 +482,21 @@ function MediaCard({ item, onClick }) {
             left: 0,
             right: 0,
             padding: "40px 16px 14px",
-            background: "linear-gradient(to top, rgba(10,11,10,0.9) 0%, transparent 100%)",
+            background:
+              "linear-gradient(to top, rgba(10,11,10,0.9) 0%, transparent 100%)",
             zIndex: 5,
           }}
         >
-          <p style={{ color: "rgba(248,246,237,0.82)", fontSize: "11px", fontWeight: "600", margin: 0, letterSpacing: "0.05em", fontStyle: "italic" }}>
+          <p
+            style={{
+              color: "rgba(248,246,237,0.82)",
+              fontSize: "11px",
+              fontWeight: "600",
+              margin: 0,
+              letterSpacing: "0.05em",
+              fontStyle: "italic",
+            }}
+          >
             {item.title}
           </p>
         </div>
@@ -410,37 +566,125 @@ export default function Media() {
     <div
       className="-mt-[6.5rem] md:-mt-28 lg:-mt-[7.5rem]"
       style={{
-        fontFamily: '"Creato Display", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial',
+        fontFamily:
+          '"Creato Display", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial',
         background: "#F8F6ED",
         color: "#272925",
       }}
     >
       {/* ─── HERO ─────────────────────────────────────────────────────────── */}
-      <section style={{ position: "relative", overflow: "hidden", background: "#0F1110", minHeight: "420px" }}>
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(125deg, rgba(39,41,37,0) 0%, rgba(48,51,41,0.9) 45%, rgba(48,51,41,0.6) 100%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 70% 60% at 85% 15%, rgba(209,167,153,0.14) 0%, transparent 60%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 55% 40% at 30% 100%, rgba(80,85,60,0.3) 0%, transparent 70%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 40% 40% at 0% 100%, rgba(8,9,8,0.55) 0%, transparent 60%)", pointerEvents: "none" }} />
+      <section
+        style={{
+          position: "relative",
+          overflow: "hidden",
+          background: "#0F1110",
+          minHeight: "420px",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(125deg, rgba(39,41,37,0) 0%, rgba(48,51,41,0.9) 45%, rgba(48,51,41,0.6) 100%)",
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "radial-gradient(ellipse 70% 60% at 85% 15%, rgba(209,167,153,0.14) 0%, transparent 60%)",
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "radial-gradient(ellipse 55% 40% at 30% 100%, rgba(80,85,60,0.3) 0%, transparent 70%)",
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "radial-gradient(ellipse 40% 40% at 0% 100%, rgba(8,9,8,0.55) 0%, transparent 60%)",
+            pointerEvents: "none",
+          }}
+        />
 
-        <div className="max-w-7xl mx-auto px-6" style={{ paddingTop: "160px", paddingBottom: "64px", position: "relative", zIndex: 10 }}>
-          <h1 style={{ fontSize: "clamp(36px, 6vw, 56px)", fontWeight: "700", lineHeight: 1.15, color: "#F8F6ED", margin: 0 }}>
+        <div
+          className="max-w-7xl mx-auto px-6"
+          style={{
+            paddingTop: "160px",
+            paddingBottom: "64px",
+            position: "relative",
+            zIndex: 10,
+          }}
+        >
+          <h1
+            style={{
+              fontSize: "clamp(36px, 6vw, 56px)",
+              fontWeight: "700",
+              lineHeight: 1.15,
+              color: "#F8F6ED",
+              margin: 0,
+            }}
+          >
             Our <br />
             <span style={{ color: "#F8F6ED", opacity: 0.9 }}>Gallery</span>
           </h1>
-          <p style={{ marginTop: "20px", fontSize: "17px", maxWidth: "520px", lineHeight: 1.65, color: "rgba(248,246,237,0.72)" }}>
-            Photos and videos from our classes, events, and memorable musical moments.
+          <p
+            style={{
+              marginTop: "20px",
+              fontSize: "17px",
+              maxWidth: "520px",
+              lineHeight: 1.65,
+              color: "rgba(248,246,237,0.72)",
+            }}
+          >
+            Photos and videos from our classes, events, and memorable musical
+            moments.
           </p>
 
           {/* Stats */}
-          <div style={{ marginTop: "30px", display: "flex", flexWrap: "wrap", gap: "32px" }}>
+          <div
+            style={{
+              marginTop: "30px",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "32px",
+            }}
+          >
             {[
               { num: items.length, label: "Total Media" },
               { num: photoCount, label: "Photos" },
               { num: videoCount, label: "Videos" },
             ].map((s) => (
               <div key={s.label}>
-                <div style={{ fontSize: "28px", fontWeight: "700", color: "#F8F6ED" }}>{s.num}</div>
-                <div style={{ fontSize: "13px", marginTop: "2px", color: "rgba(248,246,237,0.55)" }}>{s.label}</div>
+                <div
+                  style={{
+                    fontSize: "28px",
+                    fontWeight: "700",
+                    color: "#F8F6ED",
+                  }}
+                >
+                  {s.num}
+                </div>
+                <div
+                  style={{
+                    fontSize: "13px",
+                    marginTop: "2px",
+                    color: "rgba(248,246,237,0.55)",
+                  }}
+                >
+                  {s.label}
+                </div>
               </div>
             ))}
           </div>
@@ -451,10 +695,41 @@ export default function Media() {
       <section style={{ padding: "48px 0 0" }}>
         <div className="max-w-7xl mx-auto px-6">
           {/* Decorative rule */}
-          <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
-            <div style={{ height: "1px", flex: 1, background: "linear-gradient(to right, transparent, rgba(39,41,37,0.12))" }} />
-            <span style={{ fontSize: "10px", letterSpacing: "0.2em", color: "#94A3B8", textTransform: "uppercase", fontWeight: "600" }}>Browse Collection</span>
-            <div style={{ height: "1px", flex: 1, background: "linear-gradient(to left, transparent, rgba(39,41,37,0.12))" }} />
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "16px",
+              marginBottom: "24px",
+            }}
+          >
+            <div
+              style={{
+                height: "1px",
+                flex: 1,
+                background:
+                  "linear-gradient(to right, transparent, rgba(39,41,37,0.12))",
+              }}
+            />
+            <span
+              style={{
+                fontSize: "10px",
+                letterSpacing: "0.2em",
+                color: "#94A3B8",
+                textTransform: "uppercase",
+                fontWeight: "600",
+              }}
+            >
+              Browse Collection
+            </span>
+            <div
+              style={{
+                height: "1px",
+                flex: 1,
+                background:
+                  "linear-gradient(to left, transparent, rgba(39,41,37,0.12))",
+              }}
+            />
           </div>
 
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
@@ -477,8 +752,16 @@ export default function Media() {
                   transition: "all 0.2s",
                   textTransform: "uppercase",
                   ...(filter === tab.key
-                    ? { background: "#272925", color: "#F8F6ED", borderColor: "#272925" }
-                    : { background: "transparent", color: "#64748B", borderColor: "rgba(39,41,37,0.2)" }),
+                    ? {
+                        background: "#272925",
+                        color: "#F8F6ED",
+                        borderColor: "#272925",
+                      }
+                    : {
+                        background: "transparent",
+                        color: "#64748B",
+                        borderColor: "rgba(39,41,37,0.2)",
+                      }),
                 }}
                 onMouseEnter={(e) => {
                   if (filter !== tab.key) {
@@ -504,20 +787,73 @@ export default function Media() {
       <section style={{ padding: "32px 0 100px" }}>
         <div className="max-w-7xl mx-auto px-6">
           {loading ? (
-            <div style={{ textAlign: "center", padding: "100px 0", color: "#94A3B8" }}>
+            <div
+              style={{
+                textAlign: "center",
+                padding: "100px 0",
+                color: "#94A3B8",
+              }}
+            >
               {/* Elegant loading indicator */}
-              <div style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
-                <div style={{ width: "32px", height: "32px", borderRadius: "50%", border: "1.5px solid rgba(39,41,37,0.12)", borderTop: "1.5px solid #272925", animation: "spin 0.8s linear infinite" }} />
-                <p style={{ fontSize: "13px", letterSpacing: "0.1em", textTransform: "uppercase", color: "#94A3B8" }}>Loading gallery</p>
+              <div
+                style={{
+                  display: "inline-flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "16px",
+                }}
+              >
+                <div
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "50%",
+                    border: "1.5px solid rgba(39,41,37,0.12)",
+                    borderTop: "1.5px solid #272925",
+                    animation: "spin 0.8s linear infinite",
+                  }}
+                />
+                <p
+                  style={{
+                    fontSize: "13px",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "#94A3B8",
+                  }}
+                >
+                  Loading gallery
+                </p>
               </div>
             </div>
           ) : filtered.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "100px 24px", color: "#94A3B8" }}>
-              <div style={{ width: "48px", height: "1px", background: "rgba(39,41,37,0.15)", margin: "0 auto 24px" }} />
+            <div
+              style={{
+                textAlign: "center",
+                padding: "100px 24px",
+                color: "#94A3B8",
+              }}
+            >
+              <div
+                style={{
+                  width: "48px",
+                  height: "1px",
+                  background: "rgba(39,41,37,0.15)",
+                  margin: "0 auto 24px",
+                }}
+              />
               <p style={{ fontSize: "14px", letterSpacing: "0.06em" }}>
-                {items.length === 0 ? "No media published yet. Check back soon." : "No items in this category."}
+                {items.length === 0
+                  ? "No media published yet. Check back soon."
+                  : "No items in this category."}
               </p>
-              <div style={{ width: "48px", height: "1px", background: "rgba(39,41,37,0.15)", margin: "24px auto 0" }} />
+              <div
+                style={{
+                  width: "48px",
+                  height: "1px",
+                  background: "rgba(39,41,37,0.15)",
+                  margin: "24px auto 0",
+                }}
+              />
             </div>
           ) : (
             <div
