@@ -627,93 +627,9 @@
 // }
 
 // src/pages/user/OurTeachers.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Footer from "../../components/Footer";
-
-// ─── PALETTE ──────────────────────────────────────────────────────────────────
-// cream:    #F8F6ED  ← tombol utama (menggantikan kuning/gold)
-// charcoal: #272925  ← aksen utama, teks gelap
-// olive:    #50553C  ← aksen sekunder, teks heading
-// blush:    #D1A799  ← aksen halus
-// ──────────────────────────────────────────────────────────────────────────────
-
-const TEACHERS = [
-  {
-    name: "Stefina Wibisono",
-    title: "Principal Teacher",
-    instrument: "Piano",
-    credentials: [
-      "Master's in Classical Piano Performance",
-      "Carnegie Mellon University",
-    ],
-    quote:
-      "It warms my heart to see students learning music as a language to express themselves, deliver ideas, and be empathetic to their surroundings, without words.",
-    photo: "/teachers/StefinaWibisono.jpg",
-    tags: ["Classical Piano", "Advanced Repertoire", "Performance"],
-    notes: ["Limited slots only", "Unavailable for home visit"],
-  },
-  {
-    name: "Vivian Rubin",
-    title: "Senior Teacher",
-    instrument: "Piano",
-    credentials: ["Bachelor's Degree in Music Education"],
-    quote:
-      "I enjoy watching students play piano. I love to witness their growth to overcome their challenges. For example, when they finally master songs with various difficulty levels.",
-    photo: "/teachers/VivianRubin.png",
-    tags: ["Piano", "Student Growth", "All Levels"],
-    notes: [],
-  },
-  {
-    name: "Genessa Anggasta",
-    title: "Senior Teacher",
-    instrument: "Piano",
-    credentials: [
-      "Certified Music Therapist",
-      "Bachelor's Degree in Music Therapy",
-    ],
-    quote:
-      "I love playing piano and I'd also love to help students with my skill. My hope is that the students will enjoy practicing piano so I can help them be a better pianist than myself.",
-    photo: "/teachers/GenessaAnggasta.jpg",
-    tags: ["Piano", "Music Therapy", "Young Learners"],
-    notes: [],
-  },
-  {
-    name: "Victoria Kezia",
-    title: "Senior Teacher",
-    instrument: "Cello & Piano",
-    credentials: ["Bachelor's Degree in Music Education"],
-    quote:
-      "My goal is to help students to make music as a safe space to grow and express themselves, as well as to guide them to find their own identity through every notes they play — not only to gain skill, but to actually feel it by heart.",
-    photo: "/teachers/VictoryKezia.jpg",
-    tags: ["Cello", "Piano", "Expressive Learning"],
-    notes: [],
-  },
-  {
-    name: "Jennifer Susanto",
-    title: "Senior Teacher",
-    instrument: "Violin, Trumpet & Piano",
-    credentials: [
-      "Bachelor's Degree in Music Composition",
-      "Master's Degree in Science Psychology",
-    ],
-    quote:
-      "I strive to educate my student about music and also to guide them with life values that they can apply through playing music.",
-    photo: "/teachers/JenniferSusanto.jpg",
-    tags: ["Violin", "Trumpet", "Piano", "Life Values"],
-    notes: [],
-  },
-  {
-    name: "Angelique Kristeva",
-    title: "Junior Teacher",
-    instrument: "Piano",
-    credentials: ["Bachelor's Degree in Music Education"],
-    quote:
-      "Teaching music allows me to pass on the joy that music has given me. Seeing children connect with sound, express themselves, and find happiness through music is deeply fulfilling.",
-    photo: "/teachers/Angelique.jpg",
-    tags: ["Piano", "Children", "Joy of Music"],
-    notes: [],
-  },
-];
+import { supabase } from "../../lib/supabaseClient";
 
 const VALUES = [
   {
@@ -945,6 +861,31 @@ function TeacherCard({ t }) {
 }
 
 export default function OurTeachers() {
+  const [teachers, setTeachers] = useState([]);
+  const [teachersLoading, setTeachersLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from("teachers")
+        .select("*")
+        .eq("is_published", true)
+        .order("sort_order", { ascending: true });
+      if (error) console.error("Failed to fetch teachers:", error);
+      setTeachers(data || []);
+      setTeachersLoading(false);
+    })();
+  }, []);
+
+  // Map data Supabase → format yang dipakai TeacherCard
+  const mappedTeachers = teachers.map((t) => ({
+    ...t,
+    photo: t.photo_url || null,         // dari Supabase Storage
+    credentials: t.credentials || [],
+    tags: t.tags || [],
+    notes: t.notes || [],
+  }));
+
   return (
     <div
       /* Cancel: spacer Navbar (h-10/12/14) + pt-16 dari main → hero nempel tepat di bawah navbar */
@@ -1103,18 +1044,53 @@ export default function OurTeachers() {
       {/* ─── TEACHER GRID ─────────────────────────────────────────────────── */}
       <section style={{ padding: "72px 0 80px" }}>
         <div className="max-w-7xl mx-auto px-6">
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: "28px",
-              alignItems: "stretch",
-            }}
-          >
-            {TEACHERS.map((t, i) => (
-              <TeacherCard key={i} t={t} />
-            ))}
-          </div>
+          {teachersLoading ? (
+            /* Loading skeleton */
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                gap: "28px",
+              }}
+            >
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  style={{
+                    borderRadius: "16px",
+                    overflow: "hidden",
+                    background: "#FFFFFF",
+                    border: "1px solid #E8E0CC",
+                    animation: "pulse 1.5s ease-in-out infinite",
+                  }}
+                >
+                  <div style={{ aspectRatio: "1/1", background: "#E8E4D8" }} />
+                  <div style={{ padding: "20px 22px" }}>
+                    <div style={{ height: "16px", background: "#E8E4D8", borderRadius: "8px", width: "60%", marginBottom: "8px" }} />
+                    <div style={{ height: "12px", background: "#F0EDE4", borderRadius: "6px", width: "40%" }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : mappedTeachers.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "64px 0", color: "#94A3B8" }}>
+              <div style={{ fontSize: "48px", marginBottom: "16px" }}>👩‍🏫</div>
+              <p style={{ fontSize: "16px" }}>Belum ada teacher yang dipublikasikan.</p>
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                gap: "28px",
+                alignItems: "stretch",
+              }}
+            >
+              {mappedTeachers.map((t, i) => (
+                <TeacherCard key={t.id || i} t={t} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

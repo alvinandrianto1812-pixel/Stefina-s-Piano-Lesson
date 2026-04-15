@@ -2,41 +2,41 @@
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
+import { useAuth } from "../contexts/AuthProvider";
 
 export default function AdminRoute({ children }) {
+  const { user } = useAuth(); // AuthProvider handle loading secara global
   const [loading, setLoading] = useState(true);
   const [allowed, setAllowed] = useState(false);
 
   useEffect(() => {
     let active = true;
 
-    const resolve = async () => {
-      // hydrate session
-      const { data } = await supabase.auth.getSession();
-      const u = data.session?.user;
-      if (!active) return;
-
-      if (!u) {
-        setAllowed(false);
-        setLoading(false);
+    const checkRole = async () => {
+      if (!user) {
+        if (active) {
+          setAllowed(false);
+          setLoading(false);
+        }
         return;
       }
 
-      // cek role via email (utama), fallback id
       let role = null;
-      if (u.email) {
+      // Cek role lewat email (utama)
+      if (user.email) {
         const { data: row } = await supabase
           .from("users")
           .select("role")
-          .eq("email", u.email)
+          .eq("email", user.email)
           .maybeSingle();
         role = row?.role ?? null;
       }
+      // Fallback lewat id
       if (!role) {
         const { data: row } = await supabase
           .from("users")
           .select("role")
-          .eq("id", u.id)
+          .eq("id", user.id)
           .maybeSingle();
         role = row?.role ?? null;
       }
@@ -46,22 +46,21 @@ export default function AdminRoute({ children }) {
       setLoading(false);
     };
 
-    // pertama kali
-    resolve();
-
-    // dengarkan perubahan auth
-    const { data: sub } = supabase.auth.onAuthStateChange(() => {
-      setLoading(true);
-      resolve();
-    });
+    checkRole();
 
     return () => {
       active = false;
-      sub?.subscription?.unsubscribe();
     };
-  }, []);
+  }, [user]);
 
-  if (loading) return <div className="p-6">Loading...</div>;
+  if (loading) {
+    return (
+      <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <p style={{ color: "#94A3B8", fontSize: "14px", fontFamily: "system-ui" }}>Memverifikasi akses…</p>
+      </div>
+    );
+  }
+
   if (!allowed) return <Navigate to="/" replace />;
   return children;
 }
