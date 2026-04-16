@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
+import AdminFinance from "./AdminFinance";
 
 const BUCKET = "media-gallery";
 const TEACHERS_FOLDER = "teachers";
@@ -9,7 +10,7 @@ const TEACHERS_FOLDER = "teachers";
 export default function Admin() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("payments"); // "payments" | "events" | "media" | "teachers"
+  const [activeTab, setActiveTab] = useState("payments"); // "payments" | "events" | "media" | "teachers" | "finance"
 
   // ── Payments state ──
   const [payments, setPayments] = useState([]);
@@ -578,7 +579,7 @@ export default function Admin() {
     setTeachersData(prev => prev.map(item => item.id === t.id ? { ...item, is_published: !t.is_published } : item));
 
     const { error } = await supabase.from("teachers").update({ is_published: !t.is_published }).eq("id", t.id);
-    
+
     if (error) {
       alert("Gagal memperbarui status: " + error.message);
       // Revert if error
@@ -598,19 +599,19 @@ export default function Admin() {
       {/* Tab Switcher */}
       <div className="flex gap-2 border-b border-slate-200 overflow-x-auto">
         {[
-          { key: "payments",  label: "💳 Pembayaran" },
-          { key: "events",    label: "📅 Events" },
-          { key: "media",     label: "🖼️ Media Gallery" },
-          { key: "teachers",  label: "👩‍🏫 Teachers" },
+          { key: "payments", label: "💳 Pembayaran" },
+          { key: "events", label: "📅 Events" },
+          { key: "media", label: "🖼️ Media Gallery" },
+          { key: "teachers", label: "👩‍🏫 Teachers" },
+          { key: "finance", label: "💰 Keuangan" },
         ].map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-5 py-2.5 text-sm font-medium transition border-b-2 -mb-px whitespace-nowrap ${
-              activeTab === tab.key
+            className={`px-5 py-2.5 text-sm font-medium transition border-b-2 -mb-px whitespace-nowrap ${activeTab === tab.key
                 ? "border-[#272925] text-[#272925]"
                 : "border-transparent text-slate-500 hover:text-slate-700"
-            }`}
+              }`}
           >
             {tab.label}
           </button>
@@ -1094,11 +1095,10 @@ export default function Admin() {
                         </p>
                         <button
                           onClick={() => togglePublish(item)}
-                          className={`mt-1.5 w-full py-1 rounded text-xs font-medium transition ${
-                            item.is_published
+                          className={`mt-1.5 w-full py-1 rounded text-xs font-medium transition ${item.is_published
                               ? "bg-yellow-400 text-yellow-900 hover:bg-yellow-500"
                               : "bg-green-500 text-white hover:bg-green-600"
-                          }`}
+                            }`}
                         >
                           {item.is_published ? "Sembunyikan" : "Publikasikan"}
                         </button>
@@ -1107,11 +1107,10 @@ export default function Admin() {
 
                     {/* Published badge */}
                     <div
-                      className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        item.is_published
+                      className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold ${item.is_published
                           ? "bg-green-100 text-green-700"
                           : "bg-slate-200 text-slate-600"
-                      }`}
+                        }`}
                     >
                       {item.is_published ? "Publik" : "Draft"}
                     </div>
@@ -1159,9 +1158,8 @@ export default function Admin() {
                       {t.sort_order}
                     </div>
                     {/* Published badge */}
-                    <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                      t.is_published ? "bg-green-100 text-green-700" : "bg-slate-200 text-slate-600"
-                    }`}>
+                    <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold ${t.is_published ? "bg-green-100 text-green-700" : "bg-slate-200 text-slate-600"
+                      }`}>
                       {t.is_published ? "Publik" : "Draft"}
                     </div>
                   </div>
@@ -1184,9 +1182,8 @@ export default function Admin() {
                     <div className="flex gap-2 mt-auto pt-3 border-t border-slate-100">
                       <button
                         onClick={() => toggleTeacherPublish(t)}
-                        className={`flex-1 py-1.5 rounded text-xs font-medium transition ${
-                          t.is_published ? "bg-yellow-50 text-yellow-700 hover:bg-yellow-100" : "bg-green-50 text-green-700 hover:bg-green-100"
-                        }`}
+                        className={`flex-1 py-1.5 rounded text-xs font-medium transition ${t.is_published ? "bg-yellow-50 text-yellow-700 hover:bg-yellow-100" : "bg-green-50 text-green-700 hover:bg-green-100"
+                          }`}
                       >
                         {t.is_published ? "Sembunyikan" : "Publikasikan"}
                       </button>
@@ -1295,11 +1292,10 @@ export default function Admin() {
                         value={teacherForm.sort_order}
                         readOnly={!teacherEditing}
                         onChange={(e) => setTeacherForm(s => ({ ...s, sort_order: e.target.value }))}
-                        className={`w-full px-3 py-2 border-2 rounded-xl text-sm transition ${
-                          teacherEditing
+                        className={`w-full px-3 py-2 border-2 rounded-xl text-sm transition ${teacherEditing
                             ? "border-slate-200 focus:outline-none focus:border-[#272925]"
                             : "border-slate-100 bg-slate-50 text-slate-500 cursor-not-allowed"
-                        }`}
+                          }`}
                       />
                       <p className="text-xs text-slate-400 mt-1">
                         {teacherEditing
@@ -1326,6 +1322,9 @@ export default function Admin() {
           )}
         </section>
       )}
+
+      {/* ── FINANCE TAB ── */}
+      {activeTab === "finance" && <AdminFinance />}
     </div>
   );
 }

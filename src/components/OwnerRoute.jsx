@@ -1,11 +1,14 @@
-// src/components/AdminRoute.jsx
+// src/components/OwnerRoute.jsx
+// Middleware route guard yang hanya mengizinkan user dengan role = 'owner'.
+// Owner adalah super-user tertinggi, di atas admin.
+// Jika bukan owner: redirect ke "/".
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../contexts/AuthProvider";
 
-export default function AdminRoute({ children }) {
-  const { user } = useAuth(); // AuthProvider handle loading secara global
+export default function OwnerRoute({ children }) {
+  const { user } = useAuth(); // loading sudah dihandle AuthProvider
   const [loading, setLoading] = useState(true);
   const [allowed, setAllowed] = useState(false);
 
@@ -22,7 +25,8 @@ export default function AdminRoute({ children }) {
       }
 
       let role = null;
-      // Cek role lewat email (utama)
+
+      // Cek lewat email (utama)
       if (user.email) {
         const { data: row } = await supabase
           .from("users")
@@ -31,7 +35,8 @@ export default function AdminRoute({ children }) {
           .maybeSingle();
         role = row?.role ?? null;
       }
-      // Fallback lewat id
+
+      // Fallback lewat id jika email kosong
       if (!role) {
         const { data: row } = await supabase
           .from("users")
@@ -42,7 +47,7 @@ export default function AdminRoute({ children }) {
       }
 
       if (!active) return;
-      setAllowed(role === "admin" || role === "owner");
+      setAllowed(role === "owner");
       setLoading(false);
     };
 
@@ -55,8 +60,17 @@ export default function AdminRoute({ children }) {
 
   if (loading) {
     return (
-      <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p style={{ color: "#94A3B8", fontSize: "14px", fontFamily: "system-ui" }}>Memverifikasi akses…</p>
+      <div
+        style={{
+          minHeight: "60vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <p style={{ color: "#94A3B8", fontSize: "14px", fontFamily: "system-ui" }}>
+          Memverifikasi akses owner…
+        </p>
       </div>
     );
   }
