@@ -22,11 +22,16 @@ export default function OwnerReport() {
   const fetchReport = async () => {
     setLoading(true);
     try {
+      // Only run if filterBulan is exactly YYYY-MM
+      if (!/^\d{4}-\d{2}$/.test(filterBulan)) {
+        setLoading(false);
+        return;
+      }
       const [year, month] = filterBulan.split("-");
       const dateFrom = `${year}-${month}-01T00:00:00Z`;
-      // We calculate to the last moment of the month using next month's 1st 00:00 minus epsilon, 
-      // but Supabase gte and lt is better: gte 1st, lt 1st of next month.
-      const dateToRaw = new Date(+year, parseInt(month, 10), 1);
+      
+      // Calculate next month's 1st date for "less than" boundary
+      const dateToRaw = new Date(parseInt(year, 10), parseInt(month, 10), 1);
       const yTo = dateToRaw.getFullYear();
       const mTo = String(dateToRaw.getMonth() + 1).padStart(2, '0');
       const dateTo = `${yTo}-${mTo}-01T00:00:00Z`;

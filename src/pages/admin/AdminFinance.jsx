@@ -81,9 +81,11 @@ export default function AdminFinance() {
     fetchPengeluaran();
   }, [filterBulan]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const [year, month] = filterBulan.split("-");
-  const dateFrom = `${year}-${month}-01`;
-  const dateTo = new Date(+year, +month, 0).toISOString().slice(0, 10); // last day
+  // Only compute dates if exact YYYY-MM
+  const isBulanValid = /^\d{4}-\d{2}$/.test(filterBulan);
+  const [year, month] = isBulanValid ? filterBulan.split("-") : ["", ""];
+  const dateFrom = isBulanValid ? `${year}-${month}-01` : "";
+  const dateTo = isBulanValid ? new Date(+year, +month, 0).toISOString().slice(0, 10) : "";
 
   async function fetchTeachers() {
     const { data } = await supabase
@@ -94,6 +96,7 @@ export default function AdminFinance() {
   }
 
   async function fetchPresensi() {
+    if (!isBulanValid) return;
     setPresensiLoading(true);
     const { data, error } = await supabase
       .from("presensi_guru")
@@ -107,6 +110,7 @@ export default function AdminFinance() {
   }
 
   async function fetchPengeluaran() {
+    if (!isBulanValid) return;
     setPengeluaranLoading(true);
     const { data, error } = await supabase
       .from("finance_records")
