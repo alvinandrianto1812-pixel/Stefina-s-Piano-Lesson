@@ -1,0 +1,20 @@
+.scroll-float {
+  overflow: visible;
+  display: block;
+}
+
+.scroll-float-text {
+  display: inline;
+}
+
+/* Each character is wrapped in this span */
+.scroll-float-char {
+  display: inline-block;
+  will-change: opacity, transform;
+}
+
+/* Non-breaking space for actual spaces */
+.scroll-float-char--space {
+  display: inline-block;
+  width: 0.3em;
+}

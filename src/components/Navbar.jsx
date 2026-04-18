@@ -1,8 +1,9 @@
 // src/components/Navbar.jsx
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import NavAnimation from "./NavAnimation";
+import { gsap } from "gsap";
 
 const DROPDOWN_GROUPS = [
   {
@@ -186,6 +187,13 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(null);
 
+  // GSAP animation refs for mobile menu
+  const mobileMenuRef = useRef(null);
+  const mobileMenuTlRef = useRef(null);
+  const hamburgerLineTopRef = useRef(null);
+  const hamburgerLineBotRef = useRef(null);
+  const mobileNavItemsRef = useRef([]);
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -233,9 +241,107 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    setMenuOpen(false);
+    if (menuOpen) closeMenu();
     setMobileOpen(null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
+
+  // Build GSAP timeline for mobile menu
+  const buildMobileTl = () => {
+    const panel = mobileMenuRef.current;
+    if (!panel) return null;
+
+    const items = mobileNavItemsRef.current.filter(Boolean);
+
+    // Measure natural height first so reverse works correctly
+    gsap.set(panel, { height: 'auto', display: 'block', overflow: 'hidden' });
+    const naturalHeight = panel.scrollHeight;
+    gsap.set(panel, { height: 0 });
+    gsap.set(items, { y: 24, opacity: 0, scale: 0.95 });
+
+    const tl = gsap.timeline({ paused: true });
+
+    // 1. Expand panel height
+    tl.to(panel, {
+      height: naturalHeight,
+      duration: 0.42,
+      ease: 'power3.out',
+    });
+
+    // 2. Stagger items in with bounce
+    tl.to(
+      items,
+      {
+        y: 0,
+        opacity: 1,
+        scale: 1,
+        duration: 0.36,
+        ease: 'back.out(1.7)',
+        stagger: 0.055,
+      },
+      '-=0.18'
+    );
+
+    return tl;
+  };
+
+  useLayoutEffect(() => {
+    const panel = mobileMenuRef.current;
+    if (!panel) return;
+    gsap.set(panel, { height: 0, overflow: 'hidden', display: 'none' });
+  }, []);
+
+  const openMenu = () => {
+    const panel = mobileMenuRef.current;
+    if (!panel) return;
+
+    gsap.set(panel, { display: 'block' });
+    const tl = buildMobileTl();
+    mobileMenuTlRef.current = tl;
+    tl?.play();
+
+    // Animate hamburger lines → X with back ease
+    gsap.to(hamburgerLineTopRef.current, {
+      y: 5, rotate: 45, duration: 0.3, ease: 'back.out(1.4)',
+    });
+    gsap.to(hamburgerLineBotRef.current, {
+      y: -5, rotate: -45, duration: 0.3, ease: 'back.out(1.4)',
+    });
+
+    setMenuOpen(true);
+  };
+
+  const closeMenu = () => {
+    const tl = mobileMenuTlRef.current;
+    const panel = mobileMenuRef.current;
+
+    // Animate X → hamburger lines
+    gsap.to(hamburgerLineTopRef.current, {
+      y: 0, rotate: 0, duration: 0.25, ease: 'power2.out',
+    });
+    gsap.to(hamburgerLineBotRef.current, {
+      y: 0, rotate: 0, duration: 0.25, ease: 'power2.out',
+    });
+
+    if (tl) {
+      tl.eventCallback('onReverseComplete', () => {
+        if (panel) gsap.set(panel, { display: 'none' });
+        setMenuOpen(false);
+      });
+      tl.reverse();
+    } else {
+      if (panel) gsap.set(panel, { display: 'none', height: 0 });
+      setMenuOpen(false);
+    }
+  };
+
+  const toggleMenu = () => {
+    if (menuOpen) closeMenu(); else openMenu();
+  };
+
+  const setMobileItemRef = (i) => (el) => {
+    mobileNavItemsRef.current[i] = el;
+  };
 
   const isActive = (path) => location.pathname === path;
   const handleLogout = () => navigate("/logout");
@@ -409,11 +515,11 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Hamburger */}
+          {/* Hamburger — GSAP animated */}
           <button
             className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-slate-700 hover:text-olive"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle Menu"
+            onClick={toggleMenu}
+            aria-label={menuOpen ? 'Close Menu' : 'Open Menu'}
           >
             <svg
               width="24"
@@ -421,32 +527,38 @@ export default function Navbar() {
               viewBox="0 0 24 24"
               fill="none"
               aria-hidden="true"
+              style={{ overflow: 'visible' }}
             >
-              {menuOpen ? (
-                <path
-                  d="M6 6l12 12M6 18L18 6"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                />
-              ) : (
-                <path
-                  d="M4 7h16M4 12h16M4 17h16"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                />
-              )}
+              <line
+                ref={hamburgerLineTopRef}
+                x1="3" y1="7" x2="21" y2="7"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                style={{ transformOrigin: '12px 7px' }}
+              />
+              <line
+                ref={hamburgerLineBotRef}
+                x1="3" y1="17" x2="21" y2="17"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                style={{ transformOrigin: '12px 17px' }}
+              />
             </svg>
           </button>
         </div>
 
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div className="md:hidden bg-white/97 backdrop-blur-sm px-4 pb-5 pt-2 space-y-1 border-t border-[#E8E0CC]">
+        {/* Mobile menu — always rendered, shown/hidden via GSAP */}
+        <div
+          ref={mobileMenuRef}
+          className="md:hidden bg-white/97 backdrop-blur-sm px-4 pb-5 pt-2 space-y-1 border-t border-[#E8E0CC]"
+          style={{ display: 'none', overflow: 'hidden' }}
+        >
             <Link
+              ref={setMobileItemRef(0)}
               to="/"
-              onClick={() => setMenuOpen(false)}
+              onClick={() => closeMenu()}
               className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition ${isActive("/") ? "bg-[#ECEAE2] font-semibold" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
               style={isActive("/") ? { color: "#272925" } : {}}
             >
@@ -454,7 +566,7 @@ export default function Navbar() {
             </Link>
 
             {DROPDOWN_GROUPS.map((group, gi) => (
-              <div key={group.label}>
+              <div key={group.label} ref={setMobileItemRef(gi + 1)}>
                 <button
                   onClick={() => setMobileOpen(mobileOpen === gi ? null : gi)}
                   className="w-full flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium text-slate-700 hover:bg-[#F8F6ED] transition"
@@ -490,7 +602,7 @@ export default function Navbar() {
                       <Link
                         key={item.to}
                         to={item.to}
-                        onClick={() => setMenuOpen(false)}
+                        onClick={() => closeMenu()}
                         className={`flex flex-col rounded-xl px-4 py-2.5 text-sm transition ${isActive(item.to) ? "bg-[#ECEAE2]" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
                         style={isActive(item.to) ? { color: "#272925" } : {}}
                       >
@@ -505,11 +617,12 @@ export default function Navbar() {
               </div>
             ))}
 
-            {STANDALONE.map((item) => (
+            {STANDALONE.map((item, si) => (
               <Link
                 key={item.to}
+                ref={setMobileItemRef(DROPDOWN_GROUPS.length + 1 + si)}
                 to={item.to}
-                onClick={() => setMenuOpen(false)}
+                onClick={() => closeMenu()}
                 className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition ${isActive(item.to) ? "bg-[#ECEAE2] font-semibold" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
                 style={isActive(item.to) ? { color: "#272925" } : {}}
               >
@@ -518,8 +631,9 @@ export default function Navbar() {
             ))}
 
             <Link
+              ref={setMobileItemRef(DROPDOWN_GROUPS.length + 2)}
               to="/OurPolicy"
-              onClick={() => setMenuOpen(false)}
+              onClick={() => closeMenu()}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -542,8 +656,9 @@ export default function Navbar() {
 
             {isAdmin && (
               <Link
+                ref={setMobileItemRef(DROPDOWN_GROUPS.length + 3)}
                 to="/admin"
-                onClick={() => setMenuOpen(false)}
+                onClick={() => closeMenu()}
                 className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition ${isActive("/admin") ? "bg-[#ECEAE2]" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
                 style={isActive("/admin") ? { color: "#272925" } : {}}
               >
@@ -553,8 +668,9 @@ export default function Navbar() {
 
             {isOwner && (
               <Link
+                ref={setMobileItemRef(DROPDOWN_GROUPS.length + 4)}
                 to="/owner"
-                onClick={() => setMenuOpen(false)}
+                onClick={() => closeMenu()}
                 className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition ${isActive("/owner") ? "bg-[#FCECE9]" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
                 style={isActive("/owner") ? { color: "#C0503D" } : {}}
               >
@@ -562,11 +678,11 @@ export default function Navbar() {
               </Link>
             )}
 
-            <div className="pt-2">
+            <div ref={setMobileItemRef(DROPDOWN_GROUPS.length + 5)} className="pt-2">
               {user ? (
                 <button
                   onClick={() => {
-                    setMenuOpen(false);
+                    closeMenu();
                     navigate("/logout");
                   }}
                   style={{
@@ -586,7 +702,7 @@ export default function Navbar() {
               ) : (
                 <Link
                   to="/auth"
-                  onClick={() => setMenuOpen(false)}
+                  onClick={() => closeMenu()}
                   style={{
                     display: "block",
                     width: "100%",
@@ -605,7 +721,6 @@ export default function Navbar() {
               )}
             </div>
           </div>
-        )}
       </nav>
 
       {/* Spacer */}

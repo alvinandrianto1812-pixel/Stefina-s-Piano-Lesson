@@ -1,9 +1,11 @@
-// src/pages/LandingPage.jsx
+﻿// src/pages/LandingPage.jsx
 import TypingText from "../../components/TypingText";
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { useNavigate, useLocation } from "react-router-dom";
 import Footer from "../../components/Footer";
+import ScrollFloat from "../../components/ScrollFloat";
+import MagicRings from "../../components/MagicRings";
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -47,6 +49,35 @@ export default function LandingPage() {
               "radial-gradient(800px 300px at 20% 10%, rgba(209,167,153,0.22), transparent 60%)" /* #D1A799 */,
           }}
         />
+
+        {/* MagicRings — full hero section cover, rings centered in hero */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        >
+          <MagicRings
+            color="#D1A799"
+            colorTwo="#50553C"
+            ringCount={5}
+            speed={0.65}
+            opacity={0.9}
+            attenuation={6}
+            lineThickness={2}
+            baseRadius={0.28}
+            radiusStep={0.10}
+            noiseAmount={0.02}
+            followMouse={true}
+            mouseInfluence={0.12}
+            parallax={0.04}
+            hoverScale={1.08}
+            clickBurst={true}
+          />
+        </div>
         <div className="max-w-7xl mx-auto px-4 pt-28 pb-10 grid md:grid-cols-2 gap-10 items-center">
           <div>
             <h1 className="headline text-4xl md:text-5xl leading-tight text-[#50553C]">
@@ -97,6 +128,7 @@ export default function LandingPage() {
           {/* “Mockup” class card */}
           <div className="md:justify-self-end w-full">
             <div className="rounded-2xl bg-white/90 backdrop-blur shadow-luxe border border-white/60 p-6">
+
               <div className="flex items-center justify-between">
                 <h3
                   className="font-semibold"
@@ -131,9 +163,17 @@ export default function LandingPage() {
       {/* FEATURES */}
       <section id="features" className="py-16 scroll-mt-24">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="headline text-3xl text-center mb-10 text-[#50553C]">
+          <ScrollFloat
+            as="h2"
+            className="headline text-3xl text-center mb-10 text-[#50553C]"
+            animationDuration={1}
+            ease="back.inOut(2)"
+            scrollStart="center bottom+=50%"
+            scrollEnd="bottom bottom-=40%"
+            stagger={0.04}
+          >
             Why Choose Us?
-          </h2>
+          </ScrollFloat>
           <div className="grid md:grid-cols-4 gap-6">
             {[
               {
@@ -169,9 +209,17 @@ export default function LandingPage() {
       {/* TESTIMONIALS */}
       <section id="testimonials" className="py-16 scroll-mt-24">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="headline text-3xl text-center mb-10 text-[#50553C]">
+          <ScrollFloat
+            as="h2"
+            className="headline text-3xl text-center mb-10 text-[#50553C]"
+            animationDuration={1}
+            ease="back.inOut(2)"
+            scrollStart="center bottom+=50%"
+            scrollEnd="bottom bottom-=40%"
+            stagger={0.04}
+          >
             What Parents Say
-          </h2>
+          </ScrollFloat>
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
@@ -210,9 +258,17 @@ export default function LandingPage() {
         }}
       >
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="headline text-3xl text-center mb-10 text-[#50553C]">
+          <ScrollFloat
+            as="h2"
+            className="headline text-3xl text-center mb-10 text-[#50553C]"
+            animationDuration={1}
+            ease="back.inOut(2)"
+            scrollStart="center bottom+=50%"
+            scrollEnd="bottom bottom-=40%"
+            stagger={0.03}
+          >
             Frequently Asked Questions
-          </h2>
+          </ScrollFloat>
           <div className="divide-y rounded-2xl border bg-white">
             {[
               {
@@ -248,9 +304,17 @@ export default function LandingPage() {
         style={{ backgroundColor: "#272925" }}
       >
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h3 className="headline text-3xl text-[#F8F6ED]">
+          <ScrollFloat
+            as="h3"
+            className="headline text-3xl text-[#F8F6ED]"
+            animationDuration={1}
+            ease="back.inOut(2)"
+            scrollStart="center bottom+=50%"
+            scrollEnd="bottom bottom-=40%"
+            stagger={0.03}
+          >
             Ready to Start Your Musical Journey?
-          </h3>
+          </ScrollFloat>
           <p className="mt-2 text-slate-300">
             Book a trial, fill out a short questionnaire, and choose a suitable
             schedule.
@@ -269,3 +333,6 @@ export default function LandingPage() {
     </div>
   );
 }
+
+
+
