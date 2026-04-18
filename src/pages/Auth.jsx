@@ -30,12 +30,17 @@ export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(() => {
-    const saved = localStorage.getItem("rememberMe");
-    if (saved === null) {
-      localStorage.setItem("rememberMe", "true");
+    try {
+      const saved = localStorage.getItem("rememberMe");
+      if (saved === null) {
+        localStorage.setItem("rememberMe", "true");
+        return true;
+      }
+      return JSON.parse(saved);
+    } catch (e) {
+      // Ignored: Storage blocked
       return true;
     }
-    return JSON.parse(saved);
   });
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [notice, setNotice] = useState("");
@@ -62,7 +67,11 @@ export default function Auth() {
 
   // untuk remember me
   useEffect(() => {
-    localStorage.setItem("rememberMe", JSON.stringify(rememberMe));
+    try {
+      localStorage.setItem("rememberMe", JSON.stringify(rememberMe));
+    } catch (e) {
+      // Ignored: Storage blocked
+    }
   }, [rememberMe]);
 
   const onChange = (e) => {

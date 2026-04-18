@@ -20,6 +20,8 @@ import Media from "./pages/user/Media";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
+import OwnerRoute from "./components/OwnerRoute";
+import OwnerReport from "./pages/owner/OwnerReport";
 
 export default function App() {
   return (
@@ -60,6 +62,16 @@ export default function App() {
               <AdminRoute>
                 <Admin />
               </AdminRoute>
+            }
+          />
+
+          {/* ---- Rute khusus Owner (super-admin) ---- */}
+          <Route
+            path="/owner"
+            element={
+              <OwnerRoute>
+                <OwnerReport />
+              </OwnerRoute>
             }
           />
 

@@ -182,6 +182,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(null);
 
@@ -204,7 +205,8 @@ export default function Navbar() {
           .select("role")
           .eq("email", user.email)
           .maybeSingle();
-        setIsAdmin(data?.role === "admin");
+        setIsAdmin(data?.role === "admin" || data?.role === "owner");
+        setIsOwner(data?.role === "owner");
       } else {
         setIsAdmin(false);
       }
@@ -220,7 +222,8 @@ export default function Navbar() {
             .select("role")
             .eq("email", u.email)
             .maybeSingle();
-          setIsAdmin(data?.role === "admin");
+          setIsAdmin(data?.role === "admin" || data?.role === "owner");
+          setIsOwner(data?.role === "owner");
         } else {
           setIsAdmin(false);
         }
@@ -332,6 +335,19 @@ export default function Navbar() {
                 <span
                   className={`pointer-events-none absolute left-3 right-3 -bottom-0.5 h-0.5 origin-left rounded-full transition-transform ${isActive("/admin") ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
                   style={{ background: "#272925" }}
+                />
+              </Link>
+            )}
+
+            {isOwner && (
+              <Link
+                to="/owner"
+                className={`group relative px-3 py-2 text-[13px] lg:text-[15px] transition-colors ${isActive("/owner") ? "text-[#C0503D]" : "text-slate-700 hover:text-[#C0503D]"}`}
+              >
+                Owner
+                <span
+                  className={`pointer-events-none absolute left-3 right-3 -bottom-0.5 h-0.5 origin-left rounded-full transition-transform ${isActive("/owner") ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
+                  style={{ background: "#C0503D" }}
                 />
               </Link>
             )}
@@ -532,6 +548,17 @@ export default function Navbar() {
                 style={isActive("/admin") ? { color: "#272925" } : {}}
               >
                 Admin
+              </Link>
+            )}
+
+            {isOwner && (
+              <Link
+                to="/owner"
+                onClick={() => setMenuOpen(false)}
+                className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition ${isActive("/owner") ? "bg-[#FCECE9]" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
+                style={isActive("/owner") ? { color: "#C0503D" } : {}}
+              >
+                Owner
               </Link>
             )}
 

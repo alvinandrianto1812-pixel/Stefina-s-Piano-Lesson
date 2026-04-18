@@ -5,37 +5,55 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Awal dari trik kita: Buat custom storage adapter
+// In-memory fallback untuk browser yang memblokir storage (misal: Firefox strict mode / private tab)
+const memoryStorage = {};
+
 const customStorageAdapter = {
   getItem: (key) => {
-    // Cek apakah 'rememberMe' di localStorage diset ke 'true'
-    // Jika ya, gunakan localStorage. Jika tidak, gunakan sessionStorage.
-    const remember = window.localStorage.getItem("rememberMe") === "true";
-    const primary   = remember ? window.localStorage : window.sessionStorage;
-    const secondary = remember ? window.sessionStorage : window.localStorage;
-
-    // Coba baca dari storage yang sesuai preferensi saat ini
-    const value = primary.getItem(key);
-    if (value !== null) return value;
-
-    // Jika tidak ada, cek storage lama (migrasi saat preferensi berubah)
-    const migrated = secondary.getItem(key);
-    if (migrated !== null) {
-      // Pindahkan token ke storage yang sekarang aktif, hapus dari yang lama
-      primary.setItem(key, migrated);
-      secondary.removeItem(key);
+    if (typeof window === "undefined") return null;
+    let remember = false;
+    try {
+      remember = window.localStorage.getItem("rememberMe") === "true";
+    } catch (e) {
+      // Ignored: Storage blocked
     }
-    return migrated;
+
+    try {
+      const primary = remember ? window.localStorage : window.sessionStorage;
+      const secondary = remember ? window.sessionStorage : window.localStorage;
+
+      // Coba baca dari storage utama
+      let value = null;
+      try { value = primary.getItem(key); } catch (e) {}
+      if (value !== null) return value;
+
+      // Cek migrasi dari storage sekunder
+      let migrated = null;
+      try { migrated = secondary.getItem(key); } catch (e) {}
+      if (migrated !== null) {
+        try { primary.setItem(key, migrated); } catch (e) {}
+        try { secondary.removeItem(key); } catch (e) {}
+      }
+      return migrated;
+    } catch (err) {
+      return memoryStorage[key] || null;
+    }
   },
   setItem: (key, value) => {
-    // Logika yang sama saat menyimpan item
-    const remember = window.localStorage.getItem("rememberMe") === "true";
-    const storage = remember ? window.localStorage : window.sessionStorage;
-    storage.setItem(key, value);
+    if (typeof window === "undefined") return;
+    try {
+      const remember = window.localStorage.getItem("rememberMe") === "true";
+      const storage = remember ? window.localStorage : window.sessionStorage;
+      storage.setItem(key, value);
+    } catch (e) {
+      memoryStorage[key] = value;
+    }
   },
   removeItem: (key) => {
-    // Hapus dari kedua storage untuk memastikan logout bersih
-    window.localStorage.removeItem(key);
-    window.sessionStorage.removeItem(key);
+    if (typeof window === "undefined") return;
+    try { window.localStorage.removeItem(key); } catch (e) {}
+    try { window.sessionStorage.removeItem(key); } catch (e) {}
+    delete memoryStorage[key];
   },
 };
 
