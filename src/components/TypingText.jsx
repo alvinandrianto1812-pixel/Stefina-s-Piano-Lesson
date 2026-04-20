@@ -45,12 +45,22 @@ export default function TypingText({
 
   return (
     <span className={`relative ${className}`} aria-live="polite">
-      {/* teks berwarna emas/gradient */}
-      <span className="bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent">
+      {/* teks dengan warna brand brick */}
+      <span style={{ color: 'var(--brick)' }}>
         {text}
       </span>
-      {/* kursor berkedip */}
-      <span className="ml-1 inline-block w-[2px] h-[1em] align-[-0.15em] bg-amber-500 animate-pulse" />
+      {/* kursor berkedip — warna blush */}
+      <span
+        style={{
+          display: 'inline-block',
+          width: '2px',
+          height: '0.9em',
+          verticalAlign: '-0.1em',
+          marginLeft: '2px',
+          background: 'var(--blush)',
+          animation: 'typing-blink 0.9s step-end infinite',
+        }}
+      />
     </span>
   );
 }

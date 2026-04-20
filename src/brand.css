@@ -132,3 +132,40 @@ h1, h2, h3, .headline {
   background: linear-gradient(90deg, var(--blush), var(--brick));
   border-radius: 9999px;
 }
+
+/* ── TypingText cursor blink ── */
+@keyframes typing-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── ScrollFloat heading styles ── */
+.scroll-float.fe-section-heading,
+.scroll-float.fe-section-heading .scroll-float-text {
+  font-family: 'Rockdale FREE', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--olive);
+  text-align: center;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.scroll-float.faq-heading,
+.scroll-float.faq-heading .scroll-float-text {
+  font-family: 'Rockdale FREE', serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  color: var(--olive);
+  text-align: center;
+  margin-bottom: 2.5rem;
+  display: block;
+}
+
+.scroll-float.cta-heading,
+.scroll-float.cta-heading .scroll-float-text {
+  font-family: 'Rockdale FREE', serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.75rem);
+  color: var(--olive);
+  text-align: center;
+  margin-bottom: 0.5rem;
+  display: block;
+}

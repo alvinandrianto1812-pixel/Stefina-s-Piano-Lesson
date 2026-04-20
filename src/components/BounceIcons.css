@@ -1,0 +1,63 @@
+/* BounceIcons.css */
+.bounce-icons {
+  width: 100%;
+  overflow: hidden;
+  position: relative; /* establish a clipping context */
+  padding: 2rem 0;
+  background: #F8F6ED;
+  border-top: 1px solid rgba(209,167,153,0.25);
+  border-bottom: 1px solid rgba(209,167,153,0.25);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+  /* Clip any child that tries to paint outside */
+  clip-path: inset(0);
+}
+
+.bounce-icons__track {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 0;
+  width: 100%;
+  padding: 0 2rem;
+}
+
+.bounce-icons__sym {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: serif;
+  line-height: 1;
+  cursor: default;
+  user-select: none;
+  animation: bounce-sym 1.6s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+  transition: color 0.2s ease;
+}
+
+.bounce-icons__sym:hover {
+  animation-play-state: paused;
+  transform: scale(1.4) translateY(-4px) !important;
+}
+
+@keyframes bounce-sym {
+  0%   { transform: translateY(0px) scale(1);    opacity: 0.45; }
+  50%  { opacity: 0.8; }
+  100% { transform: translateY(-14px) scale(1.2); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bounce-icons__sym { animation: none; opacity: 0.7; }
+}

@@ -1,0 +1,174 @@
+/* TestimonialSlider.css */
+
+.ts-section {
+  background: var(--charcoal);
+  padding: 6rem 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.ts-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(209,167,153,0.3), transparent);
+}
+
+.ts-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Heading */
+.ts-heading {
+  font-family: 'Rockdale FREE', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--cream);
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+.ts-sub {
+  text-align: center;
+  color: rgba(248,246,237,0.5);
+  font-size: 0.95rem;
+  margin-bottom: 3.5rem;
+  font-family: 'Creato Display', sans-serif;
+}
+
+/* Slider track */
+.ts-track-wrap {
+  overflow: hidden;
+  border-radius: 20px;
+}
+.ts-track {
+  display: flex;
+  transition: transform 0.6s cubic-bezier(.4,0,.2,1);
+}
+
+/* Single slide */
+.ts-slide {
+  flex: 0 0 100%;
+  padding: 3rem 3.5rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(209,167,153,0.15);
+  border-radius: 20px;
+  position: relative;
+}
+
+.ts-quote-mark {
+  font-family: 'Rockdale FREE', serif;
+  font-size: 5rem;
+  line-height: 0.5;
+  color: var(--blush);
+  opacity: 0.5;
+  margin-bottom: 1.5rem;
+  display: block;
+  user-select: none;
+}
+
+.ts-quote {
+  font-family: 'Creato Display', sans-serif;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  color: var(--cream);
+  line-height: 1.8;
+  font-style: italic;
+  margin-bottom: 2rem;
+}
+
+.ts-author {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.ts-author__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(209,167,153,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Rockdale FREE', serif;
+  font-size: 1.2rem;
+  color: var(--blush);
+  border: 1px solid rgba(209,167,153,0.3);
+  flex-shrink: 0;
+}
+.ts-author__name {
+  font-family: 'Creato Display', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--blush);
+}
+.ts-author__role {
+  font-family: 'Creato Display', sans-serif;
+  font-size: 0.78rem;
+  color: rgba(248,246,237,0.45);
+  margin-top: 0.1rem;
+}
+
+/* Stars */
+.ts-stars {
+  position: absolute;
+  top: 2.5rem;
+  right: 3rem;
+  display: flex;
+  gap: 0.2rem;
+  color: var(--blush);
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Controls */
+.ts-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+.ts-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(209,167,153,0.3);
+  background: transparent;
+  color: var(--blush);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.ts-btn:hover:not(:disabled) {
+  background: rgba(209,167,153,0.15);
+  border-color: var(--blush);
+  transform: scale(1.1);
+}
+.ts-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.ts-pips {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.ts-pip {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(209,167,153,0.3);
+  transition: width 0.3s ease, background 0.3s ease;
+  cursor: pointer;
+}
+.ts-pip.active {
+  width: 20px;
+  border-radius: 99px;
+  background: var(--blush);
+}
+
+@media (max-width: 640px) {
+  .ts-slide { padding: 2rem 1.5rem; }
+  .ts-stars { top: 1.5rem; right: 1.5rem; }
+}
