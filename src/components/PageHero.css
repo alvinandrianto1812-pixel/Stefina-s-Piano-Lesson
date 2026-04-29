@@ -1,0 +1,111 @@
+/* src/components/PageHero.css */
+
+.page-hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--charcoal);
+  min-height: 460px;
+}
+
+/* Ambient gradient layers */
+.page-hero__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 60% at 82% 8%,  rgba(209,167,153,0.17) 0%, transparent 58%),
+    radial-gradient(ellipse 55% 45% at 15% 92%, rgba(80,85,60,0.28)   0%, transparent 65%),
+    radial-gradient(ellipse 40% 40% at  0% 100%,rgba(8,9,8,0.5)       0%, transparent 60%);
+}
+
+/* MagicRings layer */
+.page-hero__rings {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Content */
+.page-hero__content {
+  position: relative;
+  z-index: 10;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 9rem 2rem 5rem;
+}
+
+/* Eyebrow */
+.page-hero__eyebrow {
+  font-family: 'Creato Display', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--blush);
+  margin: 0 0 1rem;
+}
+
+/* Title — styled by .scroll-float inside ScrollFloat */
+.page-hero .scroll-float {
+  font-family: 'Rockdale FREE', serif;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  line-height: 1.1;
+  color: var(--cream);
+  margin: 0 0 1.25rem;
+  display: block;
+}
+.page-hero .scroll-float .scroll-float-text { color: var(--cream); }
+
+/* Subtitle */
+.page-hero__subtitle {
+  font-family: 'Creato Display', sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: rgba(248,246,237,0.62);
+  max-width: 54ch;
+  margin: 0;
+}
+
+/* Stats row */
+.page-hero__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  margin-top: 2.75rem;
+}
+.page-hero__stat-num {
+  font-family: 'Rockdale FREE', serif;
+  font-size: 1.9rem;
+  color: var(--blush);
+  line-height: 1;
+}
+.page-hero__stat-label {
+  font-family: 'Creato Display', sans-serif;
+  font-size: 0.72rem;
+  color: rgba(248,246,237,0.45);
+  margin-top: 0.25rem;
+  letter-spacing: 0.05em;
+}
+
+/* Wave divider */
+.page-hero__wave {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  display: block;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Horizontal rule separator inside hero */
+.page-hero__rule {
+  width: 40px;
+  height: 2px;
+  background: var(--blush);
+  opacity: 0.4;
+  border-radius: 2px;
+  margin-bottom: 1.5rem;
+}

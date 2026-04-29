@@ -7,25 +7,27 @@ import './ScrollFloat.css';
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * ScrollFloat — animates text character-by-character as the user scrolls.
+ * ScrollFloat — animates text character-by-character when it enters the viewport.
  *
- * If `children` is a string → split into chars and animate each one.
- * If `children` is a ReactNode (JSX) → wraps the whole block and fades/slides it in.
+ * If `children` is a string → split into chars and animate each one with stagger.
+ * If `children` is a ReactNode (JSX) → fades/slides the whole block in.
  *
  * Props:
  *  as            – HTML tag for the wrapper (default: 'h2')
  *  className     – classes applied to the wrapper element
- *  animationDuration, ease, scrollStart, scrollEnd, stagger — GSAP options
+ *  animationDuration, ease, scrollStart, stagger — GSAP options
+ *  scrub         – if true, ties animation to scroll position (legacy). Default: false.
  */
 const ScrollFloat = ({
   children,
   as: Tag = 'h2',
   className = '',
-  animationDuration = 1,
-  ease = 'back.inOut(2)',
-  scrollStart = 'center bottom+=50%',
-  scrollEnd = 'bottom bottom-=40%',
-  stagger = 0.03,
+  animationDuration = 0.8,
+  ease = 'back.out(1.7)',
+  scrollStart = 'top 88%',
+  scrollEnd = 'bottom 20%',   // only used when scrub=true
+  stagger = 0.025,
+  scrub = false,
   scrollContainerRef,
 }) => {
   const containerRef = useRef(null);
@@ -69,42 +71,50 @@ const ScrollFloat = ({
     let targets;
 
     if (isString) {
-      // Animate each character
       targets = el.querySelectorAll('.scroll-float-char');
     } else {
-      // Animate the whole wrapper as a single element
       targets = [el];
     }
 
     if (!targets.length) return;
 
-    const anim = gsap.fromTo(
-      targets,
-      {
-        willChange: 'opacity, transform',
-        opacity: 0,
-        yPercent: isString ? 120 : 30,
-        scaleY: isString ? 2.3 : 1,
-        scaleX: isString ? 0.7 : 1,
-        transformOrigin: '50% 0%',
-      },
-      {
-        duration: animationDuration,
-        ease,
-        opacity: 1,
-        yPercent: 0,
-        scaleY: 1,
-        scaleX: 1,
-        stagger: isString ? stagger : 0,
-        scrollTrigger: {
-          trigger: el,
-          scroller,
-          start: scrollStart,
-          end: scrollEnd,
-          scrub: true,
-        },
-      }
-    );
+    // Set initial hidden state immediately (avoids flash of visible text)
+    gsap.set(targets, {
+      opacity: 0,
+      yPercent: isString ? 110 : 28,
+      scaleY: isString ? 2.0 : 1,
+      scaleX: isString ? 0.75 : 1,
+      transformOrigin: '50% 100%',
+    });
+
+    const anim = gsap.to(targets, {
+      duration: animationDuration,
+      ease,
+      opacity: 1,
+      yPercent: 0,
+      scaleY: 1,
+      scaleX: 1,
+      stagger: isString ? stagger : 0,
+      ...(scrub
+        ? {
+            scrollTrigger: {
+              trigger: el,
+              scroller,
+              start: scrollStart,
+              end: scrollEnd,
+              scrub: 1.2,
+            },
+          }
+        : {
+            scrollTrigger: {
+              trigger: el,
+              scroller,
+              start: scrollStart,
+              toggleActions: 'play none none none',
+              once: true,
+            },
+          }),
+    });
 
     return () => {
       anim.scrollTrigger?.kill();
@@ -112,6 +122,7 @@ const ScrollFloat = ({
     };
   }, [
     isString,
+    scrub,
     scrollContainerRef,
     animationDuration,
     ease,

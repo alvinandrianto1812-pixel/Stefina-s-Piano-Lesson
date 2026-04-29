@@ -1,1264 +1,284 @@
-// // src/pages/user/OurTeachers.jsx
-// import React from "react";
-// import Footer from "../../components/Footer";
-
-// const TEACHERS = [
-//   {
-//     name: "Stefina Wibisono",
-//     title: "Principal Teacher",
-//     instrument: "Piano",
-//     credentials: [
-//       "Master's in Classical Piano Performance",
-//       "Carnegie Mellon University",
-//     ],
-//     quote:
-//       "It warms my heart to see students learning music as a language to express themselves, deliver ideas, and be empathetic to their surroundings, without words.",
-//     photo: "/teachers/StefinaWibisono.jpg",
-//     tags: ["Classical Piano", "Advanced Repertoire", "Performance"],
-//     notes: ["Limited slots only", "Unavailable for home visit"],
-//   },
-//   {
-//     name: "Vivian Rubin",
-//     title: "Senior Teacher",
-//     instrument: "Piano",
-//     credentials: ["Bachelor's Degree in Music Education"],
-//     quote:
-//       "I enjoy watching students play piano. I love to witness their growth to overcome their challenges. For example, when they finally master songs with various difficulty levels.",
-//     photo: "/teachers/VivianRubin.png",
-//     tags: ["Piano", "Student Growth", "All Levels"],
-//     notes: [],
-//   },
-//   {
-//     name: "Genessa Anggasta",
-//     title: "Senior Teacher",
-//     instrument: "Piano",
-//     credentials: [
-//       "Certified Music Therapist",
-//       "Bachelor's Degree in Music Therapy",
-//     ],
-//     quote:
-//       "I love playing piano and I'd also love to help students with my skill. My hope is that the students will enjoy practicing piano so I can help them be a better pianist than myself.",
-//     photo: "/teachers/GenessaAnggasta.jpg",
-//     tags: ["Piano", "Music Therapy", "Young Learners"],
-//     notes: [],
-//   },
-//   {
-//     name: "Victoria Kezia",
-//     title: "Senior Teacher",
-//     instrument: "Cello & Piano",
-//     credentials: ["Bachelor's Degree in Music Education"],
-//     quote:
-//       "My goal is to help students to make music as a safe space to grow and express themselves, as well as to guide them to find their own identity through every notes they play — not only to gain skill, but to actually feel it by heart.",
-//     photo: "/teachers/VictoryKezia.jpg",
-//     tags: ["Cello", "Piano", "Expressive Learning"],
-//     notes: [],
-//   },
-//   {
-//     name: "Jennifer Susanto",
-//     title: "Senior Teacher",
-//     instrument: "Violin, Trumpet & Piano",
-//     credentials: [
-//       "Bachelor's Degree in Music Composition",
-//       "Master's Degree in Science Psychology",
-//     ],
-//     quote:
-//       "I strive to educate my student about music and also to guide them with life values that they can apply through playing music.",
-//     photo: "/teachers/JenniferSusanto.jpg",
-//     tags: ["Violin", "Trumpet", "Piano", "Life Values"],
-//     notes: [],
-//   },
-//   {
-//     name: "Angelique Kristeva",
-//     title: "Junior Teacher",
-//     instrument: "Piano",
-//     credentials: ["Bachelor's Degree in Music Education"],
-//     quote:
-//       "Teaching music allows me to pass on the joy that music has given me. Seeing children connect with sound, express themselves, and find happiness through music is deeply fulfilling.",
-//     photo: "/teachers/Angelique.jpg",
-//     tags: ["Piano", "Children", "Joy of Music"],
-//     notes: [],
-//   },
-// ];
-
-// const VALUES = [
-//   {
-//     icon: "♩",
-//     title: "Personalized Learning",
-//     desc: "Each student receives a curriculum tailored to their goals, pace, and musical taste.",
-//   },
-//   {
-//     icon: "★",
-//     title: "Performance Mindset",
-//     desc: "We train students not just to play, but to perform — with presence and confidence.",
-//   },
-//   {
-//     icon: "◈",
-//     title: "Strong Fundamentals",
-//     desc: "Solid technique and theory from day one, building a foundation that lasts a lifetime.",
-//   },
-//   {
-//     icon: "↑",
-//     title: "Progress Tracking",
-//     desc: "Measurable milestones and lesson notes after every session keep growth visible.",
-//   },
-//   {
-//     icon: "✦",
-//     title: "Creative Exploration",
-//     desc: "Beyond the syllabus — we encourage improvisation, composition, and musical curiosity.",
-//   },
-//   {
-//     icon: "◉",
-//     title: "Supportive Community",
-//     desc: "An inclusive environment where every student feels seen, heard, and inspired.",
-//   },
-// ];
-
-// function TeacherCard({ t }) {
-//   return (
-//     <article
-//       className="rounded-2xl overflow-hidden border flex flex-col"
-//       style={{
-//         background: "#FFFFFF",
-//         borderColor: "#E8E0CC",
-//         boxShadow: "0 2px 16px rgba(39,41,37,0.07)",
-//         transition: "transform 0.3s ease, box-shadow 0.3s ease",
-//         height: "100%",
-//       }}
-//       onMouseEnter={(e) => {
-//         e.currentTarget.style.transform = "translateY(-5px)";
-//         e.currentTarget.style.boxShadow = "0 14px 36px rgba(39,41,37,0.13)";
-//       }}
-//       onMouseLeave={(e) => {
-//         e.currentTarget.style.transform = "translateY(0)";
-//         e.currentTarget.style.boxShadow = "0 2px 16px rgba(39,41,37,0.07)";
-//       }}
-//     >
-//       {/* ── FOTO: kotak 1:1, object-cover object-top ── */}
-//       <div
-//         style={{
-//           width: "100%",
-//           aspectRatio: "1 / 1",
-//           overflow: "hidden",
-//           background: "#E8E4D8",
-//           flexShrink: 0,
-//           position: "relative",
-//         }}
-//       >
-//         <img
-//           src={t.photo}
-//           alt={t.name}
-//           style={{
-//             width: "100%",
-//             height: "100%",
-//             objectFit: "cover",
-//             objectPosition: "center top",
-//             display: "block",
-//             transition: "transform 0.5s ease",
-//           }}
-//           onMouseEnter={(e) =>
-//             (e.currentTarget.style.transform = "scale(1.04)")
-//           }
-//           onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-//           onError={(e) => {
-//             e.currentTarget.style.display = "none";
-//             const fb =
-//               e.currentTarget.parentNode.querySelector(".photo-fallback");
-//             if (fb) fb.style.display = "flex";
-//           }}
-//         />
-//         {/* fallback inisial */}
-//         <div
-//           className="photo-fallback"
-//           style={{
-//             display: "none",
-//             position: "absolute",
-//             inset: 0,
-//             alignItems: "center",
-//             justifyContent: "center",
-//             fontSize: "56px",
-//             fontWeight: "bold",
-//             background: "linear-gradient(135deg, #50553C, #272925)",
-//             color: "#D4AF37",
-//           }}
-//         >
-//           {t.name.charAt(0)}
-//         </div>
-
-//         {/* instrument badge */}
-//         <div
-//           style={{
-//             position: "absolute",
-//             top: "12px",
-//             right: "12px",
-//             padding: "4px 10px",
-//             borderRadius: "999px",
-//             fontSize: "11px",
-//             fontWeight: "600",
-//             background: "rgba(39,41,37,0.75)",
-//             color: "#D4AF37",
-//             backdropFilter: "blur(8px)",
-//           }}
-//         >
-//           {t.instrument}
-//         </div>
-//       </div>
-
-//       {/* ── INFO ── */}
-//       <div
-//         className="flex flex-col gap-3"
-//         style={{ padding: "20px 22px 22px", flex: 1 }}
-//       >
-//         {/* nama & title */}
-//         <div>
-//           <h3
-//             style={{
-//               fontSize: "17px",
-//               fontWeight: "700",
-//               color: "#272925",
-//               margin: 0,
-//             }}
-//           >
-//             {t.name}
-//           </h3>
-//           <p
-//             style={{
-//               fontSize: "11px",
-//               fontWeight: "600",
-//               color: "#B8912A",
-//               marginTop: "2px",
-//               letterSpacing: "0.04em",
-//               textTransform: "uppercase",
-//             }}
-//           >
-//             {t.title}
-//           </p>
-//         </div>
-
-//         {/* credentials */}
-//         <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-//           {t.credentials.map((c, i) => (
-//             <p
-//               key={i}
-//               style={{ fontSize: "12px", color: "#64748B", margin: 0 }}
-//             >
-//               {c}
-//             </p>
-//           ))}
-//         </div>
-
-//         {/* divider tipis */}
-//         <div
-//           style={{
-//             height: "1px",
-//             background: "linear-gradient(90deg, #D4AF37 0%, transparent 100%)",
-//             opacity: 0.4,
-//           }}
-//         />
-
-//         {/* quote */}
-//         <blockquote
-//           style={{
-//             fontSize: "13px",
-//             lineHeight: "1.65",
-//             fontStyle: "italic",
-//             color: "#475569",
-//             borderLeft: "2px solid #D4AF37",
-//             paddingLeft: "12px",
-//             margin: 0,
-//             flex: 1,
-//           }}
-//         >
-//           "{t.quote}"
-//         </blockquote>
-
-//         {/* tags */}
-//         <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-//           {t.tags.map((tag) => (
-//             <span
-//               key={tag}
-//               style={{
-//                 padding: "4px 10px",
-//                 borderRadius: "8px",
-//                 fontSize: "11px",
-//                 fontWeight: "500",
-//                 background: "#F5EDD6",
-//                 color: "#50553C",
-//               }}
-//             >
-//               {tag}
-//             </span>
-//           ))}
-//         </div>
-
-//         {/* notes */}
-//         {t.notes.length > 0 && (
-//           <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-//             {t.notes.map((note, i) => (
-//               <p
-//                 key={i}
-//                 style={{ fontSize: "11px", color: "#94A3B8", margin: 0 }}
-//               >
-//                 * {note}
-//               </p>
-//             ))}
-//           </div>
-//         )}
-//       </div>
-//     </article>
-//   );
-// }
-
-// export default function OurTeachers() {
-//   return (
-//     <div
-//       style={{
-//         fontFamily:
-//           '"Creato Display", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial',
-//         background: "#F8F6ED",
-//         color: "#272925",
-//       }}
-//     >
-//       {/* ─── HERO ─────────────────────────────────────────────────────────── */}
-//       <section
-//         style={{
-//           position: "relative",
-//           overflow: "hidden",
-//           background:
-//             "linear-gradient(160deg, #272925 0%, #50553C 55%, #F8F6ED 100%)",
-//           minHeight: "48vh",
-//         }}
-//       >
-//         {[15, 28, 41, 54, 67].map((top, i) => (
-//           <div
-//             key={i}
-//             style={{
-//               position: "absolute",
-//               left: 0,
-//               right: 0,
-//               top: `${top}%`,
-//               height: "1px",
-//               background:
-//                 "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.07) 20%, rgba(255,255,255,0.07) 80%, transparent 100%)",
-//               pointerEvents: "none",
-//             }}
-//           />
-//         ))}
-//         <div
-//           style={{
-//             position: "absolute",
-//             right: "-80px",
-//             top: "-40px",
-//             width: "480px",
-//             height: "480px",
-//             borderRadius: "50%",
-//             background:
-//               "radial-gradient(circle, rgba(209,167,153,0.18) 0%, transparent 70%)",
-//             pointerEvents: "none",
-//           }}
-//         />
-
-//         <div
-//           className="max-w-7xl mx-auto px-6"
-//           style={{
-//             paddingTop: "112px",
-//             paddingBottom: "64px",
-//             position: "relative",
-//             zIndex: 10,
-//           }}
-//         >
-//           <p
-//             style={{
-//               fontSize: "11px",
-//               letterSpacing: "0.25em",
-//               textTransform: "uppercase",
-//               color: "#D1A799",
-//               marginBottom: "16px",
-//             }}
-//           >
-//             Our Educators
-//           </p>
-//           <h1
-//             style={{
-//               fontSize: "clamp(36px, 6vw, 56px)",
-//               fontWeight: "700",
-//               lineHeight: 1.15,
-//               color: "#F8F6ED",
-//               margin: 0,
-//             }}
-//           >
-//             Meet the <br />
-//             <span style={{ color: "#D4AF37" }}>Teachers</span>
-//           </h1>
-//           <p
-//             style={{
-//               marginTop: "20px",
-//               fontSize: "17px",
-//               maxWidth: "520px",
-//               lineHeight: 1.65,
-//               color: "rgba(248,246,237,0.72)",
-//             }}
-//           >
-//             A curated team of professional musicians — each bringing their own
-//             expertise, warmth, and dedication to every lesson.
-//           </p>
-
-//           <div
-//             style={{
-//               marginTop: "40px",
-//               display: "flex",
-//               flexWrap: "wrap",
-//               gap: "32px",
-//             }}
-//           >
-//             {[
-//               { num: "6", label: "Expert Teachers" },
-//               { num: "4+", label: "Instruments" },
-//               { num: "All Ages", label: "Welcome" },
-//             ].map((s) => (
-//               <div key={s.label}>
-//                 <div
-//                   style={{
-//                     fontSize: "28px",
-//                     fontWeight: "700",
-//                     color: "#D4AF37",
-//                   }}
-//                 >
-//                   {s.num}
-//                 </div>
-//                 <div
-//                   style={{
-//                     fontSize: "13px",
-//                     marginTop: "2px",
-//                     color: "rgba(248,246,237,0.6)",
-//                   }}
-//                 >
-//                   {s.label}
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-
-//         <svg
-//           style={{
-//             position: "absolute",
-//             bottom: 0,
-//             left: 0,
-//             width: "100%",
-//             display: "block",
-//           }}
-//           viewBox="0 0 1440 60"
-//           preserveAspectRatio="none"
-//         >
-//           <path
-//             fill="#F8F6ED"
-//             d="M0,40 C360,80 1080,0 1440,40 L1440,60 L0,60 Z"
-//           />
-//         </svg>
-//       </section>
-
-//       {/* ─── TEACHER GRID ─────────────────────────────────────────────────── */}
-//       <section style={{ padding: "72px 0 80px" }}>
-//         <div className="max-w-7xl mx-auto px-6">
-//           {/*
-//             Grid: 3 kolom di desktop, 2 di tablet, 1 di mobile.
-//             Semua kartu sama tinggi karena pakai align-items: stretch (default grid).
-//             Foto pakai aspect-ratio: 1/1 sehingga otomatis kotak & seragam.
-//           */}
-//           <div
-//             style={{
-//               display: "grid",
-//               gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-//               gap: "28px",
-//               alignItems: "stretch",
-//             }}
-//           >
-//             {TEACHERS.map((t, i) => (
-//               <TeacherCard key={i} t={t} />
-//             ))}
-//           </div>
-//         </div>
-//       </section>
-
-//       {/* ─── TEACHING VALUES ──────────────────────────────────────────────── */}
-//       <section
-//         style={{
-//           padding: "72px 0",
-//           background:
-//             "linear-gradient(180deg, #F8F6ED 0%, rgba(80,85,60,0.07) 100%)",
-//         }}
-//       >
-//         <div className="max-w-7xl mx-auto px-6">
-//           <div style={{ textAlign: "center", marginBottom: "56px" }}>
-//             <p
-//               style={{
-//                 fontSize: "11px",
-//                 letterSpacing: "0.25em",
-//                 textTransform: "uppercase",
-//                 color: "#B8912A",
-//                 marginBottom: "12px",
-//               }}
-//             >
-//               Our Philosophy
-//             </p>
-//             <h2
-//               style={{
-//                 fontSize: "clamp(28px, 4vw, 36px)",
-//                 fontWeight: "700",
-//                 color: "#272925",
-//                 margin: 0,
-//               }}
-//             >
-//               What We Stand For
-//             </h2>
-//           </div>
-
-//           <div
-//             style={{
-//               display: "grid",
-//               gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-//               gap: "20px",
-//             }}
-//           >
-//             {VALUES.map((v, i) => (
-//               <div
-//                 key={i}
-//                 style={{
-//                   borderRadius: "16px",
-//                   padding: "28px",
-//                   background: "#FFFFFF",
-//                   border: "1px solid #E8E0CC",
-//                   transition: "box-shadow 0.25s",
-//                 }}
-//                 onMouseEnter={(e) =>
-//                   (e.currentTarget.style.boxShadow =
-//                     "0 8px 28px rgba(39,41,37,0.1)")
-//                 }
-//                 onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
-//               >
-//                 <div
-//                   style={{
-//                     fontSize: "28px",
-//                     color: "#D4AF37",
-//                     marginBottom: "14px",
-//                   }}
-//                 >
-//                   {v.icon}
-//                 </div>
-//                 <h3
-//                   style={{
-//                     fontSize: "15px",
-//                     fontWeight: "700",
-//                     color: "#272925",
-//                     marginBottom: "8px",
-//                   }}
-//                 >
-//                   {v.title}
-//                 </h3>
-//                 <p
-//                   style={{
-//                     fontSize: "13px",
-//                     lineHeight: 1.65,
-//                     color: "#64748B",
-//                     margin: 0,
-//                   }}
-//                 >
-//                   {v.desc}
-//                 </p>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-//       </section>
-
-//       {/* ─── CTA ──────────────────────────────────────────────────────────── */}
-//       <section
-//         style={{
-//           padding: "64px 0",
-//           textAlign: "center",
-//           background: "#272925",
-//         }}
-//       >
-//         <div className="max-w-2xl mx-auto px-6">
-//           <h3
-//             style={{
-//               fontSize: "clamp(22px, 3vw, 28px)",
-//               fontWeight: "700",
-//               color: "#F8F6ED",
-//               marginBottom: "12px",
-//             }}
-//           >
-//             Ready to learn from the best?
-//           </h3>
-//           <p
-//             style={{
-//               marginBottom: "32px",
-//               color: "rgba(248,246,237,0.6)",
-//               fontSize: "15px",
-//             }}
-//           >
-//             Book a trial class and we'll match you with the right teacher.
-//           </p>
-//           <a
-//             href="/StudioPolicy"
-//             style={{
-//               display: "inline-block",
-//               padding: "12px 32px",
-//               borderRadius: "999px",
-//               fontWeight: "600",
-//               fontSize: "15px",
-//               background: "linear-gradient(135deg, #D4AF37, #B8912A)",
-//               color: "#FFFFFF",
-//               textDecoration: "none",
-//               boxShadow: "0 8px 24px rgba(212,175,55,0.3)",
-//               transition: "opacity 0.2s",
-//             }}
-//             onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.88")}
-//             onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-//           >
-//             Book a Trial Class
-//           </a>
-//         </div>
-//       </section>
-
-//       <Footer />
-//     </div>
-//   );
-// }
-
 // src/pages/user/OurTeachers.jsx
-import React, { useEffect, useState } from "react";
-import Footer from "../../components/Footer";
-import { supabase } from "../../lib/supabaseClient";
+import { useEffect, useState } from 'react';
+import Footer from '../../components/Footer';
+import PageHero from '../../components/PageHero';
+import ScrollFloat from '../../components/ScrollFloat';
+import useScrollReveal from '../../hooks/useScrollReveal';
+import use3DTilt from '../../hooks/use3DTilt';
+import { supabase } from '../../lib/supabaseClient';
 
+/* ─── Philosophy Values ─────────────────────────────────── */
 const VALUES = [
-  {
-    icon: "♩",
-    title: "Personalized Learning",
-    desc: "Each student receives a curriculum tailored to their goals, pace, and musical taste.",
-  },
-  {
-    icon: "★",
-    title: "Performance Mindset",
-    desc: "We train students not just to play, but to perform — with presence and confidence.",
-  },
-  {
-    icon: "◈",
-    title: "Strong Fundamentals",
-    desc: "Solid technique and theory from day one, building a foundation that lasts a lifetime.",
-  },
-  {
-    icon: "↑",
-    title: "Progress Tracking",
-    desc: "Measurable milestones and lesson notes after every session keep growth visible.",
-  },
-  {
-    icon: "✦",
-    title: "Creative Exploration",
-    desc: "Beyond the syllabus — we encourage improvisation, composition, and musical curiosity.",
-  },
-  {
-    icon: "◉",
-    title: "Supportive Community",
-    desc: "An inclusive environment where every student feels seen, heard, and inspired.",
-  },
+  { icon: '♩', title: 'Personalized Learning',  desc: 'Each student receives a curriculum tailored to their goals, pace, and musical taste.' },
+  { icon: '♪', title: 'Performance Mindset',    desc: 'We train students not just to play, but to perform — with presence and confidence.' },
+  { icon: '◈', title: 'Strong Fundamentals',    desc: 'Solid technique and theory from day one, building a foundation that lasts a lifetime.' },
+  { icon: '↑', title: 'Progress Tracking',      desc: 'Measurable milestones and lesson notes after every session keep growth visible.' },
+  { icon: '♫', title: 'Creative Exploration',   desc: 'Beyond the syllabus — improvisation, composition, and musical curiosity are always welcome.' },
+  { icon: '◉', title: 'Supportive Community',   desc: 'An inclusive environment where every student feels seen, heard, and inspired.' },
 ];
 
+/* ─── 3D Flip Teacher Card ──────────────────────────────── */
 function TeacherCard({ t }) {
+  const [flipped, setFlipped] = useState(false);
+  const tilt = use3DTilt({ max: 7, scale: 1.02, speed: 600 });
+
+  const handleMouseMove = (e) => { if (!flipped) tilt.onMouseMove(e); };
+  const handleMouseLeave = (e) => { tilt.onMouseLeave(e); };
+
   return (
-    <article
-      className="rounded-2xl overflow-hidden border flex flex-col"
+    <div
+      ref={tilt.ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onClick={() => setFlipped(f => !f)}
       style={{
-        background: "#FFFFFF",
-        borderColor: "#E8E0CC",
-        boxShadow: "0 2px 16px rgba(39,41,37,0.07)",
-        transition: "transform 0.3s ease, box-shadow 0.3s ease",
-        height: "100%",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-5px)";
-        e.currentTarget.style.boxShadow = "0 14px 36px rgba(39,41,37,0.13)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "0 2px 16px rgba(39,41,37,0.07)";
+        perspective: '1200px',
+        cursor: 'pointer',
+        userSelect: 'none',
+        willChange: 'transform',
       }}
     >
-      {/* ── FOTO 1:1 ── */}
-      <div
-        style={{
-          width: "100%",
-          aspectRatio: "1 / 1",
-          overflow: "hidden",
-          background: "#E8E4D8",
-          flexShrink: 0,
-          position: "relative",
-        }}
-      >
-        <img
-          src={t.photo}
-          alt={t.name}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            objectPosition: "center top",
-            display: "block",
-            transition: "transform 0.5s ease",
-          }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.transform = "scale(1.04)")
-          }
-          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-          onError={(e) => {
-            e.currentTarget.style.display = "none";
-            const fb =
-              e.currentTarget.parentNode.querySelector(".photo-fallback");
-            if (fb) fb.style.display = "flex";
-          }}
-        />
-        <div
-          className="photo-fallback"
-          style={{
-            display: "none",
-            position: "absolute",
-            inset: 0,
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "56px",
-            fontWeight: "bold",
-            background: "linear-gradient(135deg, #50553C, #272925)",
-            color: "#F8F6ED",
-          }}
-        >
-          {t.name.charAt(0)}
+      {/* Flip inner */}
+      <div style={{
+        position: 'relative',
+        height: '480px',
+        transformStyle: 'preserve-3d',
+        transition: 'transform 0.65s cubic-bezier(0.4,0,0.2,1)',
+        transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+        borderRadius: '20px',
+      }}>
+
+        {/* ── FRONT ── */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          borderRadius: '20px', overflow: 'hidden',
+          background: '#fff',
+          border: '1px solid rgba(209,167,153,0.3)',
+          boxShadow: '0 8px 32px rgba(39,41,37,0.09)',
+          display: 'flex', flexDirection: 'column',
+        }}>
+          {/* Photo */}
+          <div style={{ position: 'relative', flex: '0 0 66%', background: '#E8E4D8', overflow: 'hidden' }}>
+            {t.photo_url ? (
+              <img
+                src={t.photo_url}
+                alt={t.name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block', transition: 'transform 0.5s ease' }}
+                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.04)'}
+                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex'; }}
+              />
+            ) : null}
+            {/* Fallback initial */}
+            <div style={{
+              display: t.photo_url ? 'none' : 'flex',
+              position: 'absolute', inset: 0,
+              alignItems: 'center', justifyContent: 'center',
+              fontSize: '64px', fontWeight: 700,
+              background: 'linear-gradient(135deg, var(--olive), var(--charcoal))',
+              color: 'var(--cream)',
+            }}>
+              {t.name?.charAt(0)}
+            </div>
+            {/* Gradient overlay */}
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(to top, rgba(39,41,37,0.5) 0%, transparent 100%)' }} />
+            {/* Instrument badge */}
+            <div style={{
+              position: 'absolute', top: 12, right: 12,
+              padding: '4px 12px', borderRadius: '999px',
+              fontSize: '10px', fontWeight: 700,
+              background: 'rgba(39,41,37,0.82)',
+              color: 'var(--cream)', backdropFilter: 'blur(8px)',
+              letterSpacing: '0.04em',
+            }}>
+              {t.instrument}
+            </div>
+          </div>
+          {/* Info */}
+          <div style={{ padding: '1.25rem 1.5rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--charcoal)', margin: '0 0 2px' }}>{t.name}</h3>
+              <p style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--olive)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>{t.title}</p>
+            </div>
+            <p style={{ fontSize: '0.72rem', color: 'var(--blush)', fontWeight: 600, margin: 0 }}>Tap to read quote →</p>
+          </div>
         </div>
 
-        {/* instrument badge — charcoal */}
-        <div
-          style={{
-            position: "absolute",
-            top: "12px",
-            right: "12px",
-            padding: "4px 10px",
-            borderRadius: "999px",
-            fontSize: "11px",
-            fontWeight: "600",
-            background: "rgba(39,41,37,0.82)",
-            color: "#F8F6ED",
-            backdropFilter: "blur(8px)",
-            letterSpacing: "0.02em",
-          }}
-        >
-          {t.instrument}
-        </div>
-      </div>
+        {/* ── BACK ── */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          transform: 'rotateY(180deg)',
+          borderRadius: '20px', overflow: 'hidden',
+          background: 'var(--charcoal)',
+          border: '1px solid rgba(209,167,153,0.18)',
+          boxShadow: '0 8px 32px rgba(39,41,37,0.18)',
+          display: 'flex', flexDirection: 'column',
+          padding: '2rem',
+        }}>
+          <div style={{ marginBottom: '1.25rem' }}>
+            <p style={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--blush)', margin: '0 0 0.4rem' }}>{t.title}</p>
+            <h3 style={{ fontFamily: '"Rockdale FREE", serif', fontSize: '1.35rem', color: 'var(--cream)', margin: 0 }}>{t.name}</h3>
+          </div>
 
-      {/* ── INFO ── */}
-      <div
-        className="flex flex-col gap-3"
-        style={{ padding: "20px 22px 22px", flex: 1 }}
-      >
-        {/* nama & title */}
-        <div>
-          <h3
-            style={{
-              fontSize: "17px",
-              fontWeight: "700",
-              color: "#272925",
-              margin: 0,
-            }}
-          >
-            {t.name}
-          </h3>
-          <p
-            style={{
-              fontSize: "11px",
-              fontWeight: "600",
-              color: "#50553C",
-              marginTop: "2px",
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-            }}
-          >
-            {t.title}
-          </p>
-        </div>
+          <blockquote style={{
+            flex: 1, fontSize: '0.9rem', lineHeight: 1.75,
+            fontStyle: 'italic', color: 'rgba(248,246,237,0.82)',
+            borderLeft: '2px solid var(--blush)', paddingLeft: '1rem', margin: '0 0 1.25rem',
+          }}>
+            "{t.quote}"
+          </blockquote>
 
-        {/* credentials */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-          {t.credentials.map((c, i) => (
-            <p
-              key={i}
-              style={{ fontSize: "12px", color: "#64748B", margin: 0 }}
-            >
-              {c}
-            </p>
-          ))}
-        </div>
-
-        {/* divider — charcoal accent */}
-        <div
-          style={{
-            height: "1px",
-            background: "linear-gradient(90deg, #272925 0%, transparent 100%)",
-            opacity: 0.15,
-          }}
-        />
-
-        {/* quote — olive border kiri */}
-        <blockquote
-          style={{
-            fontSize: "13px",
-            lineHeight: "1.65",
-            fontStyle: "italic",
-            color: "#475569",
-            borderLeft: "2px solid #50553C",
-            paddingLeft: "12px",
-            margin: 0,
-            flex: 1,
-          }}
-        >
-          "{t.quote}"
-        </blockquote>
-
-        {/* tags — charcoal subtle */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-          {t.tags.map((tag) => (
-            <span
-              key={tag}
-              style={{
-                padding: "4px 10px",
-                borderRadius: "8px",
-                fontSize: "11px",
-                fontWeight: "500",
-                background: "#F0EDE4",
-                color: "#272925",
-                border: "1px solid rgba(39,41,37,0.1)",
-              }}
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        {/* notes */}
-        {t.notes.length > 0 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-            {t.notes.map((note, i) => (
-              <p
-                key={i}
-                style={{ fontSize: "11px", color: "#94A3B8", margin: 0 }}
-              >
-                * {note}
-              </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '1rem' }}>
+            {(t.credentials || []).map((c, i) => (
+              <p key={i} style={{ fontSize: '0.75rem', color: 'rgba(248,246,237,0.5)', margin: 0 }}>{c}</p>
             ))}
           </div>
-        )}
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+            {(t.tags || []).map(tag => (
+              <span key={tag} style={{
+                padding: '3px 10px', borderRadius: '8px', fontSize: '10px', fontWeight: 600,
+                background: 'rgba(209,167,153,0.12)', color: 'var(--blush)',
+                border: '1px solid rgba(209,167,153,0.2)',
+              }}>{tag}</span>
+            ))}
+          </div>
+
+          {(t.notes || []).length > 0 && (
+            <div style={{ marginTop: '0.75rem' }}>
+              {t.notes.map((n, i) => <p key={i} style={{ fontSize: '10px', color: 'rgba(248,246,237,0.3)', margin: '2px 0' }}>* {n}</p>)}
+            </div>
+          )}
+          <p style={{ fontSize: '0.7rem', color: 'rgba(209,167,153,0.5)', marginTop: '1rem' }}>↩ Tap to flip back</p>
+        </div>
       </div>
-    </article>
+    </div>
   );
 }
 
+/* ─── Values Tilt Card ──────────────────────────────────── */
+function ValueCard({ icon, title, desc }) {
+  const tilt = use3DTilt({ max: 10, scale: 1.03 });
+  return (
+    <div ref={tilt.ref} onMouseMove={tilt.onMouseMove} onMouseLeave={tilt.onMouseLeave}
+      style={{
+        borderRadius: '16px', padding: '1.75rem',
+        background: '#fff', border: '1px solid rgba(209,167,153,0.25)',
+        boxShadow: '0 4px 16px rgba(39,41,37,0.06)', willChange: 'transform',
+      }}
+    >
+      <div style={{ fontSize: '1.5rem', color: 'var(--blush)', marginBottom: '0.85rem' }}>{icon}</div>
+      <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--charcoal)', marginBottom: '0.5rem' }}>{title}</h3>
+      <p style={{ fontSize: '0.85rem', lineHeight: 1.7, color: '#5a5a4a', margin: 0 }}>{desc}</p>
+    </div>
+  );
+}
+
+/* ─── Main Page ──────────────────────────────────────────── */
 export default function OurTeachers() {
-  const [teachers, setTeachers] = useState([]);
-  const [teachersLoading, setTeachersLoading] = useState(true);
+  const [teachers, setTeachers]       = useState([]);
+  const [teachersLoading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       const { data, error } = await supabase
-        .from("teachers")
-        .select("*")
-        .eq("is_published", true)
-        .order("sort_order", { ascending: true });
-      if (error) console.error("Failed to fetch teachers:", error);
+        .from('teachers')
+        .select('*')
+        .eq('is_published', true)
+        .order('sort_order', { ascending: true });
+      if (error) console.error('Failed to fetch teachers:', error);
       setTeachers(data || []);
-      setTeachersLoading(false);
+      setLoading(false);
     })();
   }, []);
 
-  // Map data Supabase → format yang dipakai TeacherCard
-  const mappedTeachers = teachers.map((t) => ({
-    ...t,
-    photo: t.photo_url || null,         // dari Supabase Storage
-    credentials: t.credentials || [],
-    tags: t.tags || [],
-    notes: t.notes || [],
-  }));
+  const gridRef   = useScrollReveal({ from: { opacity: 0, y: 40, scale: 0.97 }, stagger: 0.1, duration: 0.7, ease: 'power3.out' });
+  const valuesRef = useScrollReveal({ from: { opacity: 0, y: 30 }, stagger: 0.08, duration: 0.65, ease: 'power3.out' });
 
   return (
     <div
-      /* Cancel: spacer Navbar (h-10/12/14) + pt-16 dari main → hero nempel tepat di bawah navbar */
       className="-mt-[6.5rem] md:-mt-28 lg:-mt-[7.5rem]"
-      style={{
-        fontFamily:
-          '"Creato Display", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial',
-        background: "#F8F6ED",
-        color: "#272925",
-      }}
+      style={{ fontFamily: '"Creato Display", sans-serif', background: 'var(--cream)', color: 'var(--charcoal)' }}
     >
-      {/* ─── HERO ─────────────────────────────────────────────────────────── */}
-      <section
-        style={{
-          position: "relative",
-          overflow: "hidden",
-          background: "#0F1110",
-          minHeight: "420px", // ← pakai px, bukan vh
-        }}
-      >
-        {/* Layer 1: Warm charcoal sweep dari kiri */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(125deg, rgba(39,41,37,0) 0%, rgba(48,51,41,0.9) 45%, rgba(48,51,41,0.6) 100%)",
-            pointerEvents: "none",
-          }}
-        />
-        {/* Layer 2: Blush shimmer — warm luxury glow di kanan-atas */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(ellipse 70% 60% at 85% 15%, rgba(209,167,153,0.14) 0%, transparent 60%)",
-            pointerEvents: "none",
-          }}
-        />
-        {/* Layer 3: Olive warmth — subtle di tengah-bawah */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(ellipse 55% 40% at 30% 100%, rgba(80,85,60,0.3) 0%, transparent 70%)",
-            pointerEvents: "none",
-          }}
-        />
-        {/* Layer 4: Deep vignette sudut kiri bawah */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(ellipse 40% 40% at 0% 100%, rgba(8,9,8,0.55) 0%, transparent 60%)",
-            pointerEvents: "none",
-          }}
-        />
-        {/* Layer 5: Noise texture simulasi — halus grain di atas */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E\")",
-            opacity: 0.35,
-            pointerEvents: "none",
-          }}
-        />
+      {/* ── 1. HERO ── */}
+      <PageHero
+        eyebrow="Our Educators"
+        title="Meet the Teachers"
+        subtitle="A curated team of professional musicians — each bringing their own expertise, warmth, and dedication to every lesson."
+        stats={[
+          { num: '6',    label: 'Expert Teachers' },
+          { num: '4+',   label: 'Instruments' },
+          { num: 'All',  label: 'Ages Welcome' },
+        ]}
+      />
 
-        <div
-          className="max-w-7xl mx-auto px-6"
-          style={{
-            paddingTop: "160px", 
-            paddingBottom: "64px",
-            position: "relative",
-            zIndex: 10,
-          }}
-        >
-          <h1
-            style={{
-              fontSize: "clamp(36px, 6vw, 56px)",
-              fontWeight: "700",
-              lineHeight: 1.15,
-              color: "#F8F6ED",
-              margin: 0,
-            }}
-          >
-            Meet the <br />
-            {/* cream highlight di hero — kontras & elegan di atas charcoal */}
-            <span style={{ color: "#F8F6ED", opacity: 0.9 }}>Teachers</span>
-          </h1>
-          <p
-            style={{
-              marginTop: "20px",
-              fontSize: "17px",
-              maxWidth: "520px",
-              lineHeight: 1.65,
-              color: "rgba(248,246,237,0.72)",
-            }}
-          >
-            A curated team of professional musicians — each bringing their own
-            expertise, warmth, and dedication to every lesson.
+      {/* ── 2. TEACHER GRID ── */}
+      <section style={{ padding: '5rem 0 5rem' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem' }}>
+          <ScrollFloat animationDuration={0.85} ease="back.out(1.7)" stagger={0.03} className="about-section-heading">
+            Our Team
+          </ScrollFloat>
+          <p style={{ color: '#7a7a60', marginBottom: '3rem', marginTop: '0.5rem', fontSize: '0.88rem' }}>
+            Click any card to read their personal teaching philosophy.
           </p>
 
-          {/* stats */}
-          <div
-            style={{
-              marginTop: "30px",
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "32px",
-            }}
-          >
-            {[
-              { num: "6", label: "Expert Teachers" },
-              { num: "4+", label: "Instruments" },
-              { num: "All Ages", label: "Welcome" },
-            ].map((s) => (
-              <div key={s.label}>
-                {/* cream number — menggantikan kuning */}
-                <div
-                  style={{
-                    fontSize: "28px",
-                    fontWeight: "700",
-                    color: "#F8F6ED",
-                  }}
-                >
-                  {s.num}
-                </div>
-                <div
-                  style={{
-                    fontSize: "13px",
-                    marginTop: "2px",
-                    color: "rgba(248,246,237,0.55)",
-                  }}
-                >
-                  {s.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Wave transisi — satu layer, bersih & elegan */}
-        <svg
-          className="absolute bottom-0 left-0 w-full"
-          viewBox="0 0 1440 60"
-          preserveAspectRatio="none"
-          style={{ display: "block" }}
-        ></svg>
-      </section>
-
-      {/* ─── TEACHER GRID ─────────────────────────────────────────────────── */}
-      <section style={{ padding: "72px 0 80px" }}>
-        <div className="max-w-7xl mx-auto px-6">
           {teachersLoading ? (
-            /* Loading skeleton */
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                gap: "28px",
-              }}
-            >
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  style={{
-                    borderRadius: "16px",
-                    overflow: "hidden",
-                    background: "#FFFFFF",
-                    border: "1px solid #E8E0CC",
-                    animation: "pulse 1.5s ease-in-out infinite",
-                  }}
-                >
-                  <div style={{ aspectRatio: "1/1", background: "#E8E4D8" }} />
-                  <div style={{ padding: "20px 22px" }}>
-                    <div style={{ height: "16px", background: "#E8E4D8", borderRadius: "8px", width: "60%", marginBottom: "8px" }} />
-                    <div style={{ height: "12px", background: "#F0EDE4", borderRadius: "6px", width: "40%" }} />
-                  </div>
-                </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px,1fr))', gap: '1.75rem' }}>
+              {[1,2,3].map(i => (
+                <div key={i} style={{ height: '480px', borderRadius: '20px', background: 'rgba(209,167,153,0.08)', border: '1px solid rgba(209,167,153,0.15)' }} />
               ))}
             </div>
-          ) : mappedTeachers.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "64px 0", color: "#94A3B8" }}>
-              <div style={{ fontSize: "48px", marginBottom: "16px" }}>👩‍🏫</div>
-              <p style={{ fontSize: "16px" }}>Belum ada teacher yang dipublikasikan.</p>
+          ) : teachers.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '4rem 0', color: '#94A3B8' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👩‍🏫</div>
+              <p>Belum ada teacher yang dipublikasikan.</p>
             </div>
           ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                gap: "28px",
-                alignItems: "stretch",
-              }}
-            >
-              {mappedTeachers.map((t, i) => (
-                <TeacherCard key={t.id || i} t={t} />
-              ))}
+            <div ref={gridRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px,1fr))', gap: '1.75rem', alignItems: 'stretch' }}>
+              {teachers.map((t, i) => <TeacherCard key={t.id || i} t={t} />)}
             </div>
           )}
         </div>
       </section>
 
-      {/* ─── TEACHING VALUES ──────────────────────────────────────────────── */}
-      <section
-        style={{
-          padding: "72px 0",
-          background:
-            "linear-gradient(180deg, #F8F6ED 0%, rgba(39,41,37,0.04) 100%)",
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-6">
-          <div style={{ textAlign: "center", marginBottom: "56px" }}>
-            <p
-              style={{
-                fontSize: "11px",
-                letterSpacing: "0.25em",
-                textTransform: "uppercase",
-                color: "#50553C",
-                marginBottom: "12px",
-              }}
-            >
-              Our Philosophy
-            </p>
-            <h2
-              style={{
-                fontSize: "clamp(28px, 4vw, 36px)",
-                fontWeight: "700",
-                color: "#272925",
-                margin: 0,
-              }}
-            >
+      {/* ── 3. VALUES ── */}
+      <section style={{ padding: '4rem 0 5rem', background: 'linear-gradient(180deg, var(--cream) 0%, rgba(80,85,60,0.05) 100%)' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem' }}>
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <p style={{ fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--olive)', marginBottom: '0.75rem' }}>Our Philosophy</p>
+            <ScrollFloat animationDuration={0.85} ease="back.out(1.7)" stagger={0.03} className="about-section-heading">
               What We Stand For
-            </h2>
+            </ScrollFloat>
           </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-              gap: "20px",
-            }}
-          >
-            {VALUES.map((v, i) => (
-              <div
-                key={i}
-                style={{
-                  borderRadius: "16px",
-                  padding: "28px",
-                  background: "#FFFFFF",
-                  border: "1px solid #E8E0CC",
-                  transition: "box-shadow 0.25s, border-color 0.25s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow =
-                    "0 8px 28px rgba(39,41,37,0.1)";
-                  e.currentTarget.style.borderColor = "rgba(39,41,37,0.3)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = "none";
-                  e.currentTarget.style.borderColor = "#E8E0CC";
-                }}
-              >
-                {/* icon — charcoal */}
-                <div
-                  style={{
-                    fontSize: "24px",
-                    color: "#272925",
-                    marginBottom: "14px",
-                    opacity: 0.7,
-                  }}
-                >
-                  {v.icon}
-                </div>
-                <h3
-                  style={{
-                    fontSize: "15px",
-                    fontWeight: "700",
-                    color: "#272925",
-                    marginBottom: "8px",
-                  }}
-                >
-                  {v.title}
-                </h3>
-                <p
-                  style={{
-                    fontSize: "13px",
-                    lineHeight: 1.65,
-                    color: "#64748B",
-                    margin: 0,
-                  }}
-                >
-                  {v.desc}
-                </p>
-              </div>
-            ))}
+          <div ref={valuesRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px,1fr))', gap: '1.25rem' }}>
+            {VALUES.map(v => <ValueCard key={v.title} {...v} />)}
           </div>
         </div>
       </section>
 
-      {/* ─── CTA ──────────────────────────────────────────────────────────── */}
-      <section
-        style={{
-          padding: "64px 0",
-          textAlign: "center",
-          background: "#272925",
-        }}
-      >
-        <div className="max-w-2xl mx-auto px-6">
-          {/* thin charcoal accent line atas */}
-          <div
-            style={{
-              width: "40px",
-              height: "2px",
-              background: "#F8F6ED",
-              opacity: 0.3,
-              margin: "0 auto 24px",
-              borderRadius: "2px",
-            }}
-          />
-
-          <h3
-            style={{
-              fontSize: "clamp(22px, 3vw, 28px)",
-              fontWeight: "700",
-              color: "#F8F6ED",
-              marginBottom: "12px",
-            }}
-          >
+      {/* ── 4. CTA ── */}
+      <section style={{ padding: '5rem 0', textAlign: 'center', background: 'var(--charcoal)' }}>
+        <div style={{ maxWidth: '640px', margin: '0 auto', padding: '0 1.5rem' }}>
+          <div style={{ width: 40, height: 2, background: 'var(--blush)', opacity: 0.5, margin: '0 auto 1.5rem', borderRadius: 2 }} />
+          <h3 style={{ fontFamily: '"Rockdale FREE", serif', fontSize: 'clamp(1.5rem, 3vw, 2rem)', color: 'var(--cream)', marginBottom: '0.75rem' }}>
             Ready to learn from the best?
           </h3>
-          <p
-            style={{
-              marginBottom: "32px",
-              color: "rgba(248,246,237,0.55)",
-              fontSize: "15px",
-            }}
-          >
+          <p style={{ color: 'rgba(248,246,237,0.55)', fontSize: '0.95rem', marginBottom: '2rem' }}>
             Book a trial class and we'll match you with the right teacher.
           </p>
-
-          {/* TOMBOL CREAM — sesuai permintaan client */}
-          <a
-            href="/OurPolicy"
-            style={{
-              display: "inline-block",
-              padding: "13px 36px",
-              borderRadius: "999px",
-              fontWeight: "600",
-              fontSize: "15px",
-              background: "#F8F6ED",
-              color: "#272925",
-              textDecoration: "none",
-              border: "1px solid rgba(248,246,237,0.3)",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
-              transition: "background 0.2s, color 0.2s, transform 0.15s",
-              letterSpacing: "0.01em",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "#FFFFFF";
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,0,0,0.25)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "#F8F6ED";
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.2)";
-            }}
+          <a href="/OurPolicy" style={{
+            display: 'inline-block', padding: '0.85rem 2.25rem',
+            borderRadius: '999px', fontWeight: 700, fontSize: '0.95rem',
+            background: 'var(--cream)', color: 'var(--charcoal)',
+            textDecoration: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          }}
+            onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 8px 28px rgba(0,0,0,0.25)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 4px 20px rgba(0,0,0,0.2)'; }}
           >
             Book a Trial Class
           </a>

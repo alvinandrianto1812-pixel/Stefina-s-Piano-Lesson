@@ -3,13 +3,14 @@ import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 
-import TypingText      from '../../components/TypingText';
-import Footer          from '../../components/Footer';
-import ScrollFloat     from '../../components/ScrollFloat';
-import MagicRings      from '../../components/MagicRings';
-import BounceIcons     from '../../components/BounceIcons';
-import FeatureExplorer from '../../components/FeatureExplorer';
+import TypingText        from '../../components/TypingText';
+import Footer            from '../../components/Footer';
+import ScrollFloat       from '../../components/ScrollFloat';
+import MagicRings        from '../../components/MagicRings';
+import BounceIcons       from '../../components/BounceIcons';
+import FeatureExplorer   from '../../components/FeatureExplorer';
 import TestimonialSlider from '../../components/TestimonialSlider';
+import useScrollReveal   from '../../hooks/useScrollReveal';
 
 /* ─── WhatsApp link ─────────────────────────────── */
 const WA_LINK =
@@ -21,6 +22,12 @@ const WA_LINK =
 export default function LandingPage() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  /* Scroll-reveal refs */
+  const heroLeftRef  = useScrollReveal({ from: { opacity: 0, y: 40 }, duration: 0.9, ease: 'power3.out', stagger: 0.12, start: 'top 82%' });
+  const heroCardRef  = useScrollReveal({ from: { opacity: 0, x: 40, scale: 0.96 }, duration: 0.9, ease: 'power3.out', delay: 0.2 });
+  const faqRef       = useScrollReveal({ from: { opacity: 0, y: 32 }, duration: 0.75, ease: 'power3.out', start: 'top 88%' });
+  const ctaPanelsRef = useScrollReveal({ from: { opacity: 0, y: 40, scale: 0.97 }, duration: 0.8, ease: 'power3.out', stagger: 0.15, start: 'top 88%' });
 
   /* Scroll to hash anchor from URL */
   useEffect(() => {
@@ -92,7 +99,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
 
             {/* ── Left: headline + CTAs ── */}
-            <div>
+            <div ref={heroLeftRef}>
               {/* Eyebrow label */}
               <div
                 style={{
@@ -202,6 +209,7 @@ export default function LandingPage() {
             {/* ── Right: booking card ── */}
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <div
+                ref={heroCardRef}
                 style={{
                   background: 'rgba(255,255,255,0.85)',
                   backdropFilter: 'blur(12px)',
@@ -379,6 +387,7 @@ export default function LandingPage() {
           </ScrollFloat>
 
           <div
+            ref={faqRef}
             style={{
               borderRadius: '20px',
               border: '1px solid rgba(209,167,153,0.25)',
@@ -464,6 +473,7 @@ export default function LandingPage() {
           </p>
 
           <div
+            ref={ctaPanelsRef}
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
