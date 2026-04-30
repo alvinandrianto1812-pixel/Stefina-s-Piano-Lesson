@@ -1,18 +1,22 @@
 // src/components/PageHero.jsx
-import MagicRings from './MagicRings';
 import ScrollFloat from './ScrollFloat';
 import './PageHero.css';
 
 /**
  * PageHero — shared premium hero section for all About sub-pages.
  *
+ * Background uses pure CSS layers (no WebGL):
+ *   1. Radial gradient ambience
+ *   2. Soft breathing glow animation
+ *   3. Diagonal music-staff lines (brand thematic, very faint)
+ *
  * Props:
- *   eyebrow   string   — small uppercase label above title
- *   title     string   — main heading (run through ScrollFloat per-char)
- *   subtitle  string   — paragraph below title
- *   stats     Array<{ num, label }> — optional stat row
- *   children  ReactNode — extra content between subtitle and stats
- *   waveColor string   — fill colour of the wave SVG (default cream)
+ *   eyebrow   string              — small uppercase label above title
+ *   title     string              — main heading (per-char ScrollFloat)
+ *   subtitle  string              — paragraph below title
+ *   stats     Array<{num,label}>  — optional stat row
+ *   children  ReactNode           — extra content between subtitle and stats
+ *   waveColor string              — fill colour of the wave SVG (default cream)
  */
 export default function PageHero({
   eyebrow,
@@ -24,28 +28,14 @@ export default function PageHero({
 }) {
   return (
     <section className="page-hero">
-      {/* Ambient gradient layers */}
+      {/* Layer 1: ambient radial gradients */}
       <div className="page-hero__bg" aria-hidden="true" />
 
-      {/* WebGL MagicRings ambient */}
-      <div className="page-hero__rings" aria-hidden="true">
-        <MagicRings
-          color="#D1A799"
-          colorTwo="#50553C"
-          ringCount={4}
-          speed={0.4}
-          opacity={0.55}
-          attenuation={8}
-          lineThickness={1.5}
-          baseRadius={0.28}
-          radiusStep={0.1}
-          noiseAmount={0.015}
-          followMouse={true}
-          mouseInfluence={0.1}
-          parallax={0.04}
-          hoverScale={1.05}
-        />
-      </div>
+      {/* Layer 2: soft breathing glow */}
+      <div className="page-hero__glow" aria-hidden="true" />
+
+      {/* Layer 3: diagonal music-staff lines */}
+      <div className="page-hero__staff" aria-hidden="true" />
 
       {/* Content */}
       <div className="page-hero__content">

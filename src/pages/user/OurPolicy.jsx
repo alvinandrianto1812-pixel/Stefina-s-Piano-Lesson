@@ -1,10 +1,8 @@
-// src/pages/user/OurPolicy.jsx
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../../components/Footer';
 import PageHero from '../../components/PageHero';
 import ScrollFloat from '../../components/ScrollFloat';
-import MagicRings from '../../components/MagicRings';
 import useScrollReveal from '../../hooks/useScrollReveal';
 import use3DTilt from '../../hooks/use3DTilt';
 
@@ -227,16 +225,16 @@ export default function OurPolicy() {
             background: 'var(--charcoal)',
             boxShadow: '0 16px 48px rgba(39,41,37,0.2)',
           }}>
-            {/* MagicRings background */}
-            <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-              <MagicRings
-                color="#D1A799" colorTwo="#683730"
-                ringCount={3} speed={0.4} opacity={0.4}
-                attenuation={6} lineThickness={1.5} baseRadius={0.35}
-                radiusStep={0.12} noiseAmount={0.015}
-                followMouse={true} mouseInfluence={0.1} parallax={0.04}
-              />
-            </div>
+            {/* CSS-only decoration — diagonal staff lines, consistent with PageHero */}
+            <div aria-hidden="true" style={{
+              position: 'absolute', inset: 0, zIndex: 0,
+              backgroundImage: 'repeating-linear-gradient(-14deg, transparent 0px, transparent 28px, rgba(209,167,153,0.04) 28px, rgba(209,167,153,0.04) 29px)',
+            }} />
+            <div aria-hidden="true" style={{
+              position: 'absolute', inset: 0, zIndex: 0,
+              background: 'radial-gradient(ellipse 70% 60% at 80% 20%, rgba(209,167,153,0.1) 0%, transparent 60%)',
+              animation: 'hero-breathe 6s ease-in-out infinite',
+            }} />
 
             <div style={{ position: 'relative', zIndex: 1, padding: '3rem 2.5rem', textAlign: 'center' }}>
               <div style={{ width: 36, height: 2, background: 'var(--blush)', opacity: 0.5, margin: '0 auto 1.5rem', borderRadius: 2 }} />

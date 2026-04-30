@@ -7,23 +7,135 @@
   min-height: 460px;
 }
 
-/* Ambient gradient layers */
+/* ── Layer 1: Ambient radial gradients ── */
 .page-hero__bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 70% 60% at 82% 8%,  rgba(209,167,153,0.17) 0%, transparent 58%),
-    radial-gradient(ellipse 55% 45% at 15% 92%, rgba(80,85,60,0.28)   0%, transparent 65%),
-    radial-gradient(ellipse 40% 40% at  0% 100%,rgba(8,9,8,0.5)       0%, transparent 60%);
+    radial-gradient(ellipse 70% 60% at 82% 8%,  rgba(209,167,153,0.15) 0%, transparent 56%),
+    radial-gradient(ellipse 55% 45% at 15% 92%, rgba(80,85,60,0.22)    0%, transparent 64%),
+    radial-gradient(ellipse 40% 40% at  0% 100%,rgba(8,9,8,0.45)       0%, transparent 60%);
 }
 
-/* MagicRings layer */
-.page-hero__rings {
+/* ── Layer 2: Soft breathing glow (CSS only, no WebGL) ── */
+.page-hero__glow {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
+  background:
+    radial-gradient(ellipse 50% 45% at 75% 35%, rgba(209,167,153,0.09) 0%, transparent 60%);
+  animation: hero-breathe 6s ease-in-out infinite;
+}
+
+/* ── Layer 3: Diagonal music-staff lines (brand thematic) ── */
+.page-hero__staff {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    -14deg,
+    transparent 0px,
+    transparent 28px,
+    rgba(209,167,153,0.055) 28px,
+    rgba(209,167,153,0.055) 29px
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0,0,0,0.4) 35%,
+    rgba(0,0,0,0.6) 65%,
+    transparent 100%
+  );
+}
+
+@keyframes hero-breathe {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.06); }
+}
+
+/* ── Content ── */
+.page-hero__content {
+  position: relative;
+  z-index: 10;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 9rem 2rem 5rem;
+}
+
+/* Eyebrow */
+.page-hero__eyebrow {
+  font-family: 'Creato Display', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--blush);
+  margin: 0 0 1rem;
+}
+
+/* Title */
+.page-hero .scroll-float {
+  font-family: 'Rockdale FREE', serif;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  line-height: 1.1;
+  color: var(--cream);
+  margin: 0 0 1.25rem;
+  display: block;
+}
+.page-hero .scroll-float .scroll-float-text { color: var(--cream); }
+
+/* Subtitle */
+.page-hero__subtitle {
+  font-family: 'Creato Display', sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: rgba(248,246,237,0.62);
+  max-width: 54ch;
+  margin: 0;
+}
+
+/* Stats */
+.page-hero__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  margin-top: 2.75rem;
+}
+.page-hero__stat-num {
+  font-family: 'Rockdale FREE', serif;
+  font-size: 1.9rem;
+  color: var(--blush);
+  line-height: 1;
+}
+.page-hero__stat-label {
+  font-family: 'Creato Display', sans-serif;
+  font-size: 0.72rem;
+  color: rgba(248,246,237,0.45);
+  margin-top: 0.25rem;
+  letter-spacing: 0.05em;
+}
+
+/* Horizontal rule separator */
+.page-hero__rule {
+  width: 40px;
+  height: 2px;
+  background: var(--blush);
+  opacity: 0.45;
+  border-radius: 2px;
+  margin-bottom: 1.5rem;
+}
+
+/* Wave divider */
+.page-hero__wave {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  display: block;
+  pointer-events: none;
+  z-index: 5;
 }
 
 /* Content */

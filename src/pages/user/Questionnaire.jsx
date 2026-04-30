@@ -16,23 +16,42 @@ const DAYS = [
   { value: "saturday", label: "Saturday" },
 ];
 
-// ---------- UI ----------
-const fieldInput =
-  "w-full rounded-xl bg-white border-2 border-slate-200/80 px-4 py-3 " +
-  "placeholder-slate-400 shadow-[0_1px_2px_rgba(0,0,0,0.04)] " +
-  "focus:outline-none focus:border-amber-400 focus:ring-4 " +
-  "focus:ring-amber-200/60 transition";
-
-const fieldSelect =
-  "w-full rounded-xl bg-white border-2 border-slate-200/80 px-4 h-11 " +
-  "shadow-[0_1px_2px_rgba(0,0,0,0.04)] focus:outline-none " +
-  "focus:border-amber-400 focus:ring-4 focus:ring-amber-200/60 transition";
-
-const panelClass =
-  "rounded-2xl bg-[#FFF7EC] ring-1 ring-[#E8E0CC] " +
-  "shadow-[0_8px_24px_rgba(16,24,40,0.06)] p-6 md:p-8";
-
-const labelClass = "block text-sm font-medium text-slate-700 mb-1.5";
+/* ─── Inline style helpers (brand palette) ──────────── */
+const fieldInputStyle = {
+  width: "100%",
+  borderRadius: 12,
+  background: "#fff",
+  border: "1.5px solid rgba(39,41,37,0.15)",
+  padding: "0.7rem 1rem",
+  fontSize: "0.9rem",
+  color: "var(--charcoal)",
+  outline: "none",
+  transition: "border-color 0.2s, box-shadow 0.2s",
+  fontFamily: '"Creato Display", sans-serif',
+  boxSizing: "border-box",
+};
+const fieldSelectStyle = {
+  ...fieldInputStyle,
+  height: 44,
+  cursor: "pointer",
+  appearance: "auto",
+};
+const panelStyle = {
+  borderRadius: 20,
+  background: "#fff",
+  border: "1px solid rgba(209,167,153,0.22)",
+  boxShadow: "0 4px 20px rgba(39,41,37,0.07)",
+  padding: "1.75rem 2rem",
+};
+const labelStyle = {
+  display: "block",
+  fontSize: "0.78rem",
+  fontWeight: 700,
+  color: "var(--olive)",
+  marginBottom: "0.4rem",
+  letterSpacing: "0.04em",
+  textTransform: "uppercase",
+};
 
 const formatIDRDisplay = (n) => {
   const num = Number(n || 0);
@@ -207,11 +226,7 @@ export default function Questionnaire() {
     setFile(f);
   };
 
-  const rupiah = (n) =>
-    new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-    }).format(n || 0);
+
 
   async function uploadProof(userId) {
     const ext = file?.name?.split(".").pop() || "dat";
@@ -307,27 +322,38 @@ export default function Questionnaire() {
       ]);
       if (pErr) throw pErr;
 
-      // Redirect WA — pesan registrasi resmi
-      const hasExperience = form.has_experience ? "Yes" : "No";
-      const experienceNote = form.has_experience && form.experience_detail
-        ? `\n*) ${form.experience_detail}`
-        : "";
+      // Redirect WA — pesan registrasi resmi (official template)
+      const hasExperience = form.learned_before === "yes";
+      const experienceDetail =
+        hasExperience && form.exam_grade
+          ? `Yes\n*) Most recent exam: ${form.exam_type} Grade ${form.exam_grade}`
+          : hasExperience
+            ? `Yes\n*) Duration: ${form.learned_duration}`
+            : "No";
+      const dayLabel =
+        form.preferred_day.charAt(0).toUpperCase() +
+        form.preferred_day.slice(1);
+
       const msg =
-        `REGISTRATION:\n` +
+        `REGISTRATION:\n\n` +
         `Thank you for your registration with Guru Nada. Your information has been received.\n\n` +
         `*Student's Full Name:* ${form.student_full_name}\n` +
-        `*Student's Age:* ${form.student_age}\n` +
+        `*Student's Age:* ${form.student_age || "-"}\n` +
         `*Instrument of Interest:* ${form.instrument}\n` +
-        `*Any Previous Musical Experience:* ${hasExperience}${experienceNote}\n` +
-        `*Preferred Day and Time:* ${form.preferred_day}, ${form.preferred_time}\n\n` +
-        `To complete your registration, please:\n` +
+        `*Any Previous Musical Experience:* ${experienceDetail}\n` +
+        `*Preferred Day and Time:* ${dayLabel}, ${form.preferred_time}\n\n` +
+        `To complete your registration, please:\n\n` +
         `1. Sign the Parent Agreement: [Insert Link to Agreement]\n` +
         `2. Reply to this chat with your payment confirmation screenshot.\n\n` +
         `Our admin will process your registration and confirm your lesson schedule soon.\n\n` +
         `Thank you,\n` +
-        `Guru Nada`;
+        `Guru Nada\n` +
+        `www.gurunada.com`;
 
-      window.open(`https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(msg)}`, "_blank");
+      window.open(
+        `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(msg)}`,
+        "_blank",
+      );
     } catch (err) {
       console.error(err);
       alert(err.message || "Submit failed. Please try again.");
@@ -337,367 +363,651 @@ export default function Questionnaire() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6 md:p-10 space-y-8">
-      <header className="space-y-2">
-        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
-          Student Registration & Booking
-        </h1>
-        <p className="text-slate-600">
-          Please fill in the information below to help us understand your needs
-          and schedule your lessons.
-        </p>
-      </header>
+    <div
+      style={{
+        background: "var(--cream)",
+        minHeight: "100vh",
+        fontFamily: '"Creato Display", sans-serif',
+      }}
+    >
+      {/* Hero header strip */}
+      <div
+        style={{
+          background:
+            "linear-gradient(135deg, var(--charcoal) 0%, var(--olive) 100%)",
+          padding: "7rem 2rem 3rem",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage:
+              "repeating-linear-gradient(-14deg, transparent 0px, transparent 28px, rgba(209,167,153,0.05) 28px, rgba(209,167,153,0.05) 29px)",
+          }}
+        />
+        <div
+          style={{
+            maxWidth: 760,
+            margin: "0 auto",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          <p
+            style={{
+              fontSize: "0.68rem",
+              fontWeight: 800,
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              color: "var(--blush)",
+              margin: "0 0 0.5rem",
+            }}
+          >
+            Step 2 of 2
+          </p>
+          <h1
+            style={{
+              fontFamily: '"Rockdale FREE", serif',
+              fontSize: "clamp(1.75rem,4vw,2.5rem)",
+              color: "var(--cream)",
+              margin: "0 0 0.75rem",
+            }}
+          >
+            Student Registration
+          </h1>
+          <p
+            style={{
+              fontSize: "0.95rem",
+              color: "rgba(248,246,237,0.6)",
+              maxWidth: "50ch",
+              margin: 0,
+              lineHeight: 1.7,
+            }}
+          >
+            Fill in the information below to help us understand your needs and
+            schedule your lessons.
+          </p>
+        </div>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Student Info */}
-        <section className={panelClass}>
-          <h2 className="text-xl font-medium mb-4">Student Information</h2>
-          <div className="grid md:grid-cols-2 gap-4 md:gap-6">
-            <div>
-              <label className={labelClass}>Student's Full Name</label>
-              <input
-                name="student_full_name"
-                className={fieldInput}
-                value={form.student_full_name}
-                onChange={onChange}
-                required
-              />
-            </div>
-            <div>
-              <label className={labelClass}>Gender</label>
-              <select
-                name="student_gender"
-                className={fieldSelect}
-                value={form.student_gender}
-                onChange={onChange}
-                required
-              >
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-              </select>
-            </div>
-            <div>
-              <label className={labelClass}>Date of Birth</label>
-              <input
-                type="date"
-                name="student_dob"
-                className={fieldInput}
-                value={form.student_dob}
-                onChange={onChange}
-                required
-              />
-            </div>
-            <div>
-              <label className={labelClass}>Age (auto)</label>
-              <input
-                readOnly
-                className={`${fieldInput} bg-gray-50`}
-                value={form.student_age}
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className={labelClass}>Address</label>
-              <input
-                name="student_address"
-                className={fieldInput}
-                value={form.student_address}
-                onChange={onChange}
-              />
-            </div>
-            <div>
-              <label className={labelClass}>Phone Number</label>
-              <input
-                name="student_phone"
-                className={fieldInput}
-                value={form.student_phone}
-                onChange={onChange}
-                required
-              />
-            </div>
-            <div>
-              <label className={labelClass}>E-mail</label>
-              <input
-                type="email"
-                name="student_email"
-                className={fieldInput}
-                value={form.student_email}
-                onChange={onChange}
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className={labelClass}>Instagram</label>
-              <input
-                name="student_instagram"
-                className={fieldInput}
-                value={form.student_instagram}
-                onChange={onChange}
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Parents */}
-        <section className={panelClass}>
-          <h2 className="text-xl font-medium mb-4">Parents Information</h2>
-          <div className="grid md:grid-cols-2 gap-4 md:gap-6">
-            <div>
-              <label className={labelClass}>Father's Name</label>
-              <input
-                name="father_name"
-                className={fieldInput}
-                value={form.father_name}
-                onChange={onChange}
-              />
-            </div>
-            <div>
-              <label className={labelClass}>Father's Contact Number</label>
-              <input
-                name="father_phone"
-                className={fieldInput}
-                value={form.father_phone}
-                onChange={onChange}
-              />
-            </div>
-            <div>
-              <label className={labelClass}>Mother's Name</label>
-              <input
-                name="mother_name"
-                className={fieldInput}
-                value={form.mother_name}
-                onChange={onChange}
-              />
-            </div>
-            <div>
-              <label className={labelClass}>Mother's Contact Number</label>
-              <input
-                name="mother_phone"
-                className={fieldInput}
-                value={form.mother_phone}
-                onChange={onChange}
-              />
-            </div>
-            <div>
-              <label className={labelClass}>Parent's E-mail</label>
-              <input
-                type="email"
-                name="parents_email"
-                className={fieldInput}
-                value={form.parents_email}
-                onChange={onChange}
-              />
-            </div>
-            <div>
-              <label className={labelClass}>Parent's Instagram</label>
-              <input
-                name="parents_instagram"
-                className={fieldInput}
-                value={form.parents_instagram}
-                onChange={onChange}
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Instrument & Schedule */}
-        <section className={panelClass}>
-          <h2 className="text-xl font-medium mb-4">Instrument & Schedule</h2>
-          <div className="grid md:grid-cols-2 gap-4 md:gap-6">
-            <div>
-              <label className={labelClass}>Instrument</label>
-              <select
-                name="instrument"
-                className={fieldSelect}
-                value={form.instrument}
-                onChange={onChange}
-              >
-                {[
-                  "Piano",
-                  "Violin",
-                  "Cello",
-                  "Vocal",
-                  "Drum/Percussion",
-                  "Digital Music Producing",
-                ].map((i) => (
-                  <option key={i} value={i}>
-                    {i}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className={labelClass}>Preferable Day</label>
-              <select
-                name="preferred_day"
-                className={fieldSelect}
-                value={form.preferred_day}
-                onChange={onChange}
-                required
-              >
-                {DAYS.map((d) => (
-                  <option key={d.value} value={d.value}>
-                    {d.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className={labelClass}>Preferable Time</label>
-              <select
-                name="preferred_time"
-                className={fieldSelect}
-                value={form.preferred_time}
-                onChange={onChange}
-                required
-              >
-                {timeOpts.map((t) => (
-                  <option key={t.value} value={t.value}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-slate-500 mt-1">
-                Mon–Fri: 13:00–18:00 • Sat: 09:00–14:00 (1-hour sessions)
-              </p>
-            </div>
-            <div>
-              <label className={labelClass}>Have you learned before?</label>
-              <select
-                name="learned_before"
-                className={fieldSelect}
-                value={form.learned_before}
-                onChange={onChange}
-              >
-                <option value="no">No</option>
-                <option value="yes">Yes</option>
-              </select>
-            </div>
-            {form.learned_before === "yes" && (
+      <div
+        style={{
+          maxWidth: 760,
+          margin: "0 auto",
+          padding: "2.5rem 1.5rem 5rem",
+        }}
+      >
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
+        >
+          {/* Student Info */}
+          <section style={panelStyle}>
+            <h2
+              style={{
+                fontFamily: '"Rockdale FREE", serif',
+                fontSize: "1.15rem",
+                color: "var(--olive)",
+                margin: "0 0 1.25rem",
+                borderBottom: "1px solid rgba(209,167,153,0.2)",
+                paddingBottom: "0.75rem",
+              }}
+            >
+              Student Information
+            </h2>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))",
+                gap: "1rem",
+              }}
+            >
               <div>
-                <label className={labelClass}>If yes, how long?</label>
-                <select
-                  name="learned_duration"
-                  className={fieldSelect}
-                  value={form.learned_duration}
+                <label style={labelStyle}>Student's Full Name *</label>
+                <input
+                  name="student_full_name"
+                  style={fieldInputStyle}
+                  value={form.student_full_name}
                   onChange={onChange}
+                  required
+                  placeholder="e.g. Anya Putri"
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Gender *</label>
+                <select
+                  name="student_gender"
+                  style={fieldSelectStyle}
+                  value={form.student_gender}
+                  onChange={onChange}
+                  required
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
                 >
-                  <option value="< 6 months">&lt; 6 months</option>
-                  <option value="1–3 years">1–3 years</option>
-                  <option value="> 3 years">&gt; 3 years</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
                 </select>
               </div>
-            )}
+              <div>
+                <label style={labelStyle}>Date of Birth *</label>
+                <input
+                  type="date"
+                  name="student_dob"
+                  style={fieldInputStyle}
+                  value={form.student_dob}
+                  onChange={onChange}
+                  required
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Age (auto-calculated)</label>
+                <input
+                  readOnly
+                  style={{ ...fieldInputStyle, background: "var(--cream)", cursor: "default" }}
+                  value={form.student_age}
+                />
+              </div>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label style={labelStyle}>Address</label>
+                <input
+                  name="student_address"
+                  style={fieldInputStyle}
+                  value={form.student_address}
+                  onChange={onChange}
+                  placeholder="e.g. Jakarta Selatan"
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Phone Number *</label>
+                <input
+                  name="student_phone"
+                  style={fieldInputStyle}
+                  value={form.student_phone}
+                  onChange={onChange}
+                  required
+                  placeholder="e.g. 08123456789"
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Email</label>
+                <input
+                  type="email"
+                  name="student_email"
+                  style={fieldInputStyle}
+                  value={form.student_email}
+                  onChange={onChange}
+                  placeholder="optional"
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                />
+              </div>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label style={labelStyle}>Instagram</label>
+                <input
+                  name="student_instagram"
+                  style={fieldInputStyle}
+                  value={form.student_instagram}
+                  onChange={onChange}
+                  placeholder="@username (optional)"
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                />
+              </div>
+            </div>
+          </section>
 
-            {/* Exam section only when learned_before = yes */}
-            {form.learned_before === "yes" && (
-              <>
+          {/* Parents */}
+          <section style={panelStyle}>
+            <h2 style={{ fontFamily: '"Rockdale FREE", serif', fontSize: "1.15rem", color: "var(--olive)", margin: "0 0 1.25rem", borderBottom: "1px solid rgba(209,167,153,0.2)", paddingBottom: "0.75rem" }}>
+              Parents Information
+            </h2>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))", gap: "1rem" }}>
+              <div>
+                <label style={labelStyle}>Father's Name</label>
+                <input
+                  name="father_name"
+                  style={fieldInputStyle}
+                  value={form.father_name}
+                  onChange={onChange}
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Father's Phone</label>
+                <input
+                  name="father_phone"
+                  style={fieldInputStyle}
+                  value={form.father_phone}
+                  onChange={onChange}
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Mother's Name</label>
+                <input
+                  name="mother_name"
+                  style={fieldInputStyle}
+                  value={form.mother_name}
+                  onChange={onChange}
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Mother's Phone</label>
+                <input
+                  name="mother_phone"
+                  style={fieldInputStyle}
+                  value={form.mother_phone}
+                  onChange={onChange}
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Parent's Email</label>
+                <input
+                  type="email"
+                  name="parents_email"
+                  style={fieldInputStyle}
+                  value={form.parents_email}
+                  onChange={onChange}
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Parent's Instagram</label>
+                <input
+                  name="parents_instagram"
+                  style={fieldInputStyle}
+                  value={form.parents_instagram}
+                  onChange={onChange}
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Instrument & Schedule */}
+          <section style={panelStyle}>
+            <h2
+              style={{
+                fontFamily: '"Rockdale FREE", serif',
+                fontSize: "1.15rem",
+                color: "var(--olive)",
+                margin: "0 0 1.25rem",
+                borderBottom: "1px solid rgba(209,167,153,0.2)",
+                paddingBottom: "0.75rem",
+              }}
+            >
+              Instrument & Schedule
+            </h2>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))",
+                gap: "1.25rem",
+                alignItems: "start",
+              }}
+            >
+              <div>
+                <label style={labelStyle}>Instrument *</label>
+                <select
+                  name="instrument"
+                  style={fieldSelectStyle}
+                  value={form.instrument}
+                  onChange={onChange}
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
+                >
+                  {[
+                    "Piano",
+                    "Violin",
+                    "Cello",
+                    "Vocal",
+                    "Drum/Percussion",
+                    "Digital Music Producing",
+                  ].map((i) => (
+                    <option key={i} value={i}>
+                      {i}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label style={labelStyle}>Preferred Day *</label>
+                <select
+                  name="preferred_day"
+                  style={fieldSelectStyle}
+                  value={form.preferred_day}
+                  onChange={onChange}
+                  required
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
+                >
+                  {DAYS.map((d) => (
+                    <option key={d.value} value={d.value}>
+                      {d.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label style={labelStyle}>Preferred Time *</label>
+                <select
+                  name="preferred_time"
+                  style={fieldSelectStyle}
+                  value={form.preferred_time}
+                  onChange={onChange}
+                  required
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
+                >
+                  {timeOpts.map((t) => (
+                    <option key={t.value} value={t.value}>
+                      {t.label}
+                    </option>
+                  ))}
+                </select>
+                <p
+                  style={{
+                    fontSize: "0.72rem",
+                    color: "#94A3B8",
+                    marginTop: "0.3rem",
+                  }}
+                >
+                  Mon–Fri: 13:00–18:00 · Sat: 09:00–14:00
+                </p>
+              </div>
+              <div>
+                <label style={labelStyle}>Learned Before?</label>
+                <select
+                  name="learned_before"
+                  style={fieldSelectStyle}
+                  value={form.learned_before}
+                  onChange={onChange}
+                  onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
+                >
+                  <option value="no">No</option>
+                  <option value="yes">Yes</option>
+                </select>
+              </div>
+              {form.learned_before === "yes" && (
                 <div>
-                  <label className={labelClass}>
-                    Have you taken an exam before?
-                  </label>
+                  <label style={labelStyle}>If yes, how long?</label>
                   <select
-                    name="took_exam_before"
-                    className={fieldSelect}
-                    value={form.took_exam_before}
+                    name="learned_duration"
+                    style={fieldSelectStyle}
+                    value={form.learned_duration}
                     onChange={onChange}
+                    onFocus={(e) =>
+                      (e.target.style.borderColor = "var(--blush)")
+                    }
+                    onBlur={(e) =>
+                      (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                    }
                   >
-                    <option value="no">No</option>
-                    <option value="yes">Yes</option>
+                    <option value="< 6 months">&lt; 6 months</option>
+                    <option value="1–3 years">1–3 years</option>
+                    <option value="> 3 years">&gt; 3 years</option>
                   </select>
                 </div>
-
-                {form.took_exam_before === "yes" && (
-                  <>
-                    <div>
-                      <label className={labelClass}>Which exam?</label>
-                      <select
-                        name="exam_type"
-                        className={fieldSelect}
-                        value={form.exam_type}
-                        onChange={onChange}
-                      >
-                        {EXAM_TYPES.map((b) => (
-                          <option key={b} value={b}>
-                            {b}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className={labelClass}>Exam Grade</label>
-                      <select
-                        name="exam_grade"
-                        className={fieldSelect}
-                        value={form.exam_grade}
-                        onChange={onChange}
-                      >
-                        {EXAM_GRADES.map((g) => (
-                          <option key={g} value={g}>
-                            {g}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </>
-                )}
-              </>
-            )}
-          </div>
-        </section>
-
-        {/* Payment & Proof */}
-        <section className={panelClass}>
-          <h2 className="text-xl font-medium mb-4">Payment</h2>
-          <div className="grid md:grid-cols-2 md:items-center gap-6">
-            <div>
-              <label className="block text-sm mb-1">Amount (IDR)</label>
-              <input
-                name="amount_display"
-                type="text"
-                className={`${fieldInput} cursor-not-allowed`}
-                value={formatIDRDisplay(form.amount)}
-                readOnly
-              />
-              <p className="text-xs text-slate-500 mt-1">Fixed amount.</p>
+              )}
+              {form.learned_before === "yes" && (
+                <>
+                  <div>
+                    <label style={labelStyle}>Taken an exam before?</label>
+                    <select
+                      name="took_exam_before"
+                      style={fieldSelectStyle}
+                      value={form.took_exam_before}
+                      onChange={onChange}
+                      onFocus={(e) =>
+                        (e.target.style.borderColor = "var(--blush)")
+                      }
+                      onBlur={(e) =>
+                        (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                      }
+                    >
+                      <option value="no">No</option>
+                      <option value="yes">Yes</option>
+                    </select>
+                  </div>
+                  {form.took_exam_before === "yes" && (
+                    <>
+                      <div>
+                        <label style={labelStyle}>Which Exam?</label>
+                        <select
+                          name="exam_type"
+                          style={fieldSelectStyle}
+                          value={form.exam_type}
+                          onChange={onChange}
+                          onFocus={(e) =>
+                            (e.target.style.borderColor = "var(--blush)")
+                          }
+                          onBlur={(e) =>
+                            (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                          }
+                        >
+                          {EXAM_TYPES.map((b) => (
+                            <option key={b} value={b}>
+                              {b}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label style={labelStyle}>Exam Grade</label>
+                        <select
+                          name="exam_grade"
+                          style={fieldSelectStyle}
+                          value={form.exam_grade}
+                          onChange={onChange}
+                          onFocus={(e) =>
+                            (e.target.style.borderColor = "var(--blush)")
+                          }
+                          onBlur={(e) =>
+                            (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                          }
+                        >
+                          {EXAM_GRADES.map((g) => (
+                            <option key={g} value={g}>
+                              {g}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
             </div>
-            <div>
-              <label className={labelClass}>
-                Upload Payment Proof (image/PDF)
-              </label>
-              <input
-                type="file"
-                accept="image/*,application/pdf"
-                onChange={onFile}
-                className="file-input file-input-bordered file-input-lg 
-                  border-2 border-slate-200/80 bg-white
-                  shadow-[0_1px_2px_rgba(0,0,0,0.04)]
-                  focus:outline-none focus:border-amber-400
-                  focus:ring-4 focus:ring-amber-200/60"
-              />
-            </div>
-          </div>
-        </section>
+          </section>
 
-        <div className="flex flex-col items-center gap-3 pt-2">
-          <button
-            type="submit"
-            disabled={submitting}
-            className="inline-flex items-center justify-center px-10 py-3 rounded-full
-                       bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold tracking-wide
-                       shadow-[0_10px_20px_rgba(217,119,6,0.25)] ring-1 ring-amber-400/40
-                       hover:from-amber-600 hover:to-amber-700 hover:shadow-[0_14px_28px_rgba(217,119,6,0.35)]
-                       active:scale-[0.98] focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-300
-                       disabled:opacity-70 disabled:cursor-not-allowed transition"
-            title={!isValid ? "Please complete all required fields first." : ""}
+          {/* Payment & Proof */}
+          <section style={panelStyle}>
+            <h2
+              style={{
+                fontFamily: '"Rockdale FREE", serif',
+                fontSize: "1.15rem",
+                color: "var(--olive)",
+                margin: "0 0 1.25rem",
+                borderBottom: "1px solid rgba(209,167,153,0.2)",
+                paddingBottom: "0.75rem",
+              }}
+            >
+              Payment
+            </h2>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))",
+                gap: "1.25rem",
+                alignItems: "start",
+              }}
+            >
+              <div>
+                <label style={labelStyle}>Amount (IDR)</label>
+                <input
+                  name="amount_display"
+                  type="text"
+                  style={{
+                    ...fieldInputStyle,
+                    background: "var(--cream)",
+                    cursor: "not-allowed",
+                  }}
+                  value={formatIDRDisplay(form.amount)}
+                  readOnly
+                />
+                <p
+                  style={{
+                    fontSize: "0.72rem",
+                    color: "#94A3B8",
+                    marginTop: "0.3rem",
+                  }}
+                >
+                  Fixed trial class fee.
+                </p>
+              </div>
+              <div>
+                <label style={labelStyle}>Upload Payment Proof *</label>
+                <input
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={onFile}
+                  style={{
+                    ...fieldInputStyle,
+                    padding: "0.5rem",
+                    cursor: "pointer",
+                  }}
+                />
+                <p
+                  style={{
+                    fontSize: "0.72rem",
+                    color: "#94A3B8",
+                    marginTop: "0.3rem",
+                  }}
+                >
+                  Image or PDF, max 10MB.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Submit */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "0.75rem",
+              paddingTop: "0.5rem",
+            }}
           >
-            {submitting ? "Submitting…" : "Submit Forms"}
-          </button>
-
-          <span className="text-xs text-slate-600 text-center">
-            After submitting, you'll be redirected to WhatsApp Admin for
-            confirmation.
-          </span>
-        </div>
-      </form>
+            <button
+              type="submit"
+              disabled={submitting}
+              title={
+                !isValid
+                  ? "Please complete all required fields and upload payment proof."
+                  : ""
+              }
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.9rem 3rem",
+                borderRadius: "999px",
+                background: submitting
+                  ? "rgba(39,41,37,0.45)"
+                  : "var(--charcoal)",
+                color: "var(--cream)",
+                border: "none",
+                fontFamily: '"Creato Display", sans-serif',
+                fontWeight: 700,
+                fontSize: "0.95rem",
+                cursor: submitting ? "not-allowed" : "pointer",
+                boxShadow: submitting
+                  ? "none"
+                  : "0 8px 24px rgba(39,41,37,0.25)",
+                transition: "all 0.2s ease",
+                opacity: !isValid ? 0.55 : 1,
+              }}
+              onMouseEnter={(e) => {
+                if (!submitting && isValid) {
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 12px 32px rgba(39,41,37,0.35)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "";
+                e.currentTarget.style.boxShadow = submitting
+                  ? "none"
+                  : "0 8px 24px rgba(39,41,37,0.25)";
+              }}
+            >
+              {submitting ? "Submitting…" : "Submit Registration"}
+              {!submitting && (
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ width: 16, height: 16 }}
+                >
+                  <polyline points="9,18 15,12 9,6" />
+                </svg>
+              )}
+            </button>
+            <p
+              style={{
+                fontSize: "0.75rem",
+                color: "#94A3B8",
+                textAlign: "center",
+              }}
+            >
+              After submitting, you'll be redirected to WhatsApp for
+              registration confirmation.
+            </p>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

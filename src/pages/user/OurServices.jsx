@@ -80,16 +80,14 @@ function LessonCard({ lt }) {
         position: 'relative',
       }}
     >
-      {/* MagicRings glow on highlighted card */}
+      {/* Subtle CSS shimmer on highlighted card — no WebGL needed at this scale */}
       {lt.highlight && (
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0, borderRadius: '20px', overflow: 'hidden' }}>
-          <MagicRings
-            color="#D1A799" colorTwo="#50553C"
-            ringCount={3} speed={0.5} opacity={0.18}
-            attenuation={5} lineThickness={1.5} baseRadius={0.4}
-            radiusStep={0.12} noiseAmount={0.02} followMouse={false}
-          />
-        </div>
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 0,
+          borderRadius: '20px', overflow: 'hidden',
+          background: 'radial-gradient(ellipse 80% 70% at 50% 30%, rgba(209,167,153,0.08) 0%, transparent 70%)',
+          animation: 'hero-breathe 5s ease-in-out infinite',
+        }} />
       )}
 
       {/* Header strip */}

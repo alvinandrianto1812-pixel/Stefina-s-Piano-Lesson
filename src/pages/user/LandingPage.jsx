@@ -1,7 +1,6 @@
 // src/pages/user/LandingPage.jsx
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '../../lib/supabaseClient';
 
 import TypingText        from '../../components/TypingText';
 import Footer            from '../../components/Footer';
@@ -11,13 +10,7 @@ import BounceIcons       from '../../components/BounceIcons';
 import FeatureExplorer   from '../../components/FeatureExplorer';
 import TestimonialSlider from '../../components/TestimonialSlider';
 import useScrollReveal   from '../../hooks/useScrollReveal';
-
-/* ─── WhatsApp link ─────────────────────────────── */
-const WA_LINK =
-  'https://wa.me/6287848441575?text=' +
-  encodeURIComponent(
-    "Hello! I'd like to try a trial piano class. Is there any slot available this week?"
-  );
+import { WA_TRIAL, WA_REGISTER } from '../../lib/waLinks';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -38,6 +31,7 @@ export default function LandingPage() {
   }, [location]);
 
   const handleBook = () => navigate('/Questionnaire');
+  const handleEnrollWA = () => window.open(WA_REGISTER, '_blank', 'noopener,noreferrer');
 
   return (
     <div
@@ -153,7 +147,7 @@ export default function LandingPage() {
               {/* CTAs */}
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '2.5rem' }}>
                 <a
-                  href={WA_LINK}
+                  href={WA_TRIAL}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -529,7 +523,7 @@ export default function LandingPage() {
                   Fill out a short questionnaire and experience a full session — no commitment.
                 </p>
                 <a
-                  href={WA_LINK}
+                  href={WA_TRIAL}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -596,8 +590,10 @@ export default function LandingPage() {
                 <p style={{ fontSize: '0.85rem', color: 'rgba(248,246,237,0.65)', marginBottom: '1.25rem', lineHeight: 1.6 }}>
                   Choose your weekly schedule and start your musical journey with a dedicated mentor.
                 </p>
-                <button
-                  onClick={handleBook}
+                <a
+                  href={WA_REGISTER}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
                     display: 'inline-block',
                     padding: '0.75rem 1.5rem',
@@ -605,12 +601,14 @@ export default function LandingPage() {
                     background: 'var(--cream)',
                     color: 'var(--olive)',
                     fontWeight: 700, fontSize: '0.9rem',
-                    border: 'none', cursor: 'pointer',
+                    textDecoration: 'none',
                     transition: 'opacity 0.2s',
                   }}
+                  onMouseOver={e => e.currentTarget.style.opacity = '0.9'}
+                  onMouseOut={e => e.currentTarget.style.opacity = '1'}
                 >
                   Enroll Now →
-                </button>
+                </a>
               </div>
             </div>
           </div>

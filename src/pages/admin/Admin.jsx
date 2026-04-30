@@ -10,7 +10,20 @@ const TEACHERS_FOLDER = "teachers";
 export default function Admin() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("payments"); // "payments" | "events" | "media" | "teachers" | "finance"
+  const [activeTab, setActiveTab] = useState("payments");
+  const [navH, setNavH] = useState(64); // dynamic navbar height
+
+  // Measure actual navbar height so sub-header sticks flush below it
+  useEffect(() => {
+    const nav = document.querySelector('nav');
+    if (!nav) return;
+    setNavH(nav.getBoundingClientRect().height);
+    const ro = new ResizeObserver(entries => {
+      for (const e of entries) setNavH(e.contentRect.height);
+    });
+    ro.observe(nav);
+    return () => ro.disconnect();
+  }, []);
 
   // ── Payments state ──
   const [payments, setPayments] = useState([]);
@@ -590,50 +603,140 @@ export default function Admin() {
   // ════════════════════════════════════════════════════════
   // RENDER
   // ════════════════════════════════════════════════════════
-  if (loading) return <div className="p-6">Loading…</div>;
+  if (loading) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', background: 'var(--cream)', fontFamily: '"Creato Display", sans-serif' }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>♩</div>
+        <p style={{ color: 'var(--olive)', fontWeight: 600 }}>Loading dashboard…</p>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold text-slate-800">Dashboard Admin</h1>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #ECEAE0 0%, #F0EDE4 100%)', fontFamily: '"Creato Display", system-ui, sans-serif' }}>
+      {/* Global styles */}
+      <style>{`
+        .admin-tabs::-webkit-scrollbar { display: none; }
+        .admin-tabs { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes adminFadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .admin-fade-up { animation: adminFadeUp 0.35s ease both; }
+        .admin-row { transition: background 0.15s; }
+        .admin-row:hover { background: rgba(80,85,60,0.04); }
+        .stat-card { transition: transform 0.22s ease, box-shadow 0.22s ease; cursor: default; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(39,41,37,0.12); }
+        .tab-btn { transition: all 0.2s ease; }
+        .tab-btn:hover:not(.tab-active) { background: rgba(80,85,60,0.07) !important; color: #50553C !important; }
+      `}</style>
 
-      {/* Tab Switcher */}
-      <div className="flex gap-2 border-b border-slate-200 overflow-x-auto">
-        {[
-          { key: "payments", label: "💳 Pembayaran" },
-          { key: "events", label: "📅 Events" },
-          { key: "media", label: "🖼️ Media Gallery" },
-          { key: "teachers", label: "👩‍🏫 Teachers" },
-          { key: "finance", label: "💰 Keuangan" },
-        ].map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`px-5 py-2.5 text-sm font-medium transition border-b-2 -mb-px whitespace-nowrap ${activeTab === tab.key
-                ? "border-[#272925] text-[#272925]"
-                : "border-transparent text-slate-500 hover:text-slate-700"
-              }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      {/* Admin Sub-bar: sticky flush below main navbar */}
+      <div style={{
+        position: 'sticky',
+        top: navH,
+        zIndex: 40,
+        background: 'linear-gradient(105deg, #1a1c18 0%, #2d3126 45%, #414737 100%)',
+        padding: '0 1.75rem',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        height: '46px',
+        boxShadow: '0 4px 24px rgba(39,41,37,0.28)',
+        borderBottom: '1px solid rgba(209,167,153,0.1)',
+      }}>
+        {/* Left accent line */}
+        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, background: 'linear-gradient(180deg, #D1A799, rgba(209,167,153,0))', borderRadius: '0 2px 2px 0' }} />
+
+        {/* Identity */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          <div style={{
+            width: 28, height: 28, borderRadius: 8,
+            background: 'linear-gradient(135deg, #D1A799 0%, #b8897e 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '0.9rem', flexShrink: 0,
+            boxShadow: '0 2px 8px rgba(209,167,153,0.3)',
+          }}>♩</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+            <span style={{ fontSize: '0.55rem', fontWeight: 800, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(209,167,153,0.6)' }}>Guru Nada</span>
+            <span style={{ color: 'rgba(248,246,237,0.15)', fontSize: '0.85rem' }}>|</span>
+            <span style={{ fontSize: '0.84rem', fontWeight: 700, color: '#F8F6ED', letterSpacing: '0.01em' }}>Admin Dashboard</span>
+          </div>
+        </div>
+
+        {/* Date only — no Sign Out (already in main Navbar) */}
+        <span style={{ fontSize: '0.67rem', color: 'rgba(248,246,237,0.38)', letterSpacing: '0.04em' }}>
+          {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+        </span>
       </div>
+
+      {/* Main content */}
+      <div style={{ maxWidth: 1360, margin: '0 auto', padding: '1.75rem 1.5rem 5rem' }} className="admin-fade-up">
+
+        {/* Summary stat cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '0.9rem', marginBottom: '1.75rem' }}>
+          {[
+            { label: 'Total Pembayaran', value: payments.length,                                  icon: '💳', accent: '#50553C', bg: 'rgba(80,85,60,0.07)',  border: 'rgba(80,85,60,0.12)' },
+            { label: 'Pending Review',   value: payments.filter(p=>p.status==='pending').length,   icon: '⏳', accent: '#92400e', bg: 'rgba(234,179,8,0.07)', border: 'rgba(234,179,8,0.18)' },
+            { label: 'Terverifikasi',    value: payments.filter(p=>p.status==='verified').length,  icon: '✅', accent: '#15803d', bg: 'rgba(22,163,74,0.07)', border: 'rgba(22,163,74,0.18)' },
+            { label: 'Total Events',     value: eventsData.length,                                 icon: '📅', accent: '#1e40af', bg: 'rgba(59,130,246,0.06)', border: 'rgba(59,130,246,0.15)' },
+          ].map(s => (
+            <div key={s.label} className="stat-card" style={{ background: '#fff', borderRadius: 16, padding: '1rem 1.25rem', border: `1px solid ${s.border}`, boxShadow: '0 2px 8px rgba(39,41,37,0.05)', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.15rem', flexShrink: 0 }}>{s.icon}</div>
+              <div>
+                <p style={{ margin: 0, fontSize: '0.62rem', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{s.label}</p>
+                <p style={{ margin: '0.05rem 0 0', fontSize: '1.55rem', fontWeight: 800, color: s.accent, lineHeight: 1 }}>{s.value}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Premium pill tab switcher */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <div className="admin-tabs" style={{ display: 'inline-flex', background: '#fff', borderRadius: 14, padding: '0.28rem', gap: '0.15rem', boxShadow: '0 2px 10px rgba(39,41,37,0.07)', border: '1px solid rgba(39,41,37,0.07)', overflowX: 'auto' }}>
+            {[
+              { key: 'payments', label: 'Pembayaran', icon: '💳' },
+              { key: 'events',   label: 'Events',     icon: '📅' },
+              { key: 'media',    label: 'Media',      icon: '🖼️' },
+              { key: 'teachers', label: 'Teachers',   icon: '👩‍🏫' },
+              { key: 'finance',  label: 'Keuangan',   icon: '💰' },
+            ].map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`tab-btn${activeTab === tab.key ? ' tab-active' : ''}`}
+                style={{
+                  padding: '0.48rem 1rem',
+                  fontSize: '0.78rem', fontWeight: 700,
+                  border: 'none', cursor: 'pointer',
+                  whiteSpace: 'nowrap', borderRadius: 10,
+                  display: 'flex', alignItems: 'center', gap: '0.3rem',
+                  fontFamily: 'inherit',
+                  background: activeTab === tab.key ? 'linear-gradient(135deg, #272925, #50553C)' : 'transparent',
+                  color: activeTab === tab.key ? '#F8F6ED' : '#94A3B8',
+                  boxShadow: activeTab === tab.key ? '0 3px 10px rgba(39,41,37,0.22)' : 'none',
+                }}
+              >
+                <span>{tab.icon}</span> {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
       {/* ── PAYMENTS TAB ── */}
       {activeTab === "payments" && (
-        <section className="space-y-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-lg border shadow-sm">
-            <div className="flex flex-col md:flex-row gap-4 flex-1">
+        <section style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* Filter bar */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', background: '#fff', padding: '1rem 1.25rem', borderRadius: 14, border: '1px solid rgba(39,41,37,0.1)', boxShadow: '0 1px 4px rgba(39,41,37,0.06)' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', flex: 1 }}>
               <input
                 type="text"
-                placeholder="Cari nama, instrumen..."
+                placeholder="Cari nama, instrumen…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#272925] w-full md:w-64 text-sm"
+                style={{ padding: '0.5rem 0.9rem', border: '1.5px solid rgba(39,41,37,0.15)', borderRadius: 10, fontSize: '0.82rem', fontFamily: 'inherit', outline: 'none', width: 220, color: 'var(--charcoal)' }}
+                onFocus={e => e.target.style.borderColor = 'var(--olive)'}
+                onBlur={e => e.target.style.borderColor = 'rgba(39,41,37,0.15)'}
               />
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#272925] text-sm bg-white"
+                style={{ padding: '0.5rem 0.9rem', border: '1.5px solid rgba(39,41,37,0.15)', borderRadius: 10, fontSize: '0.82rem', fontFamily: 'inherit', background: '#fff', color: 'var(--charcoal)', cursor: 'pointer' }}
               >
                 <option value="all">Semua Status</option>
                 <option value="pending">Pending</option>
@@ -641,47 +744,40 @@ export default function Admin() {
                 <option value="rejected">Rejected</option>
               </select>
             </div>
-            <div className="flex gap-2">
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
               <button
                 onClick={exportToCSV}
-                className="px-4 py-2 rounded border bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 text-sm font-medium transition"
+                style={{ padding: '0.5rem 1rem', borderRadius: 10, border: '1px solid rgba(22,163,74,0.3)', background: 'rgba(22,163,74,0.07)', color: '#15803d', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(22,163,74,0.14)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(22,163,74,0.07)'}
               >
                 Export CSV
               </button>
               <button
                 onClick={fetchAll}
-                className="px-4 py-2 rounded border bg-slate-50 hover:bg-slate-100 text-sm font-medium transition"
+                style={{ padding: '0.5rem 1rem', borderRadius: 10, border: '1px solid rgba(39,41,37,0.15)', background: 'rgba(39,41,37,0.04)', color: 'var(--charcoal)', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(39,41,37,0.09)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(39,41,37,0.04)'}
               >
                 Refresh
               </button>
             </div>
           </div>
 
-          <div className="overflow-x-auto border rounded-lg bg-white shadow-sm">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-slate-50 border-b">
-                <tr>
-                  <th className="p-3 font-semibold text-slate-700">Tanggal</th>
-                  <th className="p-3 font-semibold text-slate-700">
-                    Orang Tua
-                  </th>
-                  <th className="p-3 font-semibold text-slate-700">Anak</th>
-                  <th className="p-3 font-semibold text-slate-700">
-                    Instrumen
-                  </th>
-                  <th className="p-3 font-semibold text-slate-700">Jadwal</th>
-                  <th className="p-3 font-semibold text-slate-700">Nominal</th>
-                  <th className="p-3 font-semibold text-slate-700">Status</th>
-                  <th className="p-3 font-semibold text-slate-700">Bukti</th>
-                  <th className="p-3 font-semibold text-slate-700 text-center">
-                    Aksi
-                  </th>
+          {/* Table */}
+          <div style={{ overflowX: 'auto', borderRadius: 14, border: '1px solid rgba(39,41,37,0.1)', background: '#fff', boxShadow: '0 1px 4px rgba(39,41,37,0.06)' }}>
+            <table style={{ width: '100%', fontSize: '0.82rem', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ background: 'rgba(80,85,60,0.05)', borderBottom: '1px solid rgba(39,41,37,0.1)' }}>
+                  {['Tanggal','Orang Tua','Anak','Instrumen','Jadwal','Nominal','Status','Bukti','Aksi'].map(h => (
+                    <th key={h} style={{ padding: '0.75rem 0.9rem', fontWeight: 700, color: 'var(--olive)', textAlign: h === 'Aksi' ? 'center' : 'left', fontSize: '0.72rem', letterSpacing: '0.04em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody>
                 {filteredPayments.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="p-8 text-center text-slate-500">
+                    <td colSpan={9} style={{ padding: '3rem', textAlign: 'center', color: '#94A3B8', fontSize: '0.85rem' }}>
                       Tidak ada data pembayaran yang sesuai.
                     </td>
                   </tr>
@@ -698,74 +794,60 @@ export default function Admin() {
                     const preferred = q
                       ? fmtPreferredSchedule(q.preferred_day, q.preferred_time)
                       : "";
+                    const statusColor = p.status === 'verified'
+                      ? { bg: 'rgba(22,163,74,0.1)', color: '#15803d', border: 'rgba(22,163,74,0.25)' }
+                      : p.status === 'rejected'
+                        ? { bg: 'rgba(220,38,38,0.08)', color: '#b91c1c', border: 'rgba(220,38,38,0.2)' }
+                        : { bg: 'rgba(234,179,8,0.1)', color: '#92400e', border: 'rgba(234,179,8,0.3)' };
                     return (
-                      <tr key={p.id} className="hover:bg-slate-50/50">
-                        <td className="p-3 align-top whitespace-nowrap">
-                          {new Date(p.created_at).toLocaleString("id-ID", {
-                            dateStyle: "medium",
-                            timeStyle: "short",
-                          })}
+                      <tr key={p.id} style={{ borderBottom: '1px solid rgba(39,41,37,0.07)', transition: 'background 0.12s' }}>
+                        <td style={{ padding: '0.7rem 0.9rem', verticalAlign: 'top', whiteSpace: 'nowrap', color: '#64748B', fontSize: '0.78rem' }}>
+                          {new Date(p.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
                         </td>
-                        <td className="p-3 align-top">
+                        <td style={{ padding: '0.7rem 0.9rem', verticalAlign: 'top', color: 'var(--charcoal)' }}>
                           {parentName}
                           {!p.questionnaire_id && (
-                            <div className="text-[10px] text-slate-500 mt-1">
-                              (not linked)
-                            </div>
+                            <div style={{ fontSize: '0.68rem', color: '#94A3B8', marginTop: 2 }}>(not linked)</div>
                           )}
                         </td>
-                        <td className="p-3 align-top font-medium text-slate-900">
-                          {q?.student_full_name || "-"}
+                        <td style={{ padding: '0.7rem 0.9rem', verticalAlign: 'top', fontWeight: 600, color: 'var(--charcoal)' }}>
+                          {q?.student_full_name || '-'}
                         </td>
-                        <td className="p-3 align-top">
-                          {q?.instrument || "-"}
+                        <td style={{ padding: '0.7rem 0.9rem', verticalAlign: 'top', color: 'var(--olive)', fontWeight: 600 }}>
+                          {q?.instrument || '-'}
                         </td>
-                        <td className="p-3 align-top">{preferred || "-"}</td>
-                        <td className="p-3 align-top whitespace-nowrap">
-                          Rp {Number(p.amount || 0).toLocaleString("id-ID")}
+                        <td style={{ padding: '0.7rem 0.9rem', verticalAlign: 'top', color: '#64748B' }}>{preferred || '-'}</td>
+                        <td style={{ padding: '0.7rem 0.9rem', verticalAlign: 'top', whiteSpace: 'nowrap', fontWeight: 600, color: 'var(--charcoal)' }}>
+                          Rp {Number(p.amount || 0).toLocaleString('id-ID')}
                         </td>
-                        <td className="p-3 align-top">
-                          <span
-                            className={
-                              "inline-block px-2.5 py-1 rounded-full text-xs font-medium " +
-                              (p.status === "verified"
-                                ? "bg-green-100 text-green-700 border border-green-200"
-                                : p.status === "rejected"
-                                  ? "bg-red-100 text-red-700 border border-red-200"
-                                  : "bg-yellow-100 text-yellow-700 border border-yellow-200")
-                            }
-                          >
-                            {p.status.charAt(0).toUpperCase() +
-                              p.status.slice(1)}
+                        <td style={{ padding: '0.7rem 0.9rem', verticalAlign: 'top' }}>
+                          <span style={{ display: 'inline-block', padding: '0.2rem 0.65rem', borderRadius: 999, fontSize: '0.72rem', fontWeight: 700, background: statusColor.bg, color: statusColor.color, border: `1px solid ${statusColor.border}` }}>
+                            {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
                           </span>
                         </td>
-                        <td className="p-3 align-top">
+                        <td style={{ padding: '0.7rem 0.9rem', verticalAlign: 'top' }}>
                           {p.proof_url ? (
-                            <a
-                              href={p.proof_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-blue-600 hover:text-blue-800 underline text-xs"
-                            >
+                            <a href={p.proof_url} target="_blank" rel="noreferrer"
+                              style={{ color: 'var(--olive)', textDecoration: 'underline', fontSize: '0.78rem', fontWeight: 600 }}>
                               Lihat Bukti
                             </a>
                           ) : (
-                            <span className="text-slate-400 text-xs">-</span>
+                            <span style={{ color: '#CBD5E1', fontSize: '0.78rem' }}>—</span>
                           )}
                         </td>
-                        <td className="p-3 align-top text-center">
-                          <div className="flex justify-center gap-2">
+                        <td style={{ padding: '0.7rem 0.9rem', verticalAlign: 'top', textAlign: 'center' }}>
+                          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.4rem' }}>
                             <button
-                              disabled={p.status === "verified"}
+                              disabled={p.status === 'verified'}
                               onClick={() => verifyPayment(p.id)}
-                              className={`px-3 py-1.5 rounded text-xs font-medium transition ${p.status === "verified" ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-green-600 text-white hover:bg-green-700 shadow-sm"}`}
+                              style={{ padding: '0.3rem 0.7rem', borderRadius: 7, fontSize: '0.75rem', fontWeight: 700, border: 'none', cursor: p.status === 'verified' ? 'not-allowed' : 'pointer', background: p.status === 'verified' ? '#F1F5F9' : '#16a34a', color: p.status === 'verified' ? '#94A3B8' : '#fff', transition: 'opacity 0.15s', fontFamily: 'inherit' }}
                             >
                               Verifikasi
                             </button>
                             <button
-                              disabled={p.status !== "pending"}
+                              disabled={p.status !== 'pending'}
                               onClick={() => rejectPayment(p.id)}
-                              className={`px-3 py-1.5 rounded text-xs font-medium transition ${p.status !== "pending" ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-red-600 text-white hover:bg-red-700 shadow-sm"}`}
+                              style={{ padding: '0.3rem 0.7rem', borderRadius: 7, fontSize: '0.75rem', fontWeight: 700, border: 'none', cursor: p.status !== 'pending' ? 'not-allowed' : 'pointer', background: p.status !== 'pending' ? '#F1F5F9' : '#dc2626', color: p.status !== 'pending' ? '#94A3B8' : '#fff', transition: 'opacity 0.15s', fontFamily: 'inherit' }}
                             >
                               Tolak
                             </button>
@@ -1325,6 +1407,8 @@ export default function Admin() {
 
       {/* ── FINANCE TAB ── */}
       {activeTab === "finance" && <AdminFinance />}
+
+      </div>{/* end max-w inner */}
     </div>
   );
 }
