@@ -226,8 +226,6 @@ export default function Questionnaire() {
     setFile(f);
   };
 
-
-
   async function uploadProof(userId) {
     const ext = file?.name?.split(".").pop() || "dat";
     const path = `${userId}/${Date.now()}.${ext}`;
@@ -249,6 +247,7 @@ export default function Questionnaire() {
       return alert(
         "Please complete all required fields and upload the proof of payment.",
       );
+    const waWindow = window.open("", "_blank");
 
     setSubmitting(true);
     try {
@@ -350,11 +349,11 @@ export default function Questionnaire() {
         `Guru Nada\n` +
         `www.gurunada.com`;
 
-      window.open(
-        `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(msg)}`,
-        "_blank",
-      );
+    waWindow.location.href = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(msg)}`;
+    navigate("/", { replace: true });
+
     } catch (err) {
+      waWindow?.close();
       console.error(err);
       alert(err.message || "Submit failed. Please try again.");
     } finally {
@@ -508,14 +507,20 @@ export default function Questionnaire() {
                   onChange={onChange}
                   required
                   onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
-                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
                 />
               </div>
               <div>
                 <label style={labelStyle}>Age (auto-calculated)</label>
                 <input
                   readOnly
-                  style={{ ...fieldInputStyle, background: "var(--cream)", cursor: "default" }}
+                  style={{
+                    ...fieldInputStyle,
+                    background: "var(--cream)",
+                    cursor: "default",
+                  }}
                   value={form.student_age}
                 />
               </div>
@@ -528,7 +533,9 @@ export default function Questionnaire() {
                   onChange={onChange}
                   placeholder="e.g. Jakarta Selatan"
                   onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
-                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
                 />
               </div>
               <div>
@@ -541,7 +548,9 @@ export default function Questionnaire() {
                   required
                   placeholder="e.g. 08123456789"
                   onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
-                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
                 />
               </div>
               <div>
@@ -554,7 +563,9 @@ export default function Questionnaire() {
                   onChange={onChange}
                   placeholder="optional"
                   onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
-                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
                 />
               </div>
               <div style={{ gridColumn: "1 / -1" }}>
@@ -566,7 +577,9 @@ export default function Questionnaire() {
                   onChange={onChange}
                   placeholder="@username (optional)"
                   onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
-                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
                 />
               </div>
             </div>
@@ -574,10 +587,25 @@ export default function Questionnaire() {
 
           {/* Parents */}
           <section style={panelStyle}>
-            <h2 style={{ fontFamily: '"Rockdale FREE", serif', fontSize: "1.15rem", color: "var(--olive)", margin: "0 0 1.25rem", borderBottom: "1px solid rgba(209,167,153,0.2)", paddingBottom: "0.75rem" }}>
+            <h2
+              style={{
+                fontFamily: '"Rockdale FREE", serif',
+                fontSize: "1.15rem",
+                color: "var(--olive)",
+                margin: "0 0 1.25rem",
+                borderBottom: "1px solid rgba(209,167,153,0.2)",
+                paddingBottom: "0.75rem",
+              }}
+            >
               Parents Information
             </h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))", gap: "1rem" }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))",
+                gap: "1rem",
+              }}
+            >
               <div>
                 <label style={labelStyle}>Father's Name</label>
                 <input
@@ -586,7 +614,9 @@ export default function Questionnaire() {
                   value={form.father_name}
                   onChange={onChange}
                   onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
-                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
                 />
               </div>
               <div>
@@ -597,7 +627,9 @@ export default function Questionnaire() {
                   value={form.father_phone}
                   onChange={onChange}
                   onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
-                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
                 />
               </div>
               <div>
@@ -608,7 +640,9 @@ export default function Questionnaire() {
                   value={form.mother_name}
                   onChange={onChange}
                   onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
-                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
                 />
               </div>
               <div>
@@ -619,7 +653,9 @@ export default function Questionnaire() {
                   value={form.mother_phone}
                   onChange={onChange}
                   onFocus={(e) => (e.target.style.borderColor = "var(--blush)")}
-                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,41,37,0.15)")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "rgba(39,41,37,0.15)")
+                  }
                 />
               </div>
               <div>

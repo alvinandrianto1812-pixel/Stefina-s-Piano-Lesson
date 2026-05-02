@@ -1,9 +1,9 @@
 // src/components/Navbar.jsx
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { supabase } from "../lib/supabaseClient";
 import NavAnimation from "./NavAnimation";
 import { gsap } from "gsap";
+import { useAuth } from "../contexts/AuthProvider";
 
 const DROPDOWN_GROUPS = [
   {
@@ -180,10 +180,10 @@ function DropdownMenu({ group }) {
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, role } = useAuth();
+  const isAdmin = role === "admin" || role === "owner";
+  const isOwner = role === "owner";
   const [menuOpen, setMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isOwner, setIsOwner] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(null);
 
@@ -202,48 +202,9 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    const init = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
-      if (user?.email) {
-        const { data } = await supabase
-          .from("users")
-          .select("role")
-          .eq("email", user.email)
-          .maybeSingle();
-        setIsAdmin(data?.role === "admin" || data?.role === "owner");
-        setIsOwner(data?.role === "owner");
-      } else {
-        setIsAdmin(false);
-      }
-    };
-    init();
-    const { data: sub } = supabase.auth.onAuthStateChange(
-      async (_e, session) => {
-        const u = session?.user ?? null;
-        setUser(u);
-        if (u?.email) {
-          const { data } = await supabase
-            .from("users")
-            .select("role")
-            .eq("email", u.email)
-            .maybeSingle();
-          setIsAdmin(data?.role === "admin" || data?.role === "owner");
-          setIsOwner(data?.role === "owner");
-        } else {
-          setIsAdmin(false);
-        }
-      },
-    );
-    return () => sub.subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
     if (menuOpen) closeMenu();
     setMobileOpen(null);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   // Build GSAP timeline for mobile menu
@@ -254,7 +215,7 @@ export default function Navbar() {
     const items = mobileNavItemsRef.current.filter(Boolean);
 
     // Measure natural height first so reverse works correctly
-    gsap.set(panel, { height: 'auto', display: 'block', overflow: 'hidden' });
+    gsap.set(panel, { height: "auto", display: "block", overflow: "hidden" });
     const naturalHeight = panel.scrollHeight;
     gsap.set(panel, { height: 0 });
     gsap.set(items, { y: 24, opacity: 0, scale: 0.95 });
@@ -265,7 +226,7 @@ export default function Navbar() {
     tl.to(panel, {
       height: naturalHeight,
       duration: 0.42,
-      ease: 'power3.out',
+      ease: "power3.out",
     });
 
     // 2. Stagger items in with bounce
@@ -276,10 +237,10 @@ export default function Navbar() {
         opacity: 1,
         scale: 1,
         duration: 0.36,
-        ease: 'back.out(1.7)',
+        ease: "back.out(1.7)",
         stagger: 0.055,
       },
-      '-=0.18'
+      "-=0.18",
     );
 
     return tl;
@@ -288,24 +249,30 @@ export default function Navbar() {
   useLayoutEffect(() => {
     const panel = mobileMenuRef.current;
     if (!panel) return;
-    gsap.set(panel, { height: 0, overflow: 'hidden', display: 'none' });
+    gsap.set(panel, { height: 0, overflow: "hidden", display: "none" });
   }, []);
 
   const openMenu = () => {
     const panel = mobileMenuRef.current;
     if (!panel) return;
 
-    gsap.set(panel, { display: 'block' });
+    gsap.set(panel, { display: "block" });
     const tl = buildMobileTl();
     mobileMenuTlRef.current = tl;
     tl?.play();
 
     // Animate hamburger lines → X with back ease
     gsap.to(hamburgerLineTopRef.current, {
-      y: 5, rotate: 45, duration: 0.3, ease: 'back.out(1.4)',
+      y: 5,
+      rotate: 45,
+      duration: 0.3,
+      ease: "back.out(1.4)",
     });
     gsap.to(hamburgerLineBotRef.current, {
-      y: -5, rotate: -45, duration: 0.3, ease: 'back.out(1.4)',
+      y: -5,
+      rotate: -45,
+      duration: 0.3,
+      ease: "back.out(1.4)",
     });
 
     setMenuOpen(true);
@@ -317,26 +284,33 @@ export default function Navbar() {
 
     // Animate X → hamburger lines
     gsap.to(hamburgerLineTopRef.current, {
-      y: 0, rotate: 0, duration: 0.25, ease: 'power2.out',
+      y: 0,
+      rotate: 0,
+      duration: 0.25,
+      ease: "power2.out",
     });
     gsap.to(hamburgerLineBotRef.current, {
-      y: 0, rotate: 0, duration: 0.25, ease: 'power2.out',
+      y: 0,
+      rotate: 0,
+      duration: 0.25,
+      ease: "power2.out",
     });
 
     if (tl) {
-      tl.eventCallback('onReverseComplete', () => {
-        if (panel) gsap.set(panel, { display: 'none' });
+      tl.eventCallback("onReverseComplete", () => {
+        if (panel) gsap.set(panel, { display: "none" });
         setMenuOpen(false);
       });
       tl.reverse();
     } else {
-      if (panel) gsap.set(panel, { display: 'none', height: 0 });
+      if (panel) gsap.set(panel, { display: "none", height: 0 });
       setMenuOpen(false);
     }
   };
 
   const toggleMenu = () => {
-    if (menuOpen) closeMenu(); else openMenu();
+    if (menuOpen) closeMenu();
+    else openMenu();
   };
 
   const setMobileItemRef = (i) => (el) => {
@@ -519,7 +493,7 @@ export default function Navbar() {
           <button
             className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-slate-700 hover:text-olive"
             onClick={toggleMenu}
-            aria-label={menuOpen ? 'Close Menu' : 'Open Menu'}
+            aria-label={menuOpen ? "Close Menu" : "Open Menu"}
           >
             <svg
               width="24"
@@ -527,23 +501,29 @@ export default function Navbar() {
               viewBox="0 0 24 24"
               fill="none"
               aria-hidden="true"
-              style={{ overflow: 'visible' }}
+              style={{ overflow: "visible" }}
             >
               <line
                 ref={hamburgerLineTopRef}
-                x1="3" y1="7" x2="21" y2="7"
+                x1="3"
+                y1="7"
+                x2="21"
+                y2="7"
                 stroke="currentColor"
                 strokeWidth="1.8"
                 strokeLinecap="round"
-                style={{ transformOrigin: '12px 7px' }}
+                style={{ transformOrigin: "12px 7px" }}
               />
               <line
                 ref={hamburgerLineBotRef}
-                x1="3" y1="17" x2="21" y2="17"
+                x1="3"
+                y1="17"
+                x2="21"
+                y2="17"
                 stroke="currentColor"
                 strokeWidth="1.8"
                 strokeLinecap="round"
-                style={{ transformOrigin: '12px 17px' }}
+                style={{ transformOrigin: "12px 17px" }}
               />
             </svg>
           </button>
@@ -553,174 +533,177 @@ export default function Navbar() {
         <div
           ref={mobileMenuRef}
           className="md:hidden bg-white/97 backdrop-blur-sm px-4 pb-5 pt-2 space-y-1 border-t border-[#E8E0CC]"
-          style={{ display: 'none', overflow: 'hidden' }}
+          style={{ display: "none", overflow: "hidden" }}
         >
-            <Link
-              ref={setMobileItemRef(0)}
-              to="/"
-              onClick={() => closeMenu()}
-              className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition ${isActive("/") ? "bg-[#ECEAE2] font-semibold" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
-              style={isActive("/") ? { color: "#272925" } : {}}
-            >
-              Home
-            </Link>
+          <Link
+            ref={setMobileItemRef(0)}
+            to="/"
+            onClick={() => closeMenu()}
+            className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition ${isActive("/") ? "bg-[#ECEAE2] font-semibold" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
+            style={isActive("/") ? { color: "#272925" } : {}}
+          >
+            Home
+          </Link>
 
-            {DROPDOWN_GROUPS.map((group, gi) => (
-              <div key={group.label} ref={setMobileItemRef(gi + 1)}>
-                <button
-                  onClick={() => setMobileOpen(mobileOpen === gi ? null : gi)}
-                  className="w-full flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium text-slate-700 hover:bg-[#F8F6ED] transition"
+          {DROPDOWN_GROUPS.map((group, gi) => (
+            <div key={group.label} ref={setMobileItemRef(gi + 1)}>
+              <button
+                onClick={() => setMobileOpen(mobileOpen === gi ? null : gi)}
+                className="w-full flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium text-slate-700 hover:bg-[#F8F6ED] transition"
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                }}
+              >
+                <span>{group.label}</span>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    fontFamily: "inherit",
+                    width: "14px",
+                    height: "14px",
+                    transition: "transform 0.2s",
+                    transform:
+                      mobileOpen === gi ? "rotate(180deg)" : "rotate(0deg)",
                   }}
                 >
-                  <span>{group.label}</span>
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{
-                      width: "14px",
-                      height: "14px",
-                      transition: "transform 0.2s",
-                      transform:
-                        mobileOpen === gi ? "rotate(180deg)" : "rotate(0deg)",
-                    }}
-                  >
-                    <polyline points="6,9 12,15 18,9" />
-                  </svg>
-                </button>
-                {mobileOpen === gi && (
-                  <div style={{ paddingLeft: "12px", paddingBottom: "4px" }}>
-                    {group.items.map((item) => (
-                      <Link
-                        key={item.to}
-                        to={item.to}
-                        onClick={() => closeMenu()}
-                        className={`flex flex-col rounded-xl px-4 py-2.5 text-sm transition ${isActive(item.to) ? "bg-[#ECEAE2]" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
-                        style={isActive(item.to) ? { color: "#272925" } : {}}
-                      >
-                        <span className="font-medium">{item.label}</span>
-                        <span className="text-xs text-slate-400 mt-0.5">
-                          {item.desc}
-                        </span>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-
-            {STANDALONE.map((item, si) => (
-              <Link
-                key={item.to}
-                ref={setMobileItemRef(DROPDOWN_GROUPS.length + 1 + si)}
-                to={item.to}
-                onClick={() => closeMenu()}
-                className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition ${isActive(item.to) ? "bg-[#ECEAE2] font-semibold" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
-                style={isActive(item.to) ? { color: "#272925" } : {}}
-              >
-                {item.label}
-              </Link>
-            ))}
-
-            <Link
-              ref={setMobileItemRef(DROPDOWN_GROUPS.length + 2)}
-              to="/OurPolicy"
-              onClick={() => closeMenu()}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: "12px",
-                padding: "12px 16px",
-                fontSize: "14px",
-                fontWeight: "600",
-                textDecoration: "none",
-                marginTop: "8px",
-                border: "1.5px solid #272925",
-                transition: "all 0.2s",
-                ...(isRegistrationActive
-                  ? { background: "#272925", color: "#F8F6ED" }
-                  : { background: "#F8F6ED", color: "#272925" }),
-              }}
-            >
-              Registration
-            </Link>
-
-            {isAdmin && (
-              <Link
-                ref={setMobileItemRef(DROPDOWN_GROUPS.length + 3)}
-                to="/admin"
-                onClick={() => closeMenu()}
-                className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition ${isActive("/admin") ? "bg-[#ECEAE2]" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
-                style={isActive("/admin") ? { color: "#272925" } : {}}
-              >
-                Admin
-              </Link>
-            )}
-
-            {isOwner && (
-              <Link
-                ref={setMobileItemRef(DROPDOWN_GROUPS.length + 4)}
-                to="/owner"
-                onClick={() => closeMenu()}
-                className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition ${isActive("/owner") ? "bg-[#FCECE9]" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
-                style={isActive("/owner") ? { color: "#C0503D" } : {}}
-              >
-                Owner
-              </Link>
-            )}
-
-            <div ref={setMobileItemRef(DROPDOWN_GROUPS.length + 5)} className="pt-2">
-              {user ? (
-                <button
-                  onClick={() => {
-                    closeMenu();
-                    navigate("/logout");
-                  }}
-                  style={{
-                    width: "100%",
-                    borderRadius: "999px",
-                    padding: "10px 16px",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    background: "transparent",
-                    color: "#272925",
-                    border: "1.5px solid rgba(39,41,37,0.35)",
-                    cursor: "pointer",
-                  }}
-                >
-                  Logout
-                </button>
-              ) : (
-                <Link
-                  to="/auth"
-                  onClick={() => closeMenu()}
-                  style={{
-                    display: "block",
-                    width: "100%",
-                    textAlign: "center",
-                    borderRadius: "999px",
-                    padding: "10px 16px",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    background: "#272925",
-                    color: "#F8F6ED",
-                    textDecoration: "none",
-                  }}
-                >
-                  Login / Register
-                </Link>
+                  <polyline points="6,9 12,15 18,9" />
+                </svg>
+              </button>
+              {mobileOpen === gi && (
+                <div style={{ paddingLeft: "12px", paddingBottom: "4px" }}>
+                  {group.items.map((item) => (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      onClick={() => closeMenu()}
+                      className={`flex flex-col rounded-xl px-4 py-2.5 text-sm transition ${isActive(item.to) ? "bg-[#ECEAE2]" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
+                      style={isActive(item.to) ? { color: "#272925" } : {}}
+                    >
+                      <span className="font-medium">{item.label}</span>
+                      <span className="text-xs text-slate-400 mt-0.5">
+                        {item.desc}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
               )}
             </div>
+          ))}
+
+          {STANDALONE.map((item, si) => (
+            <Link
+              key={item.to}
+              ref={setMobileItemRef(DROPDOWN_GROUPS.length + 1 + si)}
+              to={item.to}
+              onClick={() => closeMenu()}
+              className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition ${isActive(item.to) ? "bg-[#ECEAE2] font-semibold" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
+              style={isActive(item.to) ? { color: "#272925" } : {}}
+            >
+              {item.label}
+            </Link>
+          ))}
+
+          <Link
+            ref={setMobileItemRef(DROPDOWN_GROUPS.length + 2)}
+            to="/OurPolicy"
+            onClick={() => closeMenu()}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "12px",
+              padding: "12px 16px",
+              fontSize: "14px",
+              fontWeight: "600",
+              textDecoration: "none",
+              marginTop: "8px",
+              border: "1.5px solid #272925",
+              transition: "all 0.2s",
+              ...(isRegistrationActive
+                ? { background: "#272925", color: "#F8F6ED" }
+                : { background: "#F8F6ED", color: "#272925" }),
+            }}
+          >
+            Registration
+          </Link>
+
+          {isAdmin && (
+            <Link
+              ref={setMobileItemRef(DROPDOWN_GROUPS.length + 3)}
+              to="/admin"
+              onClick={() => closeMenu()}
+              className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition ${isActive("/admin") ? "bg-[#ECEAE2]" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
+              style={isActive("/admin") ? { color: "#272925" } : {}}
+            >
+              Admin
+            </Link>
+          )}
+
+          {isOwner && (
+            <Link
+              ref={setMobileItemRef(DROPDOWN_GROUPS.length + 4)}
+              to="/owner"
+              onClick={() => closeMenu()}
+              className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition ${isActive("/owner") ? "bg-[#FCECE9]" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
+              style={isActive("/owner") ? { color: "#C0503D" } : {}}
+            >
+              Owner
+            </Link>
+          )}
+
+          <div
+            ref={setMobileItemRef(DROPDOWN_GROUPS.length + 5)}
+            className="pt-2"
+          >
+            {user ? (
+              <button
+                onClick={() => {
+                  closeMenu();
+                  navigate("/logout");
+                }}
+                style={{
+                  width: "100%",
+                  borderRadius: "999px",
+                  padding: "10px 16px",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  background: "transparent",
+                  color: "#272925",
+                  border: "1.5px solid rgba(39,41,37,0.35)",
+                  cursor: "pointer",
+                }}
+              >
+                Logout
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                onClick={() => closeMenu()}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  textAlign: "center",
+                  borderRadius: "999px",
+                  padding: "10px 16px",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  background: "#272925",
+                  color: "#F8F6ED",
+                  textDecoration: "none",
+                }}
+              >
+                Login / Register
+              </Link>
+            )}
           </div>
+        </div>
       </nav>
 
       {/* Spacer */}
