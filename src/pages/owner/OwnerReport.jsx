@@ -1,10 +1,10 @@
-// src/pages/owner/OwnerReport.jsx
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
+import toast from "react-hot-toast";
 
 export default function OwnerReport() {
   const [filterBulan, setFilterBulan] = useState(
-    () => new Date().toISOString().slice(0, 7) // "YYYY-MM"
+    () => new Date().toISOString().slice(0, 7), // "YYYY-MM"
   );
 
   const [loading, setLoading] = useState(false);
@@ -29,11 +29,11 @@ export default function OwnerReport() {
       }
       const [year, month] = filterBulan.split("-");
       const dateFrom = `${year}-${month}-01T00:00:00Z`;
-      
+
       // Calculate next month's 1st date for "less than" boundary
       const dateToRaw = new Date(parseInt(year, 10), parseInt(month, 10), 1);
       const yTo = dateToRaw.getFullYear();
-      const mTo = String(dateToRaw.getMonth() + 1).padStart(2, '0');
+      const mTo = String(dateToRaw.getMonth() + 1).padStart(2, "0");
       const dateTo = `${yTo}-${mTo}-01T00:00:00Z`;
 
       // 1. Fetch Pemasukan (Payments verified)
@@ -129,26 +129,32 @@ export default function OwnerReport() {
         keuntunganBersih: sumOmset - sumPengeluaran,
         transactions: combinedTrans,
       });
-
     } catch (err) {
       console.error("fetchReport error:", err);
-      alert("Gagal memuat laporan: " + err.message);
+      toast.error("Gagal memuat laporan: " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
   const fmtRupiah = (n) => "Rp " + Number(n || 0).toLocaleString("id-ID");
-  const fmtDate = (d) => new Date(d).toLocaleDateString("id-ID", {
-    day: "numeric", month: "short", year: "numeric"
-  });
+  const fmtDate = (d) =>
+    new Date(d).toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Financial Report</h1>
-          <p className="text-slate-500 text-sm mt-1">Ringkasan Omset & Pengeluaran Khusus Owner</p>
+          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+            Financial Report
+          </h1>
+          <p className="text-slate-500 text-sm mt-1">
+            Ringkasan Omset & Pengeluaran Khusus Owner
+          </p>
         </div>
         <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-2 shadow-sm w-fit">
           <span className="text-sm font-medium text-slate-600">Bulan:</span>
@@ -176,28 +182,69 @@ export default function OwnerReport() {
             {/* Omset */}
             <div className="bg-white rounded-2xl p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-100 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
-                <svg width="100" height="100" viewBox="0 0 24 24" fill="currentColor" className="text-green-500"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.7c.09 1.28 1.07 1.67 2.18 1.67 1.2 0 2.03-.49 2.03-1.45 0-.74-.46-1.22-1.91-1.55-1.73-.4-3.32-1.11-3.32-3.03 0-1.7 1.36-2.59 2.6-2.87V5.5h2.67v1.88c1.5.3 2.68 1.16 2.8 2.87h-1.68c-.1-1.15-.97-1.51-2.08-1.51-1 0-1.91.43-1.91 1.34 0 .7.42 1.13 1.8 1.45 1.83.43 3.44 1.15 3.44 3.14 0 1.95-1.48 2.76-2.88 3.01z"/></svg>
+                <svg
+                  width="100"
+                  height="100"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="text-green-500"
+                >
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.7c.09 1.28 1.07 1.67 2.18 1.67 1.2 0 2.03-.49 2.03-1.45 0-.74-.46-1.22-1.91-1.55-1.73-.4-3.32-1.11-3.32-3.03 0-1.7 1.36-2.59 2.6-2.87V5.5h2.67v1.88c1.5.3 2.68 1.16 2.8 2.87h-1.68c-.1-1.15-.97-1.51-2.08-1.51-1 0-1.91.43-1.91 1.34 0 .7.42 1.13 1.8 1.45 1.83.43 3.44 1.15 3.44 3.14 0 1.95-1.48 2.76-2.88 3.01z" />
+                </svg>
               </div>
-              <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2 relative z-10">Total Pemasukan (Omset)</p>
-              <h2 className="text-3xl font-bold text-green-600 tracking-tight relative z-10">{fmtRupiah(reportData.totalOmset)}</h2>
+              <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2 relative z-10">
+                Total Pemasukan (Omset)
+              </p>
+              <h2 className="text-3xl font-bold text-green-600 tracking-tight relative z-10">
+                {fmtRupiah(reportData.totalOmset)}
+              </h2>
             </div>
-            
+
             {/* Pengeluaran */}
             <div className="bg-white rounded-2xl p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-100 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
-                <svg width="100" height="100" viewBox="0 0 24 24" fill="currentColor" className="text-red-500"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.7c.09 1.28 1.07 1.67 2.18 1.67 1.2 0 2.03-.49 2.03-1.45 0-.74-.46-1.22-1.91-1.55-1.73-.4-3.32-1.11-3.32-3.03 0-1.7 1.36-2.59 2.6-2.87V5.5h2.67v1.88c1.5.3 2.68 1.16 2.8 2.87h-1.68c-.1-1.15-.97-1.51-2.08-1.51-1 0-1.91.43-1.91 1.34 0 .7.42 1.13 1.8 1.45 1.83.43 3.44 1.15 3.44 3.14 0 1.95-1.48 2.76-2.88 3.01z"/></svg>
+                <svg
+                  width="100"
+                  height="100"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="text-red-500"
+                >
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.7c.09 1.28 1.07 1.67 2.18 1.67 1.2 0 2.03-.49 2.03-1.45 0-.74-.46-1.22-1.91-1.55-1.73-.4-3.32-1.11-3.32-3.03 0-1.7 1.36-2.59 2.6-2.87V5.5h2.67v1.88c1.5.3 2.68 1.16 2.8 2.87h-1.68c-.1-1.15-.97-1.51-2.08-1.51-1 0-1.91.43-1.91 1.34 0 .7.42 1.13 1.8 1.45 1.83.43 3.44 1.15 3.44 3.14 0 1.95-1.48 2.76-2.88 3.01z" />
+                </svg>
               </div>
-              <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2 relative z-10">Total Pengeluaran</p>
-              <h2 className="text-3xl font-bold text-red-500 tracking-tight relative z-10">{fmtRupiah(reportData.totalPengeluaran)}</h2>
+              <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2 relative z-10">
+                Total Pengeluaran
+              </p>
+              <h2 className="text-3xl font-bold text-red-500 tracking-tight relative z-10">
+                {fmtRupiah(reportData.totalPengeluaran)}
+              </h2>
             </div>
-            
+
             {/* Laba Bersih */}
             <div className="bg-gradient-to-br from-[#272925] to-[#50553C] rounded-2xl p-5 shadow-[0_8px_30px_-4px_rgba(39,41,37,0.4)] border border-[#272925] relative overflow-hidden group">
               <div className="absolute -bottom-6 -right-6 p-4 opacity-10 group-hover:rotate-12 transition-transform duration-500 pointer-events-none">
-                <svg width="140" height="140" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                <svg
+                  width="140"
+                  height="140"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-white"
+                >
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                  <polyline points="17 6 23 6 23 12"></polyline>
+                </svg>
               </div>
-              <p className="text-sm font-medium text-[#D1A799] uppercase tracking-wider mb-2 relative z-10">Keuntungan Bersih</p>
-              <h2 className={`text-3xl font-bold tracking-tight relative z-10 ${reportData.keuntunganBersih < 0 ? 'text-red-300' : 'text-[#F8F6ED]'}`}>
+              <p className="text-sm font-medium text-[#D1A799] uppercase tracking-wider mb-2 relative z-10">
+                Keuntungan Bersih
+              </p>
+              <h2
+                className={`text-3xl font-bold tracking-tight relative z-10 ${reportData.keuntunganBersih < 0 ? "text-red-300" : "text-[#F8F6ED]"}`}
+              >
                 {fmtRupiah(reportData.keuntunganBersih)}
               </h2>
             </div>
@@ -206,24 +253,39 @@ export default function OwnerReport() {
           {/* Transactions Ledger */}
           <div className="bg-white rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-100 overflow-hidden">
             <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50">
-              <h2 className="text-base font-semibold text-slate-800">Buku Besar Transaksi</h2>
+              <h2 className="text-base font-semibold text-slate-800">
+                Buku Besar Transaksi
+              </h2>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="bg-[#F8F6ED] text-slate-600 border-b border-slate-200">
                   <tr>
-                    <th className="px-6 py-3.5 font-semibold text-xs uppercase tracking-wide">Tanggal</th>
-                    <th className="px-6 py-3.5 font-semibold text-xs uppercase tracking-wide">Tipe</th>
-                    <th className="px-6 py-3.5 font-semibold text-xs uppercase tracking-wide">Deskripsi</th>
-                    <th className="px-6 py-3.5 font-semibold text-xs uppercase tracking-wide text-right">Debit (Masuk)</th>
-                    <th className="px-6 py-3.5 font-semibold text-xs uppercase tracking-wide text-right">Kredit (Keluar)</th>
+                    <th className="px-6 py-3.5 font-semibold text-xs uppercase tracking-wide">
+                      Tanggal
+                    </th>
+                    <th className="px-6 py-3.5 font-semibold text-xs uppercase tracking-wide">
+                      Tipe
+                    </th>
+                    <th className="px-6 py-3.5 font-semibold text-xs uppercase tracking-wide">
+                      Deskripsi
+                    </th>
+                    <th className="px-6 py-3.5 font-semibold text-xs uppercase tracking-wide text-right">
+                      Debit (Masuk)
+                    </th>
+                    <th className="px-6 py-3.5 font-semibold text-xs uppercase tracking-wide text-right">
+                      Kredit (Keluar)
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {reportData.transactions.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="py-12 text-center text-slate-400">
+                      <td
+                        colSpan={5}
+                        className="py-12 text-center text-slate-400"
+                      >
                         Tidak ada transaksi di bulan ini.
                       </td>
                     </tr>
@@ -231,16 +293,23 @@ export default function OwnerReport() {
                     reportData.transactions.map((t, idx) => {
                       const isIncome = t.type === "income";
                       return (
-                        <tr key={`${t.id}-${idx}`} className="hover:bg-slate-50/80 transition-colors">
+                        <tr
+                          key={`${t.id}-${idx}`}
+                          className="hover:bg-slate-50/80 transition-colors"
+                        >
                           <td className="px-6 py-3 whitespace-nowrap text-slate-500 font-medium">
                             {fmtDate(t.date)}
                           </td>
                           <td className="px-6 py-3">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                              isIncome ? "bg-green-50 text-green-600 border border-green-100" :
-                              t.type === "salary" ? "bg-blue-50 text-blue-600 border border-blue-100" :
-                              "bg-red-50 text-red-600 border border-red-100"
-                            }`}>
+                            <span
+                              className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                                isIncome
+                                  ? "bg-green-50 text-green-600 border border-green-100"
+                                  : t.type === "salary"
+                                    ? "bg-blue-50 text-blue-600 border border-blue-100"
+                                    : "bg-red-50 text-red-600 border border-red-100"
+                              }`}
+                            >
                               {t.type}
                             </span>
                           </td>

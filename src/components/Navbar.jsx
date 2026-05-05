@@ -9,26 +9,30 @@ const DROPDOWN_GROUPS = [
   {
     label: "About",
     items: [
-      { to: "/AboutUs", label: "About Us", desc: "Our story & vision" },
-      { to: "/OurTeachers", label: "Our Teachers", desc: "Meet the educators" },
+      { to: "/about-us", label: "About Us", desc: "Our story & vision" },
       {
-        to: "/OurServices",
+        to: "/our-teachers",
+        label: "Our Teachers",
+        desc: "Meet the educators",
+      },
+      {
+        to: "/our-services",
         label: "Our Services",
         desc: "Lessons, freq & duration",
       },
-      { to: "/OurPolicy", label: "Our Policy", desc: "Studio guidelines" },
+      { to: "/our-policy", label: "Our Policy", desc: "Studio guidelines" },
     ],
   },
   {
     label: "Programs",
     items: [
-      { to: "/Events", label: "Events", desc: "Concerts & workshops" },
-      { to: "/Media", label: "Media", desc: "Photos & videos gallery" },
+      { to: "/events", label: "Events", desc: "Concerts & workshops" },
+      { to: "/media", label: "Media", desc: "Photos & videos gallery" },
     ],
   },
 ];
 
-const STANDALONE = [{ to: "/ContactUs", label: "Contact Us" }];
+const STANDALONE = [{ to: "/contact-us", label: "Contact Us" }];
 
 function DropdownMenu({ group }) {
   const [open, setOpen] = useState(false);
@@ -321,7 +325,7 @@ export default function Navbar() {
   const handleLogout = () => navigate("/logout");
   const isHome = location.pathname === "/";
   const isRegistrationActive =
-    isActive("/OurPolicy") || isActive("/Questionnaire");
+    isActive("/our-policy") || isActive("/questionnaire");
 
   return (
     <>
@@ -375,7 +379,7 @@ export default function Navbar() {
             ))}
 
             <Link
-              to="/OurPolicy"
+              to="/our-policy"
               style={{
                 marginLeft: "8px",
                 padding: "8px 18px",
@@ -612,7 +616,7 @@ export default function Navbar() {
 
           <Link
             ref={setMobileItemRef(DROPDOWN_GROUPS.length + 2)}
-            to="/OurPolicy"
+            to="/our-policy"
             onClick={() => closeMenu()}
             style={{
               display: "flex",

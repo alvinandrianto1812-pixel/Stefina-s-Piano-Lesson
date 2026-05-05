@@ -1,7 +1,7 @@
-// src/App.jsx
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import AuthCallback from "./pages/AuthCallback";
+import NotFound from "./pages/NotFound";
 
 import Navbar from "./components/Navbar";
 
@@ -36,19 +36,19 @@ export default function App() {
           <Route path="/login" element={<Navigate to="/auth" replace />} />
           <Route path="/register" element={<Navigate to="/auth" replace />} />
 
-          <Route path="/Events" element={<Events />} />
-          <Route path="/Media" element={<Media />} />
-          <Route path="/OurTeachers" element={<OurTeachers />} />
-          <Route path="/AboutUs" element={<AboutUs />} />
-          <Route path="/ContactUs" element={<ContactUs />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/media" element={<Media />} />
+          <Route path="/our-teachers" element={<OurTeachers />} />
+          <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/contact-us" element={<ContactUs />} />
 
           {/* Studio Policy — wajib dibaca sebelum registrasi */}
-          <Route path="/OurPolicy" element={<OurPolicy />} />
-          <Route path="/OurServices" element={<OurServices />} />
+          <Route path="/our-policy" element={<OurPolicy />} />
+          <Route path="/our-services" element={<OurServices />} />
 
           {/* Questionnaire: user harus lewat OurPolicy dulu (logic ada di OurPolicy.jsx) */}
           <Route
-            path="/Questionnaire"
+            path="/questionnaire"
             element={
               <ProtectedRoute>
                 <Questionnaire />
@@ -80,10 +80,7 @@ export default function App() {
           {/* Auth callback */}
           <Route path="/auth/callback" element={<AuthCallback />} />
 
-          <Route
-            path="*"
-            element={<div className="p-6">Halaman tidak ditemukan.</div>}
-          />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
     </>

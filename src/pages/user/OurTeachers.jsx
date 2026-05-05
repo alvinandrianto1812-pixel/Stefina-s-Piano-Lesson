@@ -270,7 +270,7 @@ export default function OurTeachers() {
           <p style={{ color: 'rgba(248,246,237,0.55)', fontSize: '0.95rem', marginBottom: '2rem' }}>
             Book a trial class and we'll match you with the right teacher.
           </p>
-          <a href="/OurPolicy" style={{
+          <a href="/our-policy" style={{
             display: 'inline-block', padding: '0.85rem 2.25rem',
             borderRadius: '999px', fontWeight: 700, fontSize: '0.95rem',
             background: 'var(--cream)', color: 'var(--charcoal)',

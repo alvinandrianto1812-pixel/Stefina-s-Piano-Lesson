@@ -1,6 +1,7 @@
 // src/pages/user/LandingPage.jsx
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 import TypingText        from '../../components/TypingText';
 import Footer            from '../../components/Footer';
@@ -30,17 +31,26 @@ export default function LandingPage() {
     }
   }, [location]);
 
-  const handleBook = () => navigate('/Questionnaire');
+const handleBook = () => navigate('/questionnaire');
   const handleEnrollWA = () => window.open(WA_REGISTER, '_blank', 'noopener,noreferrer');
 
   return (
-    <div
-      className="text-brand-dark"
-      style={{
-        fontFamily: '"Creato Display", system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
-        background: 'var(--cream)',
-      }}
-    >
+  <div
+    className="text-brand-dark"
+    style={{
+      fontFamily: '"Creato Display", system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
+      background: 'var(--cream)',
+    }}
+  >
+    <Helmet>
+      <title>GuruNada | Kursus Piano Privat Jakarta</title>
+      <meta name="description" content="Kursus piano privat untuk semua usia di Jakarta. Mentor berpengalaman 10+ tahun, jadwal fleksibel, metode menyenangkan." />
+      <meta property="og:title" content="GuruNada | Kursus Piano Privat Jakarta" />
+      <meta property="og:description" content="Kursus piano privat untuk semua usia di Jakarta. Mentor berpengalaman 10+ tahun, jadwal fleksibel." />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="https://gurunada.com" />
+    </Helmet>
+
       {/* ══════════════════════════════════════════════
           1. HERO
       ══════════════════════════════════════════════ */}

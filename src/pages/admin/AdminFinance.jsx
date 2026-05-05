@@ -349,7 +349,6 @@ export default function AdminFinance() {
       {/* ════════════ PENGELUARAN ════════════ */}
       <section className="space-y-4">
         <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">💸 Pengeluaran</h2>
-        <p className="text-xs text-slate-400 -mt-2">Data disimpan ke tabel <code className="bg-slate-100 px-1 rounded">finance_records</code> (type: outcome / salary).</p>
 
         {/* Form */}
         <div className="bg-white border rounded-xl shadow-sm p-5">

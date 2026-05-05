@@ -1,7 +1,7 @@
-// src/pages/Questionnaire.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const ADMIN_WA = import.meta.env.VITE_WA_PHONE || "6281234567890";
 const BUCKET = "proofs";
@@ -111,32 +111,28 @@ export default function Questionnaire() {
     instrument: "Piano",
     preferred_day: "monday",
     preferred_time: "",
-    learned_before: "no", // "yes" | "no" (UI)
+    learned_before: "no",
     learned_duration: "",
-    took_exam_before: "no", // "yes" | "no" (UI)
+    took_exam_before: "no",
     exam_type: "",
     exam_grade: "",
 
-    // Payment (UI disembunyikan, tetap kirim ke DB)
     teacher_type: "junior",
     amount: "500000",
   });
 
-  // Load auth + cek policy
   useEffect(() => {
     (async () => {
       const { data } = await supabase.auth.getUser();
       if (!data?.user) return navigate("/auth");
       setUser(data.user);
 
-      // Harus sudah menyetujui OurPolicy di sesi ini
       if (sessionStorage.getItem(POLICY_KEY) !== "true") {
-        navigate("/OurPolicy", { replace: true });
+        navigate("/our-policy", { replace: true });
       }
     })();
   }, [navigate]);
 
-  // Time options + default time per day
   const timeOpts = useMemo(
     () => timeOptions(form.preferred_day),
     [form.preferred_day],
@@ -148,7 +144,6 @@ export default function Questionnaire() {
     ) {
       setForm((s) => ({ ...s, preferred_time: timeOpts[0]?.value || "" }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.preferred_day, timeOpts]);
 
   // Auto compute age
@@ -221,8 +216,22 @@ export default function Questionnaire() {
   const onFile = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    if (f.size > 10 * 1024 * 1024) return alert("Max file size is 10MB.");
-    if (!/(image|pdf)/.test(f.type)) return alert("Only image or PDF allowed.");
+    const ALLOWED_TYPES = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/webp",
+    ];
+    if (!ALLOWED_TYPES.includes(f.type)) {
+      toast.error("Format tidak didukung. Gunakan JPG, PNG, WEBP, atau PDF.");
+      e.target.value = "";
+      return;
+    }
+    if (f.size > 10 * 1024 * 1024) {
+      toast.error("Ukuran file maksimal 10MB.");
+      e.target.value = "";
+      return;
+    }
     setFile(f);
   };
 
@@ -241,10 +250,10 @@ export default function Questionnaire() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (submitting) return; // guard anti double click
+    if (submitting) return;
     if (!user) return navigate("/auth");
     if (!isValid)
-      return alert(
+      return toast.error(
         "Please complete all required fields and upload the proof of payment.",
       );
     const waWindow = window.open("", "_blank");
@@ -253,7 +262,6 @@ export default function Questionnaire() {
     try {
       const proofUrl = await uploadProof(user.id);
 
-      // Konversi ke boolean + fallback teks '-'
       const learnedYes = form.learned_before === "yes";
       const examYes = form.took_exam_before === "yes";
 
@@ -282,16 +290,13 @@ export default function Questionnaire() {
         preferred_day: form.preferred_day,
         preferred_time: form.preferred_time,
 
-        // === BOOLEANS ===
         learned_before: learnedYes,
         took_exam_before: examYes,
 
-        // === TEXT dependents: '-' bila tidak relevan ===
         learned_duration: learnedYes ? form.learned_duration : "-",
         exam_type: examYes ? form.exam_type : "-",
         exam_grade: examYes ? form.exam_grade : "-",
 
-        // Payment (disembunyikan di UI)
         teacher_type: "junior",
         amount: 500000,
 
@@ -301,7 +306,6 @@ export default function Questionnaire() {
         },
       };
 
-      // 1) insert questionnaire
       const { data: q, error: qErr } = await supabase
         .from("questionnaire")
         .insert([payload])
@@ -309,11 +313,10 @@ export default function Questionnaire() {
         .single();
       if (qErr) throw qErr;
 
-      // 3) insert payment + TAUTKAN questionnaire_id
       const { error: pErr } = await supabase.from("payments").insert([
         {
           user_id: user.id,
-          questionnaire_id: q.id, // atau 'questionare_id' kalau kolommu namanya itu
+          questionnaire_id: q.id,
           amount: 500000,
           proof_url: proofUrl,
           status: "pending",
@@ -321,7 +324,7 @@ export default function Questionnaire() {
       ]);
       if (pErr) throw pErr;
 
-      // Redirect WA — pesan registrasi resmi (official template)
+      // Redirect WA
       const hasExperience = form.learned_before === "yes";
       const experienceDetail =
         hasExperience && form.exam_grade
@@ -349,13 +352,12 @@ export default function Questionnaire() {
         `Guru Nada\n` +
         `www.gurunada.com`;
 
-    waWindow.location.href = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(msg)}`;
-    navigate("/", { replace: true });
-
+      waWindow.location.href = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(msg)}`;
+      navigate("/", { replace: true });
     } catch (err) {
       waWindow?.close();
       console.error(err);
-      alert(err.message || "Submit failed. Please try again.");
+      toast.error(err.message || "Submit failed. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -942,7 +944,7 @@ export default function Questionnaire() {
                 <label style={labelStyle}>Upload Payment Proof *</label>
                 <input
                   type="file"
-                  accept="image/*,application/pdf"
+                  accept="image/jpeg,image/png,image/webp"
                   onChange={onFile}
                   style={{
                     ...fieldInputStyle,
@@ -957,7 +959,7 @@ export default function Questionnaire() {
                     marginTop: "0.3rem",
                   }}
                 >
-                  Image or PDF, max 10MB.
+                  JPG, PNG, atau WEBP. Maks 5MB.
                 </p>
               </div>
             </div>
