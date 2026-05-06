@@ -713,7 +713,7 @@ export default function Navbar() {
       {/* Spacer */}
       <div
         aria-hidden="true"
-        className="pointer-events-none select-none h-10 md:h-12 lg:h-14"
+        className="pointer-events-none select-none h-14 md:h-16 lg:h-[100px]"
       />
     </>
   );

@@ -198,14 +198,14 @@ export default function Admin() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
             gap: "0.9rem",
             marginBottom: "1.75rem",
           }}
         >
           {[
             {
-              label: "Total Pembayaran",
+              label: "Total Payments",
               value: paymentStats.total,
               icon: "💳",
               accent: "#50553C",
@@ -221,7 +221,7 @@ export default function Admin() {
               border: "rgba(7,7,6,0.18)",
             },
             {
-              label: "Terverifikasi",
+              label: "Verified",
               value: paymentStats.verified,
               icon: "✅",
               accent: "#15803d",
@@ -300,7 +300,8 @@ export default function Admin() {
           <div
             className="admin-tabs"
             style={{
-              display: "inline-flex",
+              display: "flex",
+              width: "100%",
               background: "#fff",
               borderRadius: 14,
               padding: "0.28rem",
@@ -311,11 +312,11 @@ export default function Admin() {
             }}
           >
             {[
-              { key: "payments", label: "Pembayaran", icon: "💳" },
+              { key: "payments", label: "Payments", icon: "💳" },
               { key: "events", label: "Events", icon: "📅" },
               { key: "media", label: "Media", icon: "🖼️" },
               { key: "teachers", label: "Teachers", icon: "👩‍🏫" },
-              { key: "finance", label: "Keuangan", icon: "💰" },
+              { key: "finance", label: "Finance", icon: "💰" },
             ].map((tab) => (
               <button
                 key={tab.key}

@@ -4,7 +4,12 @@ import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
-    <footer className="brand-footer py-10 mt-10">
+    <footer
+      className="brand-footer py-10 mt-10"
+      style={{
+        paddingBottom: "calc(2.5rem + env(safe-area-inset-bottom, 0px))",
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4 lg:px-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         {/* Brand */}
         <div className="flex items-start md:items-center gap-4">
@@ -22,19 +27,6 @@ export default function Footer() {
             Learn piano from scratch to mastery with our expert teachers.
           </p>
         </div>
-
-        {/* Menu */}
-        <nav className="flex items-center gap-6 text-sm">
-          <Link to="/" className="transition hover:opacity-90">
-            Home
-          </Link>
-          <Link to="/our-teachers" className="transition hover:opacity-90">
-            Our Teachers
-          </Link>
-          <Link to="/events" className="transition hover:opacity-90">
-            Events
-          </Link>
-        </nav>
 
         {/* Copyright */}
         <div className="text-xs md:text-sm opacity-80 text-center md:text-right flex items-center justify-center md:justify-end gap-2">

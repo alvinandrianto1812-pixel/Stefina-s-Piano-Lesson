@@ -8,11 +8,18 @@
 }
 
 .ts-section::before {
-  content: '';
+  content: "";
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(209,167,153,0.3), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(209, 167, 153, 0.3),
+    transparent
+  );
 }
 
 .ts-inner {
@@ -23,7 +30,7 @@
 
 /* Heading */
 .ts-heading {
-  font-family: 'Rockdale FREE', serif;
+  font-family: "Rockdale FREE", serif;
   font-size: clamp(2rem, 4vw, 3rem);
   color: var(--cream);
   text-align: center;
@@ -31,34 +38,39 @@
 }
 .ts-sub {
   text-align: center;
-  color: rgba(248,246,237,0.5);
+  color: rgba(248, 246, 237, 0.5);
   font-size: 0.95rem;
   margin-bottom: 3.5rem;
-  font-family: 'Creato Display', sans-serif;
+  font-family: "Creato Display", sans-serif;
 }
 
 /* Slider track */
+.ts-track-wrap {
+  touch-action: pan-y;
+  user-select: none;
+}
+
 .ts-track-wrap {
   overflow: hidden;
   border-radius: 20px;
 }
 .ts-track {
   display: flex;
-  transition: transform 0.6s cubic-bezier(.4,0,.2,1);
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Single slide */
 .ts-slide {
   flex: 0 0 100%;
   padding: 3rem 3.5rem;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(209,167,153,0.15);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(209, 167, 153, 0.15);
   border-radius: 20px;
   position: relative;
 }
 
 .ts-quote-mark {
-  font-family: 'Rockdale FREE', serif;
+  font-family: "Rockdale FREE", serif;
   font-size: 5rem;
   line-height: 0.5;
   color: var(--blush);
@@ -69,7 +81,7 @@
 }
 
 .ts-quote {
-  font-family: 'Creato Display', sans-serif;
+  font-family: "Creato Display", sans-serif;
   font-size: clamp(1.05rem, 2vw, 1.25rem);
   color: var(--cream);
   line-height: 1.8;
@@ -86,26 +98,26 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(209,167,153,0.25);
+  background: rgba(209, 167, 153, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Rockdale FREE', serif;
+  font-family: "Rockdale FREE", serif;
   font-size: 1.2rem;
   color: var(--blush);
-  border: 1px solid rgba(209,167,153,0.3);
+  border: 1px solid rgba(209, 167, 153, 0.3);
   flex-shrink: 0;
 }
 .ts-author__name {
-  font-family: 'Creato Display', sans-serif;
+  font-family: "Creato Display", sans-serif;
   font-weight: 700;
   font-size: 0.9rem;
   color: var(--blush);
 }
 .ts-author__role {
-  font-family: 'Creato Display', sans-serif;
+  font-family: "Creato Display", sans-serif;
   font-size: 0.78rem;
-  color: rgba(248,246,237,0.45);
+  color: rgba(248, 246, 237, 0.45);
   margin-top: 0.1rem;
 }
 
@@ -133,7 +145,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1px solid rgba(209,167,153,0.3);
+  border: 1px solid rgba(209, 167, 153, 0.3);
   background: transparent;
   color: var(--blush);
   font-size: 1.2rem;
@@ -141,14 +153,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 .ts-btn:hover:not(:disabled) {
-  background: rgba(209,167,153,0.15);
+  background: rgba(209, 167, 153, 0.15);
   border-color: var(--blush);
   transform: scale(1.1);
 }
-.ts-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.ts-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
 
 .ts-pips {
   display: flex;
@@ -156,10 +174,13 @@
   align-items: center;
 }
 .ts-pip {
-  width: 6px; height: 6px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: rgba(209,167,153,0.3);
-  transition: width 0.3s ease, background 0.3s ease;
+  background: rgba(209, 167, 153, 0.3);
+  transition:
+    width 0.3s ease,
+    background 0.3s ease;
   cursor: pointer;
 }
 .ts-pip.active {
@@ -169,6 +190,11 @@
 }
 
 @media (max-width: 640px) {
-  .ts-slide { padding: 2rem 1.5rem; }
-  .ts-stars { top: 1.5rem; right: 1.5rem; }
+  .ts-slide {
+    padding: 2rem 1.5rem;
+  }
+  .ts-stars {
+    top: 1.5rem;
+    right: 1.5rem;
+  }
 }

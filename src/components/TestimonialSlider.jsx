@@ -1,30 +1,46 @@
 // src/components/TestimonialSlider.jsx
-import { useState } from 'react';
-import './TestimonialSlider.css';
+import { useState, useRef } from "react";
+import "./TestimonialSlider.css";
 
 const TESTIMONIALS = [
   {
-    quote: "My daughter was shy performing in public — after 3 months with GuruNada, she played confidently at the school recital. The mentors are patient and genuinely care about progress.",
-    name: 'Mrs. Rina Santoso',
-    role: 'Parent of a 10-year-old student',
-    initial: 'R',
+    quote:
+      "My daughter was shy performing in public — after 3 months with GuruNada, she played confidently at the school recital. The mentors are patient and genuinely care about progress.",
+    name: "Mrs. Rina Santoso",
+    role: "Parent of a 10-year-old student",
+    initial: "R",
   },
   {
-    quote: "The flexible schedule is a lifesaver. We rescheduled twice last month without any hassle — and my son never missed a beat in his learning. Highly recommended for busy families.",
-    name: 'Mr. Andi Wijaya',
-    role: 'Parent of a 13-year-old student',
-    initial: 'A',
+    quote:
+      "The flexible schedule is a lifesaver. We rescheduled twice last month without any hassle — and my son never missed a beat in his learning. Highly recommended for busy families.",
+    name: "Mr. Andi Wijaya",
+    role: "Parent of a 13-year-old student",
+    initial: "A",
   },
   {
-    quote: "Professional teachers, warm approach. My child actually looks forward to lessons every week — and that says everything. The progress notes keep us informed after every session.",
-    name: 'Michelle Hartono',
-    role: 'Parent of a 9-year-old student',
-    initial: 'M',
+    quote:
+      "Professional teachers, warm approach. My child actually looks forward to lessons every week — and that says everything. The progress notes keep us informed after every session.",
+    name: "Michelle Hartono",
+    role: "Parent of a 9-year-old student",
+    initial: "M",
   },
 ];
 
 export default function TestimonialSlider() {
   const [active, setActive] = useState(0);
+  const touchStartX = useRef(null);
+
+  const onTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const delta = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(delta) < 40) return; // ignore accidental tap
+    if (delta > 0) next();
+    else prev();
+    touchStartX.current = null;
+  };
 
   const prev = () => setActive((a) => Math.max(0, a - 1));
   const next = () => setActive((a) => Math.min(TESTIMONIALS.length - 1, a + 1));
@@ -38,13 +54,18 @@ export default function TestimonialSlider() {
         {/* Track */}
         <div className="ts-track-wrap">
           <div
+            className="ts-track-wrap"
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
+          ></div>
+          <div
             className="ts-track"
             style={{ transform: `translateX(-${active * 100}%)` }}
           >
             {TESTIMONIALS.map((t, i) => (
               <div key={i} className="ts-slide">
                 {/* Stars */}
-                <div className="ts-stars">{'★★★★★'}</div>
+                <div className="ts-stars">{"★★★★★"}</div>
 
                 <span className="ts-quote-mark">"</span>
                 <p className="ts-quote">{t.quote}</p>
@@ -63,14 +84,19 @@ export default function TestimonialSlider() {
 
         {/* Controls */}
         <div className="ts-controls">
-          <button className="ts-btn" onClick={prev} disabled={active === 0} aria-label="Previous">
+          <button
+            className="ts-btn"
+            onClick={prev}
+            disabled={active === 0}
+            aria-label="Previous"
+          >
             ←
           </button>
           <div className="ts-pips">
             {TESTIMONIALS.map((_, i) => (
               <div
                 key={i}
-                className={`ts-pip ${i === active ? 'active' : ''}`}
+                className={`ts-pip ${i === active ? "active" : ""}`}
                 onClick={() => setActive(i)}
                 role="button"
                 tabIndex={0}
@@ -78,7 +104,12 @@ export default function TestimonialSlider() {
               />
             ))}
           </div>
-          <button className="ts-btn" onClick={next} disabled={active === TESTIMONIALS.length - 1} aria-label="Next">
+          <button
+            className="ts-btn"
+            onClick={next}
+            disabled={active === TESTIMONIALS.length - 1}
+            aria-label="Next"
+          >
             →
           </button>
         </div>

@@ -13,9 +13,21 @@
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 70% 60% at 82% 8%,  rgba(209,167,153,0.15) 0%, transparent 56%),
-    radial-gradient(ellipse 55% 45% at 15% 92%, rgba(80,85,60,0.22)    0%, transparent 64%),
-    radial-gradient(ellipse 40% 40% at  0% 100%,rgba(8,9,8,0.45)       0%, transparent 60%);
+    radial-gradient(
+      ellipse 70% 60% at 82% 8%,
+      rgba(209, 167, 153, 0.15) 0%,
+      transparent 56%
+    ),
+    radial-gradient(
+      ellipse 55% 45% at 15% 92%,
+      rgba(80, 85, 60, 0.22) 0%,
+      transparent 64%
+    ),
+    radial-gradient(
+      ellipse 40% 40% at 0% 100%,
+      rgba(8, 9, 8, 0.45) 0%,
+      transparent 60%
+    );
 }
 
 /* ── Layer 2: Soft breathing glow (CSS only, no WebGL) ── */
@@ -23,8 +35,11 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background:
-    radial-gradient(ellipse 50% 45% at 75% 35%, rgba(209,167,153,0.09) 0%, transparent 60%);
+  background: radial-gradient(
+    ellipse 50% 45% at 75% 35%,
+    rgba(209, 167, 153, 0.09) 0%,
+    transparent 60%
+  );
   animation: hero-breathe 6s ease-in-out infinite;
 }
 
@@ -37,21 +52,28 @@
     -14deg,
     transparent 0px,
     transparent 28px,
-    rgba(209,167,153,0.055) 28px,
-    rgba(209,167,153,0.055) 29px
+    rgba(209, 167, 153, 0.055) 28px,
+    rgba(209, 167, 153, 0.055) 29px
   );
   mask-image: linear-gradient(
     to right,
     transparent 0%,
-    rgba(0,0,0,0.4) 35%,
-    rgba(0,0,0,0.6) 65%,
+    rgba(0, 0, 0, 0.4) 35%,
+    rgba(0, 0, 0, 0.6) 65%,
     transparent 100%
   );
 }
 
 @keyframes hero-breathe {
-  0%, 100% { opacity: 0.7; transform: scale(1); }
-  50%       { opacity: 1;   transform: scale(1.06); }
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
 }
 
 /* ── Content ── */
@@ -65,7 +87,7 @@
 
 /* Eyebrow */
 .page-hero__eyebrow {
-  font-family: 'Creato Display', sans-serif;
+  font-family: "Creato Display", sans-serif;
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.22em;
@@ -76,21 +98,23 @@
 
 /* Title */
 .page-hero .scroll-float {
-  font-family: 'Rockdale FREE', serif;
+  font-family: "Rockdale FREE", serif;
   font-size: clamp(2.4rem, 6vw, 4rem);
   line-height: 1.1;
   color: var(--cream);
   margin: 0 0 1.25rem;
   display: block;
 }
-.page-hero .scroll-float .scroll-float-text { color: var(--cream); }
+.page-hero .scroll-float .scroll-float-text {
+  color: var(--cream);
+}
 
 /* Subtitle */
 .page-hero__subtitle {
-  font-family: 'Creato Display', sans-serif;
+  font-family: "Creato Display", sans-serif;
   font-size: 1.05rem;
   line-height: 1.75;
-  color: rgba(248,246,237,0.62);
+  color: rgba(248, 246, 237, 0.62);
   max-width: 54ch;
   margin: 0;
 }
@@ -103,15 +127,15 @@
   margin-top: 2.75rem;
 }
 .page-hero__stat-num {
-  font-family: 'Rockdale FREE', serif;
+  font-family: "Rockdale FREE", serif;
   font-size: 1.9rem;
   color: var(--blush);
   line-height: 1;
 }
 .page-hero__stat-label {
-  font-family: 'Creato Display', sans-serif;
+  font-family: "Creato Display", sans-serif;
   font-size: 0.72rem;
-  color: rgba(248,246,237,0.45);
+  color: rgba(248, 246, 237, 0.45);
   margin-top: 0.25rem;
   letter-spacing: 0.05em;
 }
@@ -149,7 +173,7 @@
 
 /* Eyebrow */
 .page-hero__eyebrow {
-  font-family: 'Creato Display', sans-serif;
+  font-family: "Creato Display", sans-serif;
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.22em;
@@ -160,21 +184,23 @@
 
 /* Title — styled by .scroll-float inside ScrollFloat */
 .page-hero .scroll-float {
-  font-family: 'Rockdale FREE', serif;
+  font-family: "Rockdale FREE", serif;
   font-size: clamp(2.4rem, 6vw, 4rem);
   line-height: 1.1;
   color: var(--cream);
   margin: 0 0 1.25rem;
   display: block;
 }
-.page-hero .scroll-float .scroll-float-text { color: var(--cream); }
+.page-hero .scroll-float .scroll-float-text {
+  color: var(--cream);
+}
 
 /* Subtitle */
 .page-hero__subtitle {
-  font-family: 'Creato Display', sans-serif;
+  font-family: "Creato Display", sans-serif;
   font-size: 1.05rem;
   line-height: 1.75;
-  color: rgba(248,246,237,0.62);
+  color: rgba(248, 246, 237, 0.62);
   max-width: 54ch;
   margin: 0;
 }
@@ -187,15 +213,15 @@
   margin-top: 2.75rem;
 }
 .page-hero__stat-num {
-  font-family: 'Rockdale FREE', serif;
+  font-family: "Rockdale FREE", serif;
   font-size: 1.9rem;
   color: var(--blush);
   line-height: 1;
 }
 .page-hero__stat-label {
-  font-family: 'Creato Display', sans-serif;
+  font-family: "Creato Display", sans-serif;
   font-size: 0.72rem;
-  color: rgba(248,246,237,0.45);
+  color: rgba(248, 246, 237, 0.45);
   margin-top: 0.25rem;
   letter-spacing: 0.05em;
 }
@@ -220,4 +246,10 @@
   opacity: 0.4;
   border-radius: 2px;
   margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .page-hero__content {
+    padding: 2.5rem 1.25rem 3rem;
+  }
 }

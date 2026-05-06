@@ -4,9 +4,9 @@
   overflow: hidden;
   position: relative; /* establish a clipping context */
   padding: 2rem 0;
-  background: #F8F6ED;
-  border-top: 1px solid rgba(209,167,153,0.25);
-  border-bottom: 1px solid rgba(209,167,153,0.25);
+  background: #f8f6ed;
+  border-top: 1px solid rgba(209, 167, 153, 0.25);
+  border-bottom: 1px solid rgba(209, 167, 153, 0.25);
   -webkit-mask-image: linear-gradient(
     to right,
     transparent 0%,
@@ -53,11 +53,32 @@
 }
 
 @keyframes bounce-sym {
-  0%   { transform: translateY(0px) scale(1);    opacity: 0.45; }
-  50%  { opacity: 0.8; }
-  100% { transform: translateY(-14px) scale(1.2); opacity: 1; }
+  0% {
+    transform: translateY(0px) scale(1);
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-14px) scale(1.2);
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bounce-icons__sym { animation: none; opacity: 0.7; }
+  .bounce-icons__sym {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+@media (max-width: 768px) {
+  .bounce-icons__track {
+    gap: 0;
+    padding: 0 0.5rem;
+  }
+  .bounce-icons__sym {
+    font-size: 14px !important;
+  }
 }

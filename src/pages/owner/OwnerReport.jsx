@@ -259,7 +259,10 @@ export default function OwnerReport() {
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
+              <table
+                className="w-full text-sm text-left"
+                style={{ minWidth: "560px" }}
+              >
                 <thead className="bg-[#F8F6ED] text-slate-600 border-b border-slate-200">
                   <tr>
                     <th className="px-6 py-3.5 font-semibold text-xs uppercase tracking-wide">
@@ -316,10 +319,10 @@ export default function OwnerReport() {
                           <td className="px-6 py-3 text-slate-800">
                             {t.description}
                           </td>
-                          <td className="px-6 py-3 text-right font-semibold text-green-600">
+                          <td className="px-6 py-3 text-right font-semibold text-green-600 whitespace-nowrap">
                             {isIncome ? fmtRupiah(t.amount) : "—"}
                           </td>
-                          <td className="px-6 py-3 text-right font-semibold text-red-500">
+                          <td className="px-6 py-3 text-right font-semibold text-red-500 whitespace-nowrap">
                             {!isIncome ? fmtRupiah(t.amount) : "—"}
                           </td>
                         </tr>
