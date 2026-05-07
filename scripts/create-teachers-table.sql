@@ -1,6 +1,6 @@
 -- ============================================================
 -- Jalankan SQL ini di: Supabase Dashboard → SQL Editor → New query
--- https://supabase.com/dashboard/project/grgkfcgvzawoyyztagbz/sql/new
+-- Buka Supabase Dashboard → SQL Editor → New query
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS public.teachers (

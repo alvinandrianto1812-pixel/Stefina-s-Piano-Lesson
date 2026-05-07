@@ -143,9 +143,9 @@ async function run() {
   console.log(`❌ Gagal    : ${fail} file`);
   console.log("══════════════════════════════════════");
   if (ok > 0) {
-    console.log("\n🎉 Selesai! Cek di:");
-    console.log("   Storage : https://supabase.com/dashboard/project/grgkfcgvzawoyyztagbz/storage/files/buckets/media-gallery");
-    console.log("   Table   : https://supabase.com/dashboard/project/grgkfcgvzawoyyztagbz/editor");
+    console.log("\n🎉 Selesai! Cek di Supabase Dashboard:");
+    console.log("   Storage : Dashboard → Storage → media-gallery");
+    console.log("   Table   : Dashboard → Table Editor → teachers");
   }
 }
 
