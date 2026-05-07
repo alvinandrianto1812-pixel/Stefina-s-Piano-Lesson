@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import toast from "react-hot-toast";
 
+const PROOF_BUCKET = "proofs";
+
 export default function AdminPayments({ onStatsUpdate }) {
   const [payments, setPayments] = useState([]);
   const [questionnaires, setQuestionnaires] = useState([]);
@@ -90,6 +92,29 @@ export default function AdminPayments({ onStatsUpdate }) {
     if (hari) parts.push(hari);
     if (time) parts.push(time);
     return parts.join(", ");
+  };
+
+  // Buka bukti pembayaran via signed URL (bucket private)
+  const handleViewProof = async (proofUrl) => {
+    if (!proofUrl) return;
+    // Extract storage path: support old (full URL) dan new (path-only)
+    let storagePath = proofUrl;
+    if (proofUrl.startsWith("http")) {
+      const parts = proofUrl.split(`/${PROOF_BUCKET}/`);
+      storagePath = parts.length > 1 ? parts[1] : null;
+    }
+    if (!storagePath) {
+      window.open(proofUrl, "_blank");
+      return;
+    }
+    const { data, error } = await supabase.storage
+      .from(PROOF_BUCKET)
+      .createSignedUrl(storagePath, 3600); // valid 1 jam
+    if (error) {
+      toast.error("Gagal membuka bukti: " + error.message);
+      return;
+    }
+    window.open(data.signedUrl, "_blank");
   };
 
   const verifyPayment = async (paymentId) => {
@@ -488,19 +513,22 @@ export default function AdminPayments({ onStatsUpdate }) {
                       style={{ padding: "0.7rem 0.9rem", verticalAlign: "top" }}
                     >
                       {p.proof_url ? (
-                        <a
-                          href={p.proof_url}
-                          target="_blank"
-                          rel="noreferrer"
+                        <button
+                          onClick={() => handleViewProof(p.proof_url)}
                           style={{
                             color: "var(--olive)",
                             textDecoration: "underline",
                             fontSize: "0.78rem",
                             fontWeight: 600,
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            padding: 0,
+                            fontFamily: "inherit",
                           }}
                         >
                           Lihat Bukti
-                        </a>
+                        </button>
                       ) : (
                         <span style={{ color: "#CBD5E1", fontSize: "0.78rem" }}>
                           —

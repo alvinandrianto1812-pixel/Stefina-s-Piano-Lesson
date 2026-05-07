@@ -244,8 +244,8 @@ export default function Questionnaire() {
       upsert: false,
     });
     if (error) throw error;
-    const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(path);
-    return pub.publicUrl;
+    // Simpan path saja (bukan public URL) — bucket proofs bersifat private
+    return path;
   }
 
   async function handleSubmit(e) {
