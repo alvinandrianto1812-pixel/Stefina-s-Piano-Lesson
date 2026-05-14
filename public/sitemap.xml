@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://gurunada.vercel.app/</loc><priority>1.0</priority></url>
+  <url><loc>https://gurunada.vercel.app/our-teachers</loc><priority>0.8</priority></url>
+  <url><loc>https://gurunada.vercel.app/our-services</loc><priority>0.8</priority></url>
+  <url><loc>https://gurunada.vercel.app/events</loc><priority>0.8</priority></url>
+  <url><loc>https://gurunada.vercel.app/media</loc><priority>0.8</priority></url>
+  <url><loc>https://gurunada.vercel.app/about-us</loc><priority>0.8</priority></url>
+  <url><loc>https://gurunada.vercel.app/contact-us</loc><priority>0.8</priority></url>
+  <url><loc>https://gurunada.vercel.app/our-policy</loc><priority>0.6</priority></url>
+  <url><loc>https://gurunada.vercel.app/auth</loc><priority>0.5</priority></url>
+</urlset>
