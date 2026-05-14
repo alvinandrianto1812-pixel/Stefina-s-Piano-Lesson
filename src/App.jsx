@@ -1,4 +1,3 @@
-import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import AuthCallback from "./pages/AuthCallback";
 import NotFound from "./pages/NotFound";

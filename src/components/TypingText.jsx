@@ -1,5 +1,5 @@
 // src/components/TypingText.jsx
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * Props:

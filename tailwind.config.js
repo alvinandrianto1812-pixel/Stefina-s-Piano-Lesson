@@ -21,7 +21,6 @@ export default {
 
       colors: {
         brand: {
-          gold: "#D4AF37",
           dark: "#0F172A", // BIARKAN. Jika ingin selaras total, ganti ke "#272925".
           soft: "#F7F3E8",
           ivory: "#FFFBF3",

@@ -1,5 +1,5 @@
 // src/pages/user/Media.jsx
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import Footer from "../../components/Footer";
 

@@ -48,9 +48,6 @@
 .ts-track-wrap {
   touch-action: pan-y;
   user-select: none;
-}
-
-.ts-track-wrap {
   overflow: hidden;
   border-radius: 20px;
 }

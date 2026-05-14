@@ -32,15 +32,3 @@
   background: #d4af37; /* brand.gold */
   color: white;
 }
-
-/* biar antialias font lebih halus */
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* kalau mau pakai class shadow-luxe di komponen custom */
-.shadow-luxe {
-  box-shadow: 0 12px 24px rgba(16, 24, 40, 0.08),
-    0 6px 16px rgba(212, 175, 55, 0.12);
-}

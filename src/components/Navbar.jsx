@@ -1,5 +1,5 @@
 // src/components/Navbar.jsx
-import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import NavAnimation from "./NavAnimation";
 import { gsap } from "gsap";

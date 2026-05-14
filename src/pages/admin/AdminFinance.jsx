@@ -1,7 +1,7 @@
 // src/pages/admin/AdminFinance.jsx
 // Tab keuangan: presensi_guru + pengeluaran (via finance_records).
 // Controller insert hanya return { message: "success" } — tanpa data kalkulasi.
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 
 // ─────────────────────────────────────────────────────────────
