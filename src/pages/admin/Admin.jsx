@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
-import AdminFinance from "./AdminFinance";
+import AdminFinance from "./sections/AdminFinance";
 import AdminEvents from "./sections/AdminEvents";
 import AdminMedia from "./sections/AdminMedia";
 import AdminPayments from "./sections/AdminPayments";
