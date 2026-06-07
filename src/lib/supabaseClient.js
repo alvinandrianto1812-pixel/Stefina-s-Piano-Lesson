@@ -24,15 +24,23 @@ const customStorageAdapter = {
 
       // Coba baca dari storage utama
       let value = null;
-      try { value = primary.getItem(key); } catch (e) {}
+      try {
+        value = primary.getItem(key);
+      } catch (e) {}
       if (value !== null) return value;
 
       // Cek migrasi dari storage sekunder
       let migrated = null;
-      try { migrated = secondary.getItem(key); } catch (e) {}
+      try {
+        migrated = secondary.getItem(key);
+      } catch (e) {}
       if (migrated !== null) {
-        try { primary.setItem(key, migrated); } catch (e) {}
-        try { secondary.removeItem(key); } catch (e) {}
+        try {
+          primary.setItem(key, migrated);
+        } catch (e) {}
+        try {
+          secondary.removeItem(key);
+        } catch (e) {}
       }
       return migrated;
     } catch (err) {
@@ -51,8 +59,14 @@ const customStorageAdapter = {
   },
   removeItem: (key) => {
     if (typeof window === "undefined") return;
-    try { window.localStorage.removeItem(key); } catch (e) {}
-    try { window.sessionStorage.removeItem(key); } catch (e) {}
+    try {
+      const remember = window.localStorage.getItem("rememberMe") === "true";
+      if (remember) {
+        window.localStorage.removeItem(key);
+      } else {
+        window.sessionStorage.removeItem(key);
+      }
+    } catch (e) {}
     delete memoryStorage[key];
   },
 };

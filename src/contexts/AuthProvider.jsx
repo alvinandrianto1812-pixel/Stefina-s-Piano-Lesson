@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { supabase } from "../lib/supabaseClient";
 
 const AuthContext = createContext(null);
@@ -7,17 +13,23 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [roleLoading, setRoleLoading] = useState(true);
   const resolvedRef = useRef(false);
 
   // Fetch role dari DB — dipanggil sekali per session
   const fetchRole = async (user) => {
-    if (!user) { setRole(null); return; }
+    if (!user) {
+      setRole(null);
+      setRoleLoading(false);
+      return;
+    }
     const { data } = await supabase
       .from("users")
       .select("role")
       .eq("id", user.id)
       .maybeSingle();
     setRole(data?.role ?? null);
+    setRoleLoading(false);
   };
 
   const resolve = (sess) => {
@@ -38,7 +50,9 @@ export function AuthProvider({ children }) {
       resolve(null);
     }, 4000);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, sess) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, sess) => {
       clearTimeout(fallback);
       resolve(sess);
       setSession(sess);
@@ -54,14 +68,30 @@ export function AuthProvider({ children }) {
   const value = {
     session,
     user: session?.user ?? null,
-    role, // ← expose role ke seluruh app
+    role,
+    roleLoading,
     signOut: () => supabase.auth.signOut(),
   };
-
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8F6ED" }}>
-        <p style={{ color: "#94A3B8", fontSize: "14px", fontFamily: "system-ui" }}>Memuat sesi…</p>
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#F8F6ED",
+        }}
+      >
+        <p
+          style={{
+            color: "#94A3B8",
+            fontSize: "14px",
+            fontFamily: "system-ui",
+          }}
+        >
+          Memuat sesi…
+        </p>
       </div>
     );
   }
