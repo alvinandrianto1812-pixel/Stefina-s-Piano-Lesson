@@ -54,8 +54,6 @@ export default function LandingPage() {
   }, [location]);
 
   const handleBook = () => navigate("/questionnaire");
-  const handleEnrollWA = () =>
-    window.open(WA_REGISTER, "_blank", "noopener,noreferrer");
 
   return (
     <div
