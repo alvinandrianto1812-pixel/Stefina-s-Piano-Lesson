@@ -354,7 +354,7 @@ export default function OurPolicy() {
           >
             {scrolledToBottom
               ? "✓ You have read all policies"
-              : `${Math.round(scrollProgress * 100)}% read — scroll to the bottom to proceed`}
+              : `${Math.round(scrollProgress * 100)}% read - scroll to the bottom to proceed`}
           </p>
 
           {/* Policy cards */}

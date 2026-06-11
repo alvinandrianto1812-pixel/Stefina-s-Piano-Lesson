@@ -17,7 +17,7 @@ const VALUES = [
   {
     icon: "♪",
     title: "Performance Mindset",
-    desc: "We train students not just to play, but to perform — with presence and confidence.",
+    desc: "We train students not just to play, but to perform - with presence and confidence.",
   },
   {
     icon: "◈",
@@ -32,7 +32,7 @@ const VALUES = [
   {
     icon: "♫",
     title: "Creative Exploration",
-    desc: "Beyond the syllabus — improvisation, composition, and musical curiosity are always welcome.",
+    desc: "Beyond the syllabus - improvisation, composition, and musical curiosity are always welcome.",
   },
   {
     icon: "◉",
@@ -444,7 +444,7 @@ export default function OurTeachers() {
       <PageHero
         eyebrow="Our Educators"
         title="Meet the Teachers"
-        subtitle="A curated team of professional musicians — each bringing their own expertise, warmth, and dedication to every lesson."
+        subtitle="A curated team of professional musicians - each bringing their own expertise, warmth, and dedication to every lesson."
         stats={[
           { num: "6", label: "Expert Teachers" },
           { num: "4+", label: "Instruments" },

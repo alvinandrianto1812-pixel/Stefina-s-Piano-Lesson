@@ -31,7 +31,8 @@ export default function Footer() {
         {/* Copyright */}
         <div className="text-xs md:text-sm opacity-80 text-center md:text-right flex items-center justify-center md:justify-end gap-2">
           <span>
-            © {new Date().getFullYear()} GuruNada. All rights reserved.
+            GuruNada Est. 2025 · © {new Date().getFullYear()} All rights
+            reserved.{" "}
           </span>
           <span className="inline-flex items-center rounded px-1.5 py-0.5 bg-[#0F1828]/90">
             <img

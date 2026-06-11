@@ -1,18 +1,18 @@
 // src/hooks/useScrollReveal.js
 /**
- * useScrollReveal — GSAP scroll-triggered reveal for any element.
+ * useScrollReveal - GSAP scroll-triggered reveal for any element.
  *
  * Usage:
  *   const ref = useScrollReveal();
  *   <div ref={ref}>...</div>
  *
  * Options:
- *   from       — GSAP fromTo 'from' vars (default: fade + slide up)
- *   duration   — animation duration (default: 0.7)
- *   ease       — GSAP ease (default: 'power3.out')
- *   delay      — animation delay in seconds (default: 0)
- *   start      — ScrollTrigger start (default: 'top 85%')
- *   stagger    — if ref is a list of children, stagger amount (default: 0)
+ *   from       - GSAP fromTo 'from' vars (default: fade + slide up)
+ *   duration   - animation duration (default: 0.7)
+ *   ease       - GSAP ease (default: 'power3.out')
+ *   delay      - animation delay in seconds (default: 0)
+ *   start      - ScrollTrigger start (default: 'top 85%')
+ *   stagger    - if ref is a list of children, stagger amount (default: 0)
  */
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
@@ -34,7 +34,7 @@ export default function useScrollReveal({
     const el = ref.current;
     if (!el) return;
 
-    // Determine targets — if stagger > 0, animate direct children
+    // Determine targets - if stagger > 0, animate direct children
     const targets = stagger > 0 ? Array.from(el.children) : el;
     if (!targets || (Array.isArray(targets) && targets.length === 0)) return;
 

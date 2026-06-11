@@ -90,6 +90,8 @@ export default function LandingPage() {
       <section
         className="relative min-h-[92vh] flex items-center overflow-hidden"
         style={{
+          marginTop: "-72px",
+          paddingTop: "72px",
           background: "linear-gradient(160deg, #F8F6ED 60%, #EDE8DC 100%)",
         }}
       >
@@ -120,19 +122,19 @@ export default function LandingPage() {
           <MagicRings
             color="#D1A799"
             colorTwo="#50553C"
-            ringCount={4}
-            speed={0.5}
-            opacity={0.55}
-            attenuation={7}
-            lineThickness={1.6}
-            baseRadius={0.32}
-            radiusStep={0.09}
-            noiseAmount={0.015}
-            followMouse={true}
-            mouseInfluence={0.1}
-            parallax={0.03}
-            hoverScale={1.05}
-            clickBurst={true}
+            ringCount={3}
+            speed={0.25}
+            opacity={0.2}
+            attenuation={9}
+            lineThickness={1.2}
+            baseRadius={0.35}
+            radiusStep={0.1}
+            noiseAmount={0.008}
+            followMouse={false}
+            mouseInfluence={0}
+            parallax={0}
+            hoverScale={1}
+            clickBurst={false}
           />
         </div>
 
@@ -140,7 +142,7 @@ export default function LandingPage() {
         <div
           className="relative max-w-7xl mx-auto px-4 w-full"
           style={{
-            paddingTop: "clamp(1.5rem, 5vw, 7rem)",
+            paddingTop: "clamp(0.5rem, 2vw, 2rem)",
             paddingBottom: "5rem",
             zIndex: 1,
           }}
@@ -693,44 +695,44 @@ export default function LandingPage() {
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "flex-end",
-                background: "var(--charcoal)",
               }}
             >
-              {/* MagicRings background */}
-              <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-                <MagicRings
-                  color="#D1A799"
-                  colorTwo="#683730"
-                  ringCount={4}
-                  speed={0.6}
-                  opacity={0.85}
-                  attenuation={6}
-                  lineThickness={2}
-                  baseRadius={0.3}
-                  radiusStep={0.1}
-                  noiseAmount={0.02}
-                  followMouse={true}
-                  mouseInfluence={0.15}
-                  parallax={0.05}
-                  hoverScale={1.1}
-                  clickBurst={true}
-                />
-              </div>
-              {/* Gradient overlay for text legibility */}
+              {/* Layer 1: base dark */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  zIndex: 0,
+                  background:
+                    "linear-gradient(135deg, #1e1f1a 0%, #2a1f1c 100%)",
+                }}
+              />
+              {/* Layer 2: radial accent */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  zIndex: 1,
+                  background:
+                    "radial-gradient(ellipse at 30% 30%, rgba(209,167,153,0.35) 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(104,55,48,0.3) 0%, transparent 50%)",
+                }}
+              />
+              {/* Layer 3: gradient overlay text legibility */}
               <div
                 style={{
                   position: "absolute",
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: "60%",
+                  height: "70%",
                   background:
-                    "linear-gradient(to top, rgba(39,41,37,0.95) 0%, transparent 100%)",
-                  zIndex: 1,
+                    "linear-gradient(to top, rgba(20,20,18,0.97) 0%, transparent 100%)",
+                  zIndex: 2,
                 }}
               />
+
               {/* Content */}
-              <div style={{ position: "relative", zIndex: 2, padding: "2rem" }}>
+              <div style={{ position: "relative", zIndex: 3, padding: "2rem" }}>
                 <div
                   style={{
                     fontSize: "0.65rem",
@@ -795,44 +797,43 @@ export default function LandingPage() {
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "flex-end",
-                background: "var(--olive)",
               }}
             >
-              {/* MagicRings background */}
-              <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-                <MagicRings
-                  color="#F8F6ED"
-                  colorTwo="#D1A799"
-                  ringCount={4}
-                  speed={0.5}
-                  opacity={0.7}
-                  attenuation={7}
-                  lineThickness={1.8}
-                  baseRadius={0.28}
-                  radiusStep={0.11}
-                  noiseAmount={0.02}
-                  followMouse={true}
-                  mouseInfluence={0.15}
-                  parallax={0.05}
-                  hoverScale={1.1}
-                  clickBurst={true}
-                />
-              </div>
-              {/* Gradient overlay */}
+              {/* Layer 1: base dark olive */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  zIndex: 0,
+                  background:
+                    "linear-gradient(135deg, #2a2d1e 0%, #1e2015 100%)",
+                }}
+              />
+              {/* Layer 2: radial accent */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  zIndex: 1,
+                  background:
+                    "radial-gradient(ellipse at 70% 30%, rgba(248,246,237,0.15) 0%, transparent 55%), radial-gradient(ellipse at 20% 80%, rgba(209,167,153,0.25) 0%, transparent 50%)",
+                }}
+              />
+              {/* Layer 3: gradient overlay text legibility */}
               <div
                 style={{
                   position: "absolute",
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: "60%",
+                  height: "70%",
                   background:
-                    "linear-gradient(to top, rgba(80,85,60,0.97) 0%, transparent 100%)",
-                  zIndex: 1,
+                    "linear-gradient(to top, rgba(40,44,28,0.97) 0%, transparent 100%)",
+                  zIndex: 2,
                 }}
               />
               {/* Content */}
-              <div style={{ position: "relative", zIndex: 2, padding: "2rem" }}>
+              <div style={{ position: "relative", zIndex: 3, padding: "2rem" }}>
                 <div
                   style={{
                     fontSize: "0.65rem",

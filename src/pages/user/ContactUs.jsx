@@ -13,7 +13,7 @@ const CONTACTS = [
     icon: '💬',
     label: 'WhatsApp',
     value: '0818-359-580',
-    sub: 'Fastest response — usually within a few hours',
+    sub: 'Fastest response - usually within a few hours',
     href: WA_TRIAL,
     cta: 'Chat on WhatsApp',
     accent: 'var(--olive)',
@@ -32,8 +32,8 @@ const CONTACTS = [
   {
     icon: '◷',
     label: 'Operating Hours',
-    value: 'Mon–Fri · 13:00–18:00\nSat · 09:00–14:00',
-    sub: 'Sunday — Closed',
+    value: 'Mon-Fri · 13:00-18:00\nSat · 09:00-14:00',
+    sub: 'Sunday - Closed',
     href: null,
     cta: null,
     accent: 'var(--charcoal)',
@@ -52,9 +52,9 @@ const CONTACTS = [
 ];
 
 const FAQS = [
-  { q: 'How fast do you reply?', a: 'We typically reply via WhatsApp within a few hours on business days (Mon–Fri 13:00–18:00, Sat 09:00–14:00).' },
+  { q: 'How fast do you reply?', a: 'We typically reply via WhatsApp within a few hours on business days (Mon-Fri 13:00-18:00, Sat 09:00-14:00).' },
   { q: 'Can I ask about scheduling via WhatsApp?', a: 'Absolutely! WhatsApp is our preferred channel for quick questions about schedules, availability, and anything else.' },
-  { q: 'Do you offer trial classes?', a: 'Yes — and it starts with a conversation. Tap "Chat on WhatsApp" above and we\'ll arrange a trial session that fits your schedule.' },
+  { q: 'Do you offer trial classes?', a: 'Yes - and it starts with a conversation. Tap "Chat on WhatsApp" above and we\'ll arrange a trial session that fits your schedule.' },
   { q: 'Is there a home visit option?', a: 'Home visits are available for select teachers and locations. Ask us on WhatsApp to check availability.' },
 ];
 
@@ -163,7 +163,7 @@ export default function ContactUs() {
       <PageHero
         eyebrow="Get In Touch"
         title="Contact Us"
-        subtitle="Questions about classes, schedules, or events? We'd love to hear from you — just reach out on WhatsApp."
+        subtitle="Questions about classes, schedules, or events? We'd love to hear from you - just reach out on WhatsApp."
       />
 
       {/* ── 2. CONTACT CARDS ── */}

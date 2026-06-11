@@ -49,7 +49,7 @@ export default function TypingText({
       <span style={{ color: 'var(--brick)' }}>
         {text}
       </span>
-      {/* kursor berkedip — warna blush */}
+      {/* kursor berkedip - warna blush */}
       <span
         style={{
           display: 'inline-block',

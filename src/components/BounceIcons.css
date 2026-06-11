@@ -4,9 +4,9 @@
   overflow: hidden;
   position: relative; /* establish a clipping context */
   padding: 2rem 0;
-  background: #f8f6ed;
-  border-top: 1px solid rgba(209, 167, 153, 0.25);
-  border-bottom: 1px solid rgba(209, 167, 153, 0.25);
+  background: var(--cream);
+  border-top: none;
+  border-bottom: none;
   -webkit-mask-image: linear-gradient(
     to right,
     transparent 0%,

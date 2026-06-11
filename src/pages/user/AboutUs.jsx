@@ -18,12 +18,12 @@ const PILLARS = [
   {
     icon: '♩',
     title: 'Our Story',
-    text: 'Started as a small private piano class, GuruNada has grown into a multi-instrument platform trusted by families across Jakarta — guided by the same intimate, personal approach since day one.',
+    text: 'Started as a small private piano class, GuruNada has grown into a multi-instrument platform trusted by families across Jakarta - guided by the same intimate, personal approach since day one.',
   },
   {
     icon: '♪',
     title: 'Our Approach',
-    text: 'A blend of technique, music theory, and performance practice — delivered in weekly measurable milestones so students and parents always know exactly where they stand.',
+    text: 'A blend of technique, music theory, and performance practice - delivered in weekly measurable milestones so students and parents always know exactly where they stand.',
   },
   {
     icon: '♫',
@@ -43,7 +43,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'What age groups do you teach?',
-    a: 'We welcome students of all ages — from young children (5+) to adults returning to music after a long break.',
+    a: 'We welcome students of all ages - from young children (5+) to adults returning to music after a long break.',
   },
   {
     q: 'How do I get started?',
@@ -72,7 +72,7 @@ function FlipCard({ icon, front, back, accent }) {
       }}
       role="button"
       tabIndex={0}
-      aria-label={`${front} card — click to flip`}
+      aria-label={`${front} card - click to flip`}
       onKeyDown={e => e.key === 'Enter' && setFlipped(f => !f)}
     >
       <div
@@ -205,11 +205,11 @@ export default function AboutUs() {
       <PageHero
         eyebrow="About GuruNada"
         title="Our Story, Our Mission"
-        subtitle="We believe every student deserves a music education that is personal, measurable, and genuinely enjoyable — taught by professionals who care."
+        subtitle="We believe every student deserves a music education that is personal, measurable, and genuinely enjoyable - taught by professionals who care."
         stats={STATS}
       />
 
-      {/* ── 2. MISSION & VISION — flip cards ── */}
+      {/* ── 2. MISSION & VISION - flip cards ── */}
       <section style={{ padding: '5rem 0 4rem', background: 'var(--cream)' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem' }}>
           <ScrollFloat animationDuration={0.85} ease="back.out(1.7)" stagger={0.03} className="about-section-heading">
@@ -221,13 +221,13 @@ export default function AboutUs() {
               icon="♩"
               front="Our Mission"
               accent="var(--blush)"
-              back="To create a learning ecosystem focused on solid technique, theoretical understanding, and performance confidence — guided by a clear, trackable curriculum tailored to each student."
+              back="To create a learning ecosystem focused on solid technique, theoretical understanding, and performance confidence - guided by a clear, trackable curriculum tailored to each student."
             />
             <FlipCard
               icon="♫"
               front="Our Vision"
               accent="var(--olive)"
-              back="To become the most trusted music education partner for families in Indonesia — supported by modern teaching standards, thoughtful technology, and a warm, nurturing community."
+              back="To become the most trusted music education partner for families in Indonesia - supported by modern teaching standards, thoughtful technology, and a warm, nurturing community."
             />
           </div>
           <p style={{ marginTop: '1rem', fontSize: '0.78rem', color: 'var(--blush)', textAlign: 'center', fontWeight: 600 }}>Click a card to read more ↑</p>

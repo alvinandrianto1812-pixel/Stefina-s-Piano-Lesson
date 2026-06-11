@@ -26,7 +26,7 @@ export default function App() {
   return (
     <>
       <Navbar />
-      <main className="pt-16">
+      <main>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/auth" element={<Auth />} />

@@ -158,7 +158,7 @@ function EventCard({ ev, isLast, user }) {
                 >+ Add to Google Calendar</a>
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#94A3B8' }}>🔒 Login to save to Calendar —</span>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#94A3B8' }}>🔒 Login to save to Calendar -</span>
                   <Link to="/auth" style={{ fontSize: '12px', fontWeight: 700, color: 'var(--olive)', textDecoration: 'underline' }}>Login here →</Link>
                 </div>
               )}
@@ -200,10 +200,10 @@ export default function Events() {
       <PageHero
         eyebrow="What's On"
         title="Our Events"
-        subtitle="Concerts, workshops, recitals, and masterclasses — be part of our musical milestones."
+        subtitle="Concerts, workshops, recitals, and masterclasses - be part of our musical milestones."
         stats={[
-          { num: upcoming.length > 0 ? String(upcoming.length) : '—', label: 'Upcoming Events' },
-          { num: past.length > 0     ? String(past.length)     : '—', label: 'Past Events' },
+          { num: upcoming.length > 0 ? String(upcoming.length) : '-', label: 'Upcoming Events' },
+          { num: past.length > 0     ? String(past.length)     : '-', label: 'Past Events' },
         ]}
       />
 

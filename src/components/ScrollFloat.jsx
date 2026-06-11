@@ -7,16 +7,16 @@ import './ScrollFloat.css';
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * ScrollFloat — animates text character-by-character when it enters the viewport.
+ * ScrollFloat - animates text character-by-character when it enters the viewport.
  *
  * If `children` is a string → split into chars and animate each one with stagger.
  * If `children` is a ReactNode (JSX) → fades/slides the whole block in.
  *
  * Props:
- *  as            – HTML tag for the wrapper (default: 'h2')
- *  className     – classes applied to the wrapper element
- *  animationDuration, ease, scrollStart, stagger — GSAP options
- *  scrub         – if true, ties animation to scroll position (legacy). Default: false.
+ *  as            - HTML tag for the wrapper (default: 'h2')
+ *  className     - classes applied to the wrapper element
+ *  animationDuration, ease, scrollStart, stagger - GSAP options
+ *  scrub         - if true, ties animation to scroll position (legacy). Default: false.
  */
 const ScrollFloat = ({
   children,

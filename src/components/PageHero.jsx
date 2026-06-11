@@ -3,7 +3,7 @@ import ScrollFloat from './ScrollFloat';
 import './PageHero.css';
 
 /**
- * PageHero — shared premium hero section for all About sub-pages.
+ * PageHero - shared premium hero section for all About sub-pages.
  *
  * Background uses pure CSS layers (no WebGL):
  *   1. Radial gradient ambience
@@ -11,12 +11,12 @@ import './PageHero.css';
  *   3. Diagonal music-staff lines (brand thematic, very faint)
  *
  * Props:
- *   eyebrow   string              — small uppercase label above title
- *   title     string              — main heading (per-char ScrollFloat)
- *   subtitle  string              — paragraph below title
- *   stats     Array<{num,label}>  — optional stat row
- *   children  ReactNode           — extra content between subtitle and stats
- *   waveColor string              — fill colour of the wave SVG (default cream)
+ *   eyebrow   string              - small uppercase label above title
+ *   title     string              - main heading (per-char ScrollFloat)
+ *   subtitle  string              - paragraph below title
+ *   stats     Array<{num,label}>  - optional stat row
+ *   children  ReactNode           - extra content between subtitle and stats
+ *   waveColor string              - fill colour of the wave SVG (default cream)
  */
 export default function PageHero({
   eyebrow,

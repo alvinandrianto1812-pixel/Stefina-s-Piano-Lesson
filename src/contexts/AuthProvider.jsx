@@ -16,7 +16,7 @@ export function AuthProvider({ children }) {
   const [roleLoading, setRoleLoading] = useState(true);
   const resolvedRef = useRef(false);
 
-  // Fetch role dari DB — dipanggil sekali per session
+  // Fetch role dari DB - dipanggil sekali per session
   const fetchRole = async (user) => {
     if (!user) {
       setRole(null);

@@ -5,21 +5,21 @@ import "./TestimonialSlider.css";
 const TESTIMONIALS = [
   {
     quote:
-      "My daughter was shy performing in public — after 3 months with GuruNada, she played confidently at the school recital. The mentors are patient and genuinely care about progress.",
+      "My daughter was shy performing in public - after 3 months with GuruNada, she played confidently at the school recital. The mentors are patient and genuinely care about progress.",
     name: "Mrs. Rina Santoso",
     role: "Parent of a 10-year-old student",
     initial: "R",
   },
   {
     quote:
-      "The flexible schedule is a lifesaver. We rescheduled twice last month without any hassle — and my son never missed a beat in his learning. Highly recommended for busy families.",
+      "The flexible schedule is a lifesaver. We rescheduled twice last month without any hassle - and my son never missed a beat in his learning. Highly recommended for busy families.",
     name: "Mr. Andi Wijaya",
     role: "Parent of a 13-year-old student",
     initial: "A",
   },
   {
     quote:
-      "Professional teachers, warm approach. My child actually looks forward to lessons every week — and that says everything. The progress notes keep us informed after every session.",
+      "Professional teachers, warm approach. My child actually looks forward to lessons every week - and that says everything. The progress notes keep us informed after every session.",
     name: "Michelle Hartono",
     role: "Parent of a 9-year-old student",
     initial: "M",

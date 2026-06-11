@@ -1,7 +1,7 @@
-// src/pages/user/Media.jsx
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import Footer from "../../components/Footer";
+import PageHero from "../../components/PageHero";
 
 // ─── LIGHTBOX ──────────────────────────────────────────────────────────────────
 function Lightbox({ item, onClose }) {
@@ -564,7 +564,6 @@ export default function Media() {
 
   return (
     <div
-      className="-mt-[6.5rem] md:-mt-28 lg:-mt-[7.5rem]"
       style={{
         fontFamily:
           '"Creato Display", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial',
@@ -572,124 +571,16 @@ export default function Media() {
         color: "#272925",
       }}
     >
-      {/* ─── HERO ─────────────────────────────────────────────────────────── */}
-      <section
-        style={{
-          position: "relative",
-          overflow: "hidden",
-          background: "#0F1110",
-          minHeight: "420px",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(125deg, rgba(39,41,37,0) 0%, rgba(48,51,41,0.9) 45%, rgba(48,51,41,0.6) 100%)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(ellipse 70% 60% at 85% 15%, rgba(209,167,153,0.14) 0%, transparent 60%)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(ellipse 55% 40% at 30% 100%, rgba(80,85,60,0.3) 0%, transparent 70%)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(ellipse 40% 40% at 0% 100%, rgba(8,9,8,0.55) 0%, transparent 60%)",
-            pointerEvents: "none",
-          }}
-        />
-
-        <div
-          className="max-w-7xl mx-auto px-6"
-          style={{
-            paddingTop: "160px",
-            paddingBottom: "64px",
-            position: "relative",
-            zIndex: 10,
-          }}
-        >
-          <h1
-            style={{
-              fontSize: "clamp(36px, 6vw, 56px)",
-              fontWeight: "700",
-              lineHeight: 1.15,
-              color: "#F8F6ED",
-              margin: 0,
-            }}
-          >
-            Our <br />
-            <span style={{ color: "#F8F6ED", opacity: 0.9 }}>Gallery</span>
-          </h1>
-          <p
-            style={{
-              marginTop: "20px",
-              fontSize: "17px",
-              maxWidth: "520px",
-              lineHeight: 1.65,
-              color: "rgba(248,246,237,0.72)",
-            }}
-          >
-            Photos and videos from our classes, events, and memorable musical
-            moments.
-          </p>
-
-          {/* Stats */}
-          <div
-            style={{
-              marginTop: "30px",
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "32px",
-            }}
-          >
-            {[
-              { num: items.length, label: "Total Media" },
-              { num: photoCount, label: "Photos" },
-              { num: videoCount, label: "Videos" },
-            ].map((s) => (
-              <div key={s.label}>
-                <div
-                  style={{
-                    fontSize: "28px",
-                    fontWeight: "700",
-                    color: "#F8F6ED",
-                  }}
-                >
-                  {s.num}
-                </div>
-                <div
-                  style={{
-                    fontSize: "13px",
-                    marginTop: "2px",
-                    color: "rgba(248,246,237,0.55)",
-                  }}
-                >
-                  {s.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Programs"
+        title="Our Gallery"
+        subtitle="Photos and videos from our classes, events, and memorable musical moments."
+        stats={[
+          { num: items.length, label: "Total Media" },
+          { num: photoCount, label: "Photos" },
+          { num: videoCount, label: "Videos" },
+        ]}
+      />
 
       {/* ─── FILTER TABS ──────────────────────────────────────────────────── */}
       <section style={{ padding: "48px 0 0" }}>

@@ -531,7 +531,7 @@ export default function AdminPayments({ onStatsUpdate }) {
                         </button>
                       ) : (
                         <span style={{ color: "#CBD5E1", fontSize: "0.78rem" }}>
-                          —
+                          -
                         </span>
                       )}
                     </td>

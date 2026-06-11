@@ -315,7 +315,7 @@ export default function AdminMedia() {
                   </div>
                   <div>
                     <p className="text-white text-xs font-medium truncate">
-                      {item.title || "—"}
+                      {item.title || "-"}
                     </p>
                     <button
                       onClick={() => togglePublish(item)}

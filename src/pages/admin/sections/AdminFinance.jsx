@@ -1,11 +1,11 @@
 // src/pages/admin/AdminFinance.jsx
 // Tab keuangan: presensi_guru + pengeluaran (via finance_records).
-// Controller insert hanya return { message: "success" } — tanpa data kalkulasi.
+// Controller insert hanya return { message: "success" } - tanpa data kalkulasi.
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 
 // ─────────────────────────────────────────────────────────────
-// Controllers — return HANYA { message: "success" }
+// Controllers - return HANYA { message: "success" }
 // ─────────────────────────────────────────────────────────────
 
 async function insertPresensi(payload) {
@@ -41,7 +41,7 @@ async function deleteFinanceRecord(id) {
 // ─────────────────────────────────────────────────────────────
 const fmtRupiah = (n) => "Rp " + Number(n || 0).toLocaleString("id-ID");
 const fmtTgl = (d) =>
-  d ? new Date(d).toLocaleDateString("id-ID", { dateStyle: "medium" }) : "—";
+  d ? new Date(d).toLocaleDateString("id-ID", { dateStyle: "medium" }) : "-";
 
 // Kategori pengeluaran → tipe finance_records
 const PENGELUARAN_TYPES = [
@@ -201,7 +201,7 @@ export default function AdminFinance() {
         description: pengeluaranForm.description.trim(),
         amount,
         record_date: pengeluaranForm.tanggal,
-        // reference_id: null — tidak ada kalkulasi/referensi otomatis
+        // reference_id: null - tidak ada kalkulasi/referensi otomatis
       });
       flash(
         "pengeluaran",
@@ -285,7 +285,7 @@ export default function AdminFinance() {
                 }
                 required
               >
-                <option value="">— Pilih Guru —</option>
+                <option value="">- Pilih Guru -</option>
                 {teachers.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.name}
@@ -402,7 +402,7 @@ export default function AdminFinance() {
                         {fmtTgl(p.tanggal)}
                       </td>
                       <td className="px-4 py-3 font-medium text-slate-800">
-                        {p.teachers?.name ?? "—"}
+                        {p.teachers?.name ?? "-"}
                       </td>
                       <td className="px-4 py-3">
                         <span
@@ -412,7 +412,7 @@ export default function AdminFinance() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-slate-500 text-xs">
-                        {p.keterangan || "—"}
+                        {p.keterangan || "-"}
                       </td>
                       <td className="px-4 py-3 text-center">
                         <button

@@ -31,15 +31,15 @@ const LESSON_TYPES = [
   },
   {
     title: "Regular Private Lesson",
-    freq: "1× per week",
+    freq: "1x per week",
     duration: "60 minutes / session",
-    desc: "Our standard program — one dedicated session per week with your assigned teacher, following a structured and personalized curriculum.",
+    desc: "Our standard program - one dedicated session per week with your assigned teacher, following a structured and personalized curriculum.",
     highlight: true,
     badge: "Most Popular",
   },
   {
     title: "Intensive Program",
-    freq: "2× per week",
+    freq: "2x per week",
     duration: "60 minutes / session",
     desc: "For students who want to accelerate progress, prepare for exams, or build consistency faster with two lessons per week.",
     highlight: false,
@@ -253,7 +253,7 @@ export default function OurServices() {
       <PageHero
         eyebrow="What We Offer"
         title="Our Services"
-        subtitle="Private music lessons tailored to your pace, schedule, and goals — for all ages and levels."
+        subtitle="Private music lessons tailored to your pace, schedule, and goals - for all ages and levels."
         stats={[
           { num: "60 min", label: "Per Session" },
           { num: "1-on-1", label: "Private Only" },

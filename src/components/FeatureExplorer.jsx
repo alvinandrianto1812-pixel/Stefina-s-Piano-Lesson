@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import "./FeatureExplorer.css";
 
 /* ─────────────────────────────────────────
-   Visual cards — pure JSX/CSS, no images
+   Visual cards - pure JSX/CSS, no images
 ───────────────────────────────────────── */
 
 function CurriculumCard() {
@@ -79,7 +79,7 @@ function ScheduleCard() {
             fontWeight: 700,
           }}
         >
-          ● Selected — Thu 14:00 &nbsp;|&nbsp; Easy to reschedule anytime
+          ● Selected - Thu 14:00 &nbsp;|&nbsp; Easy to reschedule anytime
         </div>
       </div>
     </div>
@@ -149,10 +149,10 @@ function RecitalCard() {
 
 function ProgressCard() {
   const milestones = [
-    { text: "Week 1 — Scales & hands separately", state: "done" },
-    { text: "Week 2 — Sight-reading basics", state: "done" },
-    { text: "Week 3 — Chopin Op. 9, bars 1–16", state: "done" },
-    { text: "Week 4 — Cadenza & dynamics", state: "current" },
+    { text: "Week 1 - Scales & hands separately", state: "done" },
+    { text: "Week 2 - Sight-reading basics", state: "done" },
+    { text: "Week 3 - Chopin Op. 9, bars 1-16", state: "done" },
+    { text: "Week 4 - Cadenza & dynamics", state: "current" },
   ];
   return (
     <div className="vis-card">
@@ -178,19 +178,19 @@ const FEATURES = [
   {
     num: "01",
     title: "Personalized Curriculum",
-    desc: "Every student gets a learning path built around their goals, level, and interests — from beginner scales to advanced repertoire. No two journeys are the same.",
+    desc: "Every student gets a learning path built around their goals, level, and interests - from beginner scales to advanced repertoire. No two journeys are the same.",
     visual: <CurriculumCard />,
   },
   {
     num: "02",
     title: "Flexible Scheduling",
-    desc: "Pick any open slot that fits your week. Need to reschedule? Simply choose another available time — hassle-free, no penalty.",
+    desc: "Pick any open slot that fits your week. Need to reschedule? Simply choose another available time - hassle-free, no penalty.",
     visual: <ScheduleCard />,
   },
   {
     num: "03",
     title: "Recital & Graded Prep",
-    desc: "Preparing for ABRSM, Trinity, or a school recital? Your mentor coaches you specifically toward the exam — technique, sight-reading, and performance confidence.",
+    desc: "Preparing for ABRSM, Trinity, or a school recital? Your mentor coaches you specifically toward the exam - technique, sight-reading, and performance confidence.",
     visual: <RecitalCard />,
   },
   {
@@ -232,7 +232,7 @@ export default function FeatureExplorer() {
     <section className="fe-outer" ref={outerRef} id="features">
       {/* Sticky panel */}
       <div className="fe-sticky">
-        {/* LEFT — text */}
+        {/* LEFT - text */}
         <div className="fe-left">
           {FEATURES.map((f, i) => (
             <div key={i} className={`fe-copy ${i === active ? "active" : ""}`}>
@@ -247,7 +247,7 @@ export default function FeatureExplorer() {
                   />
                 ))}
               </div>
-              {/* Mobile nav buttons — only visible on mobile */}
+              {/* Mobile nav buttons - only visible on mobile */}
               <div
                 style={{ display: "flex", gap: "0.75rem", marginTop: "1.5rem" }}
                 className="fe-mobile-nav"
@@ -293,7 +293,7 @@ export default function FeatureExplorer() {
           ))}
         </div>
 
-        {/* RIGHT — visual */}
+        {/* RIGHT - visual */}
         <div className="fe-right">
           {FEATURES.map((f, i) => (
             <div

@@ -344,7 +344,7 @@ export default function Navbar() {
                 src="/brand/gurunada_final_charcoal-03.png"
                 srcSet="/brand/gurunada_final_charcoal-03.png 1x, /brand/gurunada_final_charcoal-03.png 2x"
                 alt="gurunada"
-                className="h-14 md:h-16 lg:h-[100px] w-auto select-none -ml-1"
+                className="h-14 md:h-16 lg:h-[72px] w-auto select-none -ml-1"
                 draggable={false}
               />
             </Link>
@@ -713,7 +713,7 @@ export default function Navbar() {
       {/* Spacer */}
       <div
         aria-hidden="true"
-        className="pointer-events-none select-none h-14 md:h-16 lg:h-[100px]"
+        className="pointer-events-none select-none h-14 md:h-16 lg:h-[72px]"
       />
     </>
   );

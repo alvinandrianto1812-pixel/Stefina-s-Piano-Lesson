@@ -2,7 +2,7 @@
 import { useRef, useCallback } from 'react';
 
 /**
- * use3DTilt — real-time 3D mouse-track tilt.
+ * use3DTilt - real-time 3D mouse-track tilt.
  * Spread the returned props onto the target element.
  */
 export default function use3DTilt({ max = 10, scale = 1.03, speed = 500, perspective = 1000 } = {}) {
