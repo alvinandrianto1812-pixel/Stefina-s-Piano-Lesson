@@ -1,45 +1,63 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 
 export default function AuthCallback() {
   const nav = useNavigate();
+  const handled = useRef(false);
 
   useEffect(() => {
-    (async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    const handleSession = async (session) => {
+      if (handled.current) return;
+      handled.current = true;
 
       if (!session) {
-        // Tidak ada session — kemungkinan email verification
         nav("/auth?confirmed=1", { replace: true });
         return;
       }
 
       const user = session.user;
-      const isOAuth = user.app_metadata?.provider !== "email";
+      const hash = window.location.hash;
+      const isEmailVerification =
+        hash.includes("type=signup") || hash.includes("type=email");
+      const isOAuth =
+        !isEmailVerification &&
+        (user.app_metadata?.providers ?? []).includes("google");
 
-      // Upsert user row
-      await supabase.from("users").upsert(
-        {
+      const { data: existing } = await supabase
+        .from("users")
+        .select("id")
+        .eq("id", user.id)
+        .single();
+
+      if (!existing) {
+        await supabase.from("users").insert({
           id: user.id,
           email: user.email,
           name:
             user.user_metadata?.full_name ?? user.user_metadata?.name ?? null,
-        },
-        { onConflict: "id" },
-      );
+        });
+      }
 
       if (isOAuth) {
-        // Google OAuth — langsung ke landing page
         nav("/", { replace: true });
       } else {
-        // Email verification — logout dulu, minta login manual
         await supabase.auth.signOut();
         nav("/auth?confirmed=1", { replace: true });
       }
-    })();
+    };
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN") handleSession(session);
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) handleSession(session);
+    });
+
+    return () => subscription.unsubscribe();
   }, [nav]);
 
   return <p>Memverifikasi akun…</p>;
