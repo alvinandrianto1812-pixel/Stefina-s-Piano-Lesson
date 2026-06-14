@@ -1,9 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import AuthCallback from "./pages/AuthCallback";
 import NotFound from "./pages/NotFound";
-
 import Navbar from "./components/Navbar";
-
 import LandingPage from "./pages/user/LandingPage";
 import Auth from "./pages/Auth";
 import Questionnaire from "./pages/user/Questionnaire";
@@ -16,11 +14,18 @@ import ContactUs from "./pages/user/ContactUs";
 import OurPolicy from "./pages/user/OurPolicy";
 import OurServices from "./pages/user/OurServices";
 import Media from "./pages/user/Media";
+import Programs from "./pages/user/Programs";
+import PendingApproval from "./pages/user/PendingApproval";
+import EventRSVP from "./pages/user/EventRSVP";
+import StudentPortal from "./pages/student/StudentPortal";
+import TeacherPortal from "./pages/teacher/TeacherPortal";
+import OwnerReport from "./pages/owner/OwnerReport";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import OwnerRoute from "./components/OwnerRoute";
-import OwnerReport from "./pages/owner/OwnerReport";
+import StudentRoute from "./components/StudentRoute";
+import TeacherRoute from "./components/TeacherRoute";
 
 export default function App() {
   return (
@@ -28,24 +33,25 @@ export default function App() {
       <Navbar />
       <main>
         <Routes>
+          {/* ── Public routes ── */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/auth" element={<Auth />} />
-
-          {/* Redirect rute lama supaya tidak 404 */}
           <Route path="/login" element={<Navigate to="/auth" replace />} />
           <Route path="/register" element={<Navigate to="/auth" replace />} />
-
           <Route path="/events" element={<Events />} />
+          <Route path="/events/:id/register" element={<EventRSVP />} />
           <Route path="/media" element={<Media />} />
           <Route path="/our-teachers" element={<OurTeachers />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/contact-us" element={<ContactUs />} />
-
-          {/* Studio Policy — wajib dibaca sebelum registrasi */}
           <Route path="/our-policy" element={<OurPolicy />} />
           <Route path="/our-services" element={<OurServices />} />
+          <Route path="/programs" element={<Programs />} />
 
-          {/* Questionnaire: user harus lewat OurPolicy dulu (logic ada di OurPolicy.jsx) */}
+          {/* ── Pending approval ── */}
+          <Route path="/pending-approval" element={<PendingApproval />} />
+
+          {/* ── Protected: semua user login ── */}
           <Route
             path="/questionnaire"
             element={
@@ -55,6 +61,27 @@ export default function App() {
             }
           />
 
+          {/* ── Student portal ── */}
+          <Route
+            path="/student"
+            element={
+              <StudentRoute>
+                <StudentPortal />
+              </StudentRoute>
+            }
+          />
+
+          {/* ── Teacher portal ── */}
+          <Route
+            path="/teacher"
+            element={
+              <TeacherRoute>
+                <TeacherPortal />
+              </TeacherRoute>
+            }
+          />
+
+          {/* ── Admin ── */}
           <Route
             path="/admin"
             element={
@@ -64,7 +91,7 @@ export default function App() {
             }
           />
 
-          {/* ---- Rute khusus Owner (super-admin) ---- */}
+          {/* ── Owner ── */}
           <Route
             path="/owner"
             element={
@@ -74,11 +101,9 @@ export default function App() {
             }
           />
 
-          {/* Rute logout */}
+          {/* ── Utility ── */}
           <Route path="/logout" element={<Logout />} />
-          {/* Auth callback */}
           <Route path="/auth/callback" element={<AuthCallback />} />
-
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
