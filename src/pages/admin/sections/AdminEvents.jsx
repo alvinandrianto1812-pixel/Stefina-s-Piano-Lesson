@@ -15,6 +15,10 @@ const EMPTY_EV = {
   tags: "",
   highlight: false,
   is_published: true,
+  // ✅ BARU
+  is_paid: false,
+  price: "",
+  max_capacity: "",
 };
 
 export default function AdminEvents({ onCountUpdate }) {
@@ -61,31 +65,53 @@ export default function AdminEvents({ onCountUpdate }) {
       tags: (ev.tags || []).join(", "),
       highlight: ev.highlight || false,
       is_published: ev.is_published !== false,
+      is_paid: ev.is_paid || false,
+      price: ev.price ? Number(ev.price) : null,
+      max_capacity: ev.max_capacity ? Number(ev.max_capacity) : null,
     });
     setEvModal(true);
   };
 
   const saveEvent = async (e) => {
     e.preventDefault();
+
+    // ✅ Tambah log untuk debug
+    console.log("evForm saat save:", evForm);
+
     const payload = {
       title: evForm.title.trim(),
-      subtitle: evForm.subtitle.trim() || null,
+      subtitle: evForm.subtitle?.trim() || null,
       event_date: evForm.event_date || null,
-      time_start: evForm.time_start.trim() || null,
-      time_end: evForm.time_end.trim() || null,
-      location: evForm.location.trim() || null,
-      location_detail: evForm.location_detail.trim() || null,
-      city: evForm.city.trim() || null,
-      description: evForm.description.trim() || null,
-      tags: evForm.tags
-        ? evForm.tags
-            .split(",")
-            .map((t) => t.trim())
-            .filter(Boolean)
-        : [],
+      time_start: evForm.time_start?.trim() || null,
+      time_end: evForm.time_end?.trim() || null,
+      location: evForm.location?.trim() || null,
+      location_detail: evForm.location_detail?.trim() || null,
+      city: evForm.city?.trim() || null,
+      description: evForm.description?.trim() || null,
+      // ✅ Guard tags
+      tags:
+        typeof evForm.tags === "string" && evForm.tags.trim()
+          ? evForm.tags
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
+          : [],
       highlight: evForm.highlight,
       is_published: evForm.is_published,
+      is_paid: evForm.is_paid,
+      // ✅ Guard price & max_capacity
+      price:
+        evForm.is_paid && evForm.price !== "" && evForm.price !== null
+          ? parseFloat(evForm.price)
+          : 0,
+      max_capacity:
+        evForm.max_capacity !== "" && evForm.max_capacity !== null
+          ? parseInt(evForm.max_capacity)
+          : null,
     };
+
+    console.log("payload yang dikirim:", payload);
+
     let error;
     if (evEditing) {
       ({ error } = await supabase
@@ -95,10 +121,13 @@ export default function AdminEvents({ onCountUpdate }) {
     } else {
       ({ error } = await supabase.from("events").insert([payload]));
     }
+
     if (error) {
+      console.error("Supabase error detail:", error);
       toast.error("Gagal simpan: " + error.message);
       return;
     }
+
     setEvModal(false);
     await fetchEvents();
   };
@@ -225,6 +254,14 @@ export default function AdminEvents({ onCountUpdate }) {
                       {ev.highlight && (
                         <span className="ml-1 px-2 py-0.5 rounded-full text-[10px] bg-yellow-100 text-yellow-700">
                           ★ Featured
+                        </span>
+                      )}
+                      {ev.is_paid && (
+                        <span className="ml-1 px-2 py-0.5 rounded-full text-[10px] bg-blue-100 text-blue-700">
+                          💳 Paid{" "}
+                          {ev.price
+                            ? `· Rp ${Number(ev.price).toLocaleString("id-ID")}`
+                            : ""}
                         </span>
                       )}
                     </td>
@@ -414,6 +451,64 @@ export default function AdminEvents({ onCountUpdate }) {
                   className="w-full px-3 py-2 border-2 border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#272925] transition"
                 />
               </div>
+              {/* Paid event toggle + price + capacity */}
+              <div className="md:col-span-2 p-4 rounded-xl border-2 border-slate-100 bg-slate-50 space-y-3">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={evForm.is_paid}
+                    onChange={(e) =>
+                      setEvForm((s) => ({
+                        ...s,
+                        is_paid: e.target.checked,
+                        price: e.target.checked ? s.price : "",
+                      }))
+                    }
+                    className="rounded"
+                  />
+                  Event Berbayar
+                </label>
+
+                {evForm.is_paid && (
+                  <div className="flex gap-3 pt-1">
+                    <div className="flex-1">
+                      <label className="block text-xs font-medium text-slate-600 mb-1">
+                        Harga (Rp)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={evForm.price}
+                        onChange={(e) =>
+                          setEvForm((s) => ({ ...s, price: e.target.value }))
+                        }
+                        placeholder="150000"
+                        className="w-full px-3 py-2 border-2 border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#272925] transition"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-xs font-medium text-slate-600 mb-1">
+                        Kapasitas Maks
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={evForm.max_capacity}
+                        onChange={(e) =>
+                          setEvForm((s) => ({
+                            ...s,
+                            max_capacity: e.target.value,
+                          }))
+                        }
+                        placeholder="50"
+                        className="w-full px-3 py-2 border-2 border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#272925] transition"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Checkboxes Published & Featured — tidak berubah */}
               <div className="flex items-center gap-6">
                 <label className="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer select-none">
                   <input

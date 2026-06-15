@@ -1,8 +1,9 @@
+// src/components/TeacherRoute.jsx
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthProvider";
 
-export default function AdminRoute({ children }) {
-    const { user, role, loading, roleLoading } = useAuth();
+export default function TeacherRoute({ children }) {
+  const { user, role, loading, roleLoading } = useAuth();
 
   if (loading || roleLoading)
     return (
@@ -20,8 +21,11 @@ export default function AdminRoute({ children }) {
       </div>
     );
 
-    if (!user) return <Navigate to="/auth" replace />;
+  if (!user) return <Navigate to="/auth" replace />;
 
-  if (role !== "admin" && role !== "owner") return <Navigate to="/" replace />;
+  if (role !== "teacher" && role !== "admin" && role !== "owner") {
+    return <Navigate to="/" replace />;
+  }
+
   return children;
 }

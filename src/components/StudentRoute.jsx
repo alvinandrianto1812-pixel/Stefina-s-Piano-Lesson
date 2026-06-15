@@ -1,7 +1,8 @@
+// src/components/StudentRoute.jsx
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthProvider";
 
-export default function OwnerRoute({ children }) {
+export default function StudentRoute({ children }) {
   const { user, role, loading, roleLoading } = useAuth();
 
   if (loading || roleLoading)
@@ -22,6 +23,14 @@ export default function OwnerRoute({ children }) {
 
   if (!user) return <Navigate to="/auth" replace />;
 
-  if (role !== "owner") return <Navigate to="/" replace />;
+  // 'user' role = belum approved, redirect ke halaman waiting
+  if (role === "user") {
+    return <Navigate to="/pending-approval" replace />;
+  }
+
+  if (role !== "student" && role !== "admin" && role !== "owner") {
+    return <Navigate to="/" replace />;
+  }
+
   return children;
 }

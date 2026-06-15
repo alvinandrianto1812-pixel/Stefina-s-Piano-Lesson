@@ -5,16 +5,13 @@ import NavAnimation from "./NavAnimation";
 import { gsap } from "gsap";
 import { useAuth } from "../contexts/AuthProvider";
 
+// BARU
 const DROPDOWN_GROUPS = [
   {
     label: "About",
     items: [
       { to: "/about-us", label: "About Us", desc: "Our story & vision" },
-      {
-        to: "/our-teachers",
-        label: "Our Teachers",
-        desc: "Meet the educators",
-      },
+      { to: "/events", label: "Events", desc: "Concerts & workshops" },
       {
         to: "/our-services",
         label: "Our Services",
@@ -26,7 +23,16 @@ const DROPDOWN_GROUPS = [
   {
     label: "Programs",
     items: [
-      { to: "/events", label: "Events", desc: "Concerts & workshops" },
+      {
+        to: "/our-teachers",
+        label: "Our Teachers",
+        desc: "Meet the educators",
+      },
+      {
+        to: "/programs",
+        label: "Music Course",
+        desc: "Packages, instruments & pricing",
+      },
       { to: "/media", label: "Media", desc: "Photos & videos gallery" },
     ],
   },
@@ -187,6 +193,8 @@ export default function Navbar() {
   const { user, role } = useAuth();
   const isAdmin = role === "admin" || role === "owner";
   const isOwner = role === "owner";
+  const isTeacher = role === "teacher";
+  const isStudent = role === "student";
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(null);
@@ -436,6 +444,32 @@ export default function Navbar() {
               </Link>
             )}
 
+            {isTeacher && (
+              <Link
+                to="/teacher"
+                className={`group relative px-3 py-2 text-[13px] lg:text-[15px] transition-colors ${isActive("/teacher") ? "text-olive" : "text-slate-700 hover:text-olive"}`}
+              >
+                My Portal
+                <span
+                  className={`pointer-events-none absolute left-3 right-3 -bottom-0.5 h-0.5 origin-left rounded-full transition-transform ${isActive("/teacher") ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
+                  style={{ background: "#272925" }}
+                />
+              </Link>
+            )}
+
+            {isStudent && (
+              <Link
+                to="/student"
+                className={`group relative px-3 py-2 text-[13px] lg:text-[15px] transition-colors ${isActive("/student") ? "text-olive" : "text-slate-700 hover:text-olive"}`}
+              >
+                My Portal
+                <span
+                  className={`pointer-events-none absolute left-3 right-3 -bottom-0.5 h-0.5 origin-left rounded-full transition-transform ${isActive("/student") ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
+                  style={{ background: "#272925" }}
+                />
+              </Link>
+            )}
+
             {user ? (
               <button
                 onClick={handleLogout}
@@ -662,8 +696,32 @@ export default function Navbar() {
             </Link>
           )}
 
+          {isTeacher && (
+            <Link
+              ref={setMobileItemRef(DROPDOWN_GROUPS.length + 5)}
+              to="/teacher"
+              onClick={() => closeMenu()}
+              className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition ${isActive("/teacher") ? "bg-[#ECEAE2]" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
+              style={isActive("/teacher") ? { color: "#272925" } : {}}
+            >
+              My Portal
+            </Link>
+          )}
+
+          {isStudent && (
+            <Link
+              ref={setMobileItemRef(DROPDOWN_GROUPS.length + 6)}
+              to="/student"
+              onClick={() => closeMenu()}
+              className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition ${isActive("/student") ? "bg-[#ECEAE2]" : "text-slate-700 hover:bg-[#F8F6ED]"}`}
+              style={isActive("/student") ? { color: "#272925" } : {}}
+            >
+              My Portal
+            </Link>
+          )}
+
           <div
-            ref={setMobileItemRef(DROPDOWN_GROUPS.length + 5)}
+            ref={setMobileItemRef(DROPDOWN_GROUPS.length + 7)}
             className="pt-2"
           >
             {user ? (

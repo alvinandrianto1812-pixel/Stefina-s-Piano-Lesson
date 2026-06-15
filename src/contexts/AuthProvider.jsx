@@ -71,6 +71,13 @@ export function AuthProvider({ children }) {
     role,
     roleLoading,
     signOut: () => supabase.auth.signOut(),
+
+    // ✅ TAMBAHAN: helper cek role (biar tidak perlu import useAuth + manual compare)
+    isOwner: role === "owner",
+    isAdmin: role === "admin" || role === "owner",
+    isTeacher: role === "teacher",
+    isStudent: role === "student",
+    isPending: role === "user",
   };
   if (loading) {
     return (
@@ -101,4 +108,10 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   return useContext(AuthContext);
+}
+
+// Tambahkan setelah fungsi useAuth() yang sudah ada
+export function useRole() {
+  const { role, roleLoading, isOwner, isAdmin, isTeacher, isStudent, isPending } = useAuth();
+  return { role, roleLoading, isOwner, isAdmin, isTeacher, isStudent, isPending };
 }

@@ -6,6 +6,7 @@ import AdminEvents from "./sections/AdminEvents";
 import AdminMedia from "./sections/AdminMedia";
 import AdminPayments from "./sections/AdminPayments";
 import AdminTeachers from "./sections/AdminTeachers";
+import AdminEventRegistrations from "./sections/AdminEventRegistrations";
 import toast from "react-hot-toast";
 
 export default function Admin() {
@@ -19,6 +20,7 @@ export default function Admin() {
     verified: 0,
   });
   const [eventCount, setEventCount] = useState(0);
+  const [registrationCount, setRegistrationCount] = useState(0);
 
   // Measure actual navbar height so sub-header sticks flush below it
   useEffect(() => {
@@ -236,6 +238,14 @@ export default function Admin() {
               bg: "rgba(59,130,246,0.06)",
               border: "rgba(59,130,246,0.15)",
             },
+            {
+              label: "Registrations",
+              value: registrationCount,
+              icon: "📋",
+              accent: "#7c3aed",
+              bg: "rgba(124,58,237,0.07)",
+              border: "rgba(124,58,237,0.15)",
+            },
           ].map((s) => (
             <div
               key={s.label}
@@ -317,6 +327,7 @@ export default function Admin() {
               { key: "media", label: "Media", icon: "🖼️" },
               { key: "teachers", label: "Teachers", icon: "👩‍🏫" },
               { key: "finance", label: "Finance", icon: "💰" },
+              { key: "registrations", label: "Registrations", icon: "📋" },
             ].map((tab) => (
               <button
                 key={tab.key}
@@ -364,6 +375,9 @@ export default function Admin() {
         {activeTab === "teachers" && <AdminTeachers />}
 
         {activeTab === "finance" && <AdminFinance />}
+        {activeTab === "registrations" && (
+          <AdminEventRegistrations onCountUpdate={setRegistrationCount} />
+        )}
       </div>
     </div>
   );
