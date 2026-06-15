@@ -78,17 +78,128 @@ export default function AdminEventRegistrations({ onCountUpdate }) {
       toast.error("Gagal update status: " + error.message);
       return;
     }
-    toast.success(
-      newStatus === "verified"
-        ? "✅ Berhasil diverifikasi!"
-        : "❌ Pendaftaran ditolak.",
+
+    // ✅ Kirim email notifikasi
+    const reg = registrations.find((r) => r.id === id);
+    if (reg?.email) {
+      await sendEmail(reg, newStatus);
+      toast.success(
+        newStatus === "verified"
+          ? "✅ Diverifikasi! Email konfirmasi terkirim."
+          : "❌ Ditolak. Email notifikasi terkirim.",
+      );
+    } else {
+      toast.success(
+        newStatus === "verified"
+          ? "✅ Berhasil diverifikasi! (Pendaftar tidak punya email)"
+          : "❌ Pendaftaran ditolak.",
+      );
+    }
+    // Tambah setelah: const reg = registrations.find((r) => r.id === id);
+    console.log("reg data:", reg);
+    console.log("email:", reg?.email);
+    console.log(
+      "API key:",
+      import.meta.env.VITE_RESEND_API_KEY ? "ADA" : "TIDAK ADA",
     );
+
     fetchRegistrations();
   };
 
   const pendingCount = registrations.filter(
     (r) => r.status === "pending",
   ).length;
+
+  const sendEmail = async (reg, newStatus) => {
+    if (!reg.email) return;
+
+    const eventTitle = reg.event?.title || "Event Gurunada";
+    const eventDate = reg.event?.event_date
+      ? new Date(reg.event.event_date + "T00:00:00").toLocaleDateString(
+          "id-ID",
+          {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          },
+        )
+      : null;
+
+    const isVerified = newStatus === "verified";
+
+    const subject = isVerified
+      ? `Pendaftaran Event ${eventTitle} Dikonfirmasi! 🎉`
+      : `Update Pendaftaran Event ${eventTitle}`;
+
+    const html = isVerified
+      ? `
+      <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #F8F6ED; padding: 2rem; border-radius: 16px;">
+        <div style="background: #272925; border-radius: 12px; padding: 1.5rem; text-align: center; margin-bottom: 1.5rem;">
+          <h1 style="color: #F8F6ED; margin: 0; font-size: 1.4rem;">🎉 Pendaftaran Dikonfirmasi!</h1>
+        </div>
+        <p style="color: #272925; font-size: 1rem;">Halo <strong>${reg.full_name}</strong>,</p>
+        <p style="color: #475569;">Pendaftaran kamu untuk event berikut sudah <strong style="color: #15803d;">diverifikasi</strong>:</p>
+        <div style="background: #fff; border-radius: 12px; padding: 1.25rem; margin: 1rem 0; border: 1px solid #E2E8F0;">
+          <p style="margin: 0 0 0.5rem; font-size: 1.1rem; font-weight: 700; color: #272925;">${eventTitle}</p>
+          ${eventDate ? `<p style="margin: 0; color: #64748B; font-size: 0.9rem;">📅 ${eventDate}</p>` : ""}
+          ${reg.event?.location ? `<p style="margin: 0.25rem 0 0; color: #64748B; font-size: 0.9rem;">📍 ${reg.event.location}</p>` : ""}
+        </div>
+        <p style="color: #475569;">Sampai jumpa di event! Jika ada pertanyaan, hubungi kami via WhatsApp.</p>
+        <div style="text-align: center; margin-top: 1.5rem;">
+          <a href="https://gurunada.vercel.app/events" style="background: #272925; color: #F8F6ED; padding: 0.75rem 2rem; border-radius: 999px; text-decoration: none; font-weight: 700; font-size: 0.9rem;">
+            Lihat Events Lainnya →
+          </a>
+        </div>
+        <p style="color: #94A3B8; font-size: 0.75rem; text-align: center; margin-top: 2rem;">© 2026 Gurunada · Est. 2025</p>
+      </div>
+    `
+      : `
+      <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #F8F6ED; padding: 2rem; border-radius: 16px;">
+        <div style="background: #272925; border-radius: 12px; padding: 1.5rem; text-align: center; margin-bottom: 1.5rem;">
+          <h1 style="color: #F8F6ED; margin: 0; font-size: 1.4rem;">Update Pendaftaran Event</h1>
+        </div>
+        <p style="color: #272925; font-size: 1rem;">Halo <strong>${reg.full_name}</strong>,</p>
+        <p style="color: #475569;">Mohon maaf, pendaftaran kamu untuk event <strong>${eventTitle}</strong> tidak dapat kami konfirmasi saat ini.</p>
+        <p style="color: #475569;">Silakan hubungi kami via WhatsApp untuk informasi lebih lanjut atau pendaftaran ulang.</p>
+        <div style="text-align: center; margin-top: 1.5rem;">
+          <a href="https://wa.me/6281234567890" style="background: #272925; color: #F8F6ED; padding: 0.75rem 2rem; border-radius: 999px; text-decoration: none; font-weight: 700; font-size: 0.9rem;">
+            Hubungi via WhatsApp →
+          </a>
+        </div>
+        <p style="color: #94A3B8; font-size: 0.75rem; text-align: center; margin-top: 2rem;">© 2026 Gurunada · Est. 2025</p>
+      </div>
+    `;
+
+    try {
+      // ✅ Panggil Edge Function, bukan Resend langsung
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const res = await fetch(
+        `https://grgkfcgvzawoyyztagbz.supabase.co/functions/v1/send-email`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({ to: reg.email, subject, html }),
+        },
+      );
+
+      const result = await res.json();
+      if (!res.ok) {
+        console.warn("Edge Function error:", result);
+      } else {
+        console.log("Email terkirim:", result);
+      }
+    } catch (err) {
+      console.warn("Email gagal terkirim:", err);
+    }
+  };
 
   return (
     <section className="space-y-6">
