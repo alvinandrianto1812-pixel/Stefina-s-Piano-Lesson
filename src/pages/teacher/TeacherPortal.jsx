@@ -6,9 +6,9 @@ import Footer from "../../components/Footer";
 
 import TeacherDashboard from "./sections/TeacherDashboard";
 import TeacherAttendance from "./sections/TeacherAttendance";
-// import TeacherMaterials from "./sections/TeacherMaterials";
-// import TeacherNotes from "./sections/TeacherNotes";
-// import TeacherLessonNotes from "./sections/TeacherLessonNotes";
+import TeacherMaterials from "./sections/TeacherMaterials";
+import TeacherNotes from "./sections/TeacherNotes";
+import TeacherLessonNotes from "./sections/TeacherLessonNotes";
 
 const TABS = [
   { key: "dashboard", label: "Dashboard", icon: "🏠" },

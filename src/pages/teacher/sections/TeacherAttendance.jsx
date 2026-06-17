@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "../supabaseClient";
+import { supabase } from "../../../lib/supabaseClient";
 
 // ─── Konstanta ────────────────────────────────────────────────
 const PALETTE = {
@@ -27,7 +27,6 @@ const STATUS_CONFIG = {
 
 // ─── Helper ────────────────────────────────────────────────────
 function toLocalDateString(date = new Date()) {
-  // Hindari timezone shift — gunakan local date bukan UTC
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
@@ -35,81 +34,30 @@ function toLocalDateString(date = new Date()) {
 }
 
 function isLockWindowPassed(lessonDateStr) {
-  // Lock: lesson_date + 1 hari jam 23:59:59 (local time)
   const [y, m, d] = lessonDateStr.split("-").map(Number);
   const lockTime = new Date(y, m - 1, d + 1, 23, 59, 59, 999);
   return new Date() > lockTime;
 }
 
 // ─── Component ─────────────────────────────────────────────────
-export default function TeacherAttendance() {
-  const [teacherId, setTeacherId] = useState(null);
-  const [students, setStudents] = useState([]);
+// Terima teacher & students dari TeacherPortal.jsx — TIDAK fetch ulang sendiri
+export default function TeacherAttendance({ teacher, students }) {
   const [attendance, setAttendance] = useState({}); // { student_id: row }
   const [selectedDate, setSelectedDate] = useState(toLocalDateString());
   const [saving, setSaving] = useState({}); // { student_id: bool }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ── Fetch teacher_id dari auth user ───────────────────────────
-  useEffect(() => {
-    async function fetchTeacher() {
-      const {
-        data: { user },
-        error: authErr,
-      } = await supabase.auth.getUser();
-      if (authErr || !user) {
-        setError("Auth gagal.");
-        setLoading(false);
-        return;
-      }
-
-      const { data, error: tErr } = await supabase
-        .from("teachers")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
-
-      if (tErr || !data) {
-        setError("Profil teacher tidak ditemukan.");
-        setLoading(false);
-        return;
-      }
-      setTeacherId(data.id);
-    }
-    fetchTeacher();
-  }, []);
-
-  // ── Fetch students milik teacher ──────────────────────────────
-  useEffect(() => {
-    if (!teacherId) return;
-    async function fetchStudents() {
-      const { data, error: sErr } = await supabase
-        .from("students")
-        .select("id, full_name, instrument, level")
-        .eq("teacher_id", teacherId)
-        .eq("is_active", true)
-        .order("full_name");
-
-      if (sErr) {
-        setError("Gagal load data murid.");
-        return;
-      }
-      setStudents(data || []);
-    }
-    fetchStudents();
-  }, [teacherId]);
-
   // ── Fetch attendance untuk tanggal yang dipilih ───────────────
   const fetchAttendance = useCallback(async () => {
-    if (!teacherId || !selectedDate) return;
+    if (!teacher?.id || !selectedDate) return;
     setLoading(true);
     setError(null);
 
     const { data, error: aErr } = await supabase
       .from("student_attendance")
       .select("*")
-      .eq("teacher_id", teacherId)
+      .eq("teacher_id", teacher.id)
       .eq("lesson_date", selectedDate);
 
     if (aErr) {
@@ -125,7 +73,7 @@ export default function TeacherAttendance() {
     });
     setAttendance(indexed);
     setLoading(false);
-  }, [teacherId, selectedDate]);
+  }, [teacher?.id, selectedDate]);
 
   useEffect(() => {
     fetchAttendance();
@@ -133,7 +81,7 @@ export default function TeacherAttendance() {
 
   // ── Upsert attendance (INSERT atau UPDATE) ────────────────────
   async function handleStatusChange(studentId, newStatus) {
-    if (!teacherId) return;
+    if (!teacher?.id) return;
 
     // Guard: cek lock window di client (UX only — DB juga guard)
     if (isLockWindowPassed(selectedDate)) return;
@@ -142,7 +90,7 @@ export default function TeacherAttendance() {
 
     const payload = {
       student_id: studentId,
-      teacher_id: teacherId,
+      teacher_id: teacher.id,
       lesson_date: selectedDate,
       status: newStatus,
       checked_in_by: "teacher",
@@ -155,17 +103,14 @@ export default function TeacherAttendance() {
       .from("student_attendance")
       .upsert(payload, {
         onConflict: "student_id,lesson_date",
-        // ignoreDuplicates: false — pastikan UPDATE tetap jalan
       });
 
     if (upsertErr) {
-      // RLS rejection akan return error code 42501 atau "violates row-level security"
       const msg = upsertErr.message.includes("row-level security")
         ? "Absensi sudah terkunci atau bukan murid Anda."
         : `Gagal simpan: ${upsertErr.message}`;
       setError(msg);
     } else {
-      // Update local state tanpa re-fetch — optimistic UI
       setAttendance((prev) => ({
         ...prev,
         [studentId]: { ...prev[studentId], ...payload },
@@ -177,13 +122,11 @@ export default function TeacherAttendance() {
 
   // ─── Derived state ─────────────────────────────────────────────
   const lockPassed = isLockWindowPassed(selectedDate);
-  const isToday = selectedDate === toLocalDateString();
   const tomorrow = (() => {
     const [y, m, d] = selectedDate.split("-").map(Number);
     return toLocalDateString(new Date(y, m - 1, d + 1));
   })();
 
-  // Summary stats
   const summary = STATUS_OPTIONS.reduce((acc, s) => {
     acc[s] = Object.values(attendance).filter((r) => r.status === s).length;
     return acc;
@@ -220,7 +163,7 @@ export default function TeacherAttendance() {
         <input
           type="date"
           value={selectedDate}
-          max={toLocalDateString()} // Tidak bisa input absensi masa depan
+          max={toLocalDateString()}
           onChange={(e) => setSelectedDate(e.target.value)}
           style={{
             padding: "8px 12px",
