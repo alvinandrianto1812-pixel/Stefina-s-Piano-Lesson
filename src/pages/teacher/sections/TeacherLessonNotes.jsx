@@ -171,7 +171,7 @@ export default function TeacherLessonNotes({ teacher, students }) {
   const [showForm, setShowForm] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [deleteId, setDeleteId] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
 
   const emptyForm = {

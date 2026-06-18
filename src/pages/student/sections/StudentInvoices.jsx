@@ -4,15 +4,45 @@ import { supabase } from "../../../lib/supabaseClient";
 import toast from "react-hot-toast";
 
 const STATUS_CONFIG = {
-  unpaid: { label: "Belum Bayar", color: "#DC2626", bg: "rgba(220,38,38,0.08)", icon: "⏳" },
-  pending_verification: { label: "Menunggu Verifikasi", color: "#92400e", bg: "rgba(234,179,8,0.08)", icon: "🔍" },
-  paid: { label: "Lunas", color: "#15803d", bg: "rgba(22,163,74,0.08)", icon: "✅" },
-  overdue: { label: "Terlambat", color: "#7c3aed", bg: "rgba(124,58,237,0.08)", icon: "⚠️" },
+  unpaid: {
+    label: "Belum Bayar",
+    color: "#DC2626",
+    bg: "rgba(220,38,38,0.08)",
+    icon: "⏳",
+  },
+  pending_verification: {
+    label: "Menunggu Verifikasi",
+    color: "#92400e",
+    bg: "rgba(234,179,8,0.08)",
+    icon: "🔍",
+  },
+  paid: {
+    label: "Lunas",
+    color: "#15803d",
+    bg: "rgba(22,163,74,0.08)",
+    icon: "✅",
+  },
+  overdue: {
+    label: "Terlambat",
+    color: "#7c3aed",
+    bg: "rgba(124,58,237,0.08)",
+    icon: "⚠️",
+  },
 };
 
 const MONTH_NAMES = [
-  "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-  "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+  "Januari",
+  "Februari",
+  "Maret",
+  "April",
+  "Mei",
+  "Juni",
+  "Juli",
+  "Agustus",
+  "September",
+  "Oktober",
+  "November",
+  "Desember",
 ];
 
 export default function StudentInvoices({ student }) {
@@ -25,7 +55,7 @@ export default function StudentInvoices({ student }) {
 
   useEffect(() => {
     fetchInvoices();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchInvoices = async () => {
@@ -60,6 +90,22 @@ export default function StudentInvoices({ student }) {
 
     try {
       // Upload file ke storage
+      const ALLOWED_TYPES = [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "application/pdf",
+      ];
+      const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        setError("Format tidak didukung. Gunakan JPG, PNG, WEBP, atau PDF.");
+        return;
+      }
+      if (file.size > MAX_SIZE) {
+        setError("Ukuran file maksimal 5MB.");
+        return;
+      }
       const ext = file.name.split(".").pop();
       const fileName = `invoice_${activeUploadId}_${Date.now()}.${ext}`;
       const { error: upErr } = await supabase.storage
@@ -102,12 +148,11 @@ export default function StudentInvoices({ student }) {
     .reduce((sum, i) => sum + Number(i.amount), 0);
 
   const unpaidCount = invoices.filter(
-    (i) => i.status === "unpaid" || i.status === "overdue"
+    (i) => i.status === "unpaid" || i.status === "overdue",
   ).length;
 
   return (
     <div className="space-y-6">
-
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -119,39 +164,88 @@ export default function StudentInvoices({ student }) {
 
       {/* Summary banner */}
       {unpaidCount > 0 ? (
-        <div style={{
-          background: "linear-gradient(135deg, #7f1d1d, #DC2626)",
-          borderRadius: 20, padding: "1.5rem 2rem",
-          boxShadow: "0 8px 32px rgba(220,38,38,0.2)",
-          display: "flex", alignItems: "center",
-          justifyContent: "space-between", flexWrap: "wrap", gap: "1rem",
-        }}>
+        <div
+          style={{
+            background: "linear-gradient(135deg, #7f1d1d, #DC2626)",
+            borderRadius: 20,
+            padding: "1.5rem 2rem",
+            boxShadow: "0 8px 32px rgba(220,38,38,0.2)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "1rem",
+          }}
+        >
           <div>
-            <p style={{ margin: "0 0 0.25rem", fontSize: "0.65rem", fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(248,246,237,0.6)" }}>
+            <p
+              style={{
+                margin: "0 0 0.25rem",
+                fontSize: "0.65rem",
+                fontWeight: 800,
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                color: "rgba(248,246,237,0.6)",
+              }}
+            >
               Tagihan Belum Lunas
             </p>
-            <p style={{ margin: 0, fontSize: "1.6rem", fontWeight: 800, color: "#F8F6ED", lineHeight: 1.2 }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: "1.6rem",
+                fontWeight: 800,
+                color: "#F8F6ED",
+                lineHeight: 1.2,
+              }}
+            >
               Rp {totalUnpaid.toLocaleString("id-ID")}
             </p>
-            <p style={{ margin: "0.25rem 0 0", fontSize: "0.8rem", color: "rgba(248,246,237,0.6)" }}>
+            <p
+              style={{
+                margin: "0.25rem 0 0",
+                fontSize: "0.8rem",
+                color: "rgba(248,246,237,0.6)",
+              }}
+            >
               {unpaidCount} tagihan menunggu pembayaran
             </p>
           </div>
           <div style={{ fontSize: "3rem" }}>💳</div>
         </div>
       ) : (
-        <div style={{
-          background: "linear-gradient(135deg, #14532d, #15803d)",
-          borderRadius: 20, padding: "1.5rem 2rem",
-          boxShadow: "0 8px 32px rgba(22,163,74,0.2)",
-          display: "flex", alignItems: "center",
-          justifyContent: "space-between",
-        }}>
+        <div
+          style={{
+            background: "linear-gradient(135deg, #14532d, #15803d)",
+            borderRadius: 20,
+            padding: "1.5rem 2rem",
+            boxShadow: "0 8px 32px rgba(22,163,74,0.2)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <div>
-            <p style={{ margin: "0 0 0.25rem", fontSize: "0.65rem", fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(248,246,237,0.6)" }}>
+            <p
+              style={{
+                margin: "0 0 0.25rem",
+                fontSize: "0.65rem",
+                fontWeight: 800,
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                color: "rgba(248,246,237,0.6)",
+              }}
+            >
               Status Pembayaran
             </p>
-            <p style={{ margin: 0, fontSize: "1.2rem", fontWeight: 800, color: "#F8F6ED" }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: "1.2rem",
+                fontWeight: 800,
+                color: "#F8F6ED",
+              }}
+            >
               Semua tagihan lunas! 🎉
             </p>
           </div>
@@ -165,55 +259,114 @@ export default function StudentInvoices({ student }) {
           Memuat tagihan…
         </div>
       ) : invoices.length === 0 ? (
-        <div style={{ padding: "3rem", textAlign: "center", background: "#fff", borderRadius: 16, border: "1px solid rgba(39,41,37,0.07)" }}>
+        <div
+          style={{
+            padding: "3rem",
+            textAlign: "center",
+            background: "#fff",
+            borderRadius: 16,
+            border: "1px solid rgba(39,41,37,0.07)",
+          }}
+        >
           <p style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🧾</p>
           <p style={{ color: "#94A3B8", margin: 0 }}>Belum ada tagihan.</p>
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+        <div
+          style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+        >
           {invoices.map((invoice) => {
             const cfg = STATUS_CONFIG[invoice.status] || STATUS_CONFIG.unpaid;
-            const canUpload = invoice.status === "unpaid" || invoice.status === "overdue";
+            const canUpload =
+              invoice.status === "unpaid" || invoice.status === "overdue";
             const isUploading = uploading === invoice.id;
             const dueDate = new Date(invoice.due_date + "T00:00:00");
-            const isOverdue = invoice.status === "unpaid" && dueDate < new Date();
+            const isOverdue =
+              invoice.status === "unpaid" && dueDate < new Date();
 
             return (
               <div
                 key={invoice.id}
                 style={{
-                  background: "#fff", borderRadius: 16,
+                  background: "#fff",
+                  borderRadius: 16,
                   border: `1px solid ${isOverdue ? "rgba(220,38,38,0.2)" : "rgba(39,41,37,0.07)"}`,
                   boxShadow: "0 2px 8px rgba(39,41,37,0.05)",
                   overflow: "hidden",
                 }}
               >
                 {/* Invoice header */}
-                <div style={{ padding: "1.1rem 1.25rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem" }}>
+                <div
+                  style={{
+                    padding: "1.1rem 1.25rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: "0.75rem",
+                  }}
+                >
                   <div>
-                    <p style={{ margin: 0, fontWeight: 700, fontSize: "1rem", color: "#272925" }}>
-                      {MONTH_NAMES[invoice.period_month - 1]} {invoice.period_year}
+                    <p
+                      style={{
+                        margin: 0,
+                        fontWeight: 700,
+                        fontSize: "1rem",
+                        color: "#272925",
+                      }}
+                    >
+                      {MONTH_NAMES[invoice.period_month - 1]}{" "}
+                      {invoice.period_year}
                     </p>
                     {invoice.description && (
-                      <p style={{ margin: "0.15rem 0 0", fontSize: "0.78rem", color: "#64748B" }}>
+                      <p
+                        style={{
+                          margin: "0.15rem 0 0",
+                          fontSize: "0.78rem",
+                          color: "#64748B",
+                        }}
+                      >
                         {invoice.description}
                       </p>
                     )}
-                    <p style={{ margin: "0.15rem 0 0", fontSize: "0.72rem", color: isOverdue ? "#DC2626" : "#94A3B8" }}>
-                      Jatuh tempo: {dueDate.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                    <p
+                      style={{
+                        margin: "0.15rem 0 0",
+                        fontSize: "0.72rem",
+                        color: isOverdue ? "#DC2626" : "#94A3B8",
+                      }}
+                    >
+                      Jatuh tempo:{" "}
+                      {dueDate.toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
                       {isOverdue && " · Terlambat!"}
                     </p>
                   </div>
 
                   <div style={{ textAlign: "right" }}>
-                    <p style={{ margin: "0 0 0.25rem", fontSize: "1.2rem", fontWeight: 800, color: "#272925" }}>
+                    <p
+                      style={{
+                        margin: "0 0 0.25rem",
+                        fontSize: "1.2rem",
+                        fontWeight: 800,
+                        color: "#272925",
+                      }}
+                    >
                       Rp {Number(invoice.amount).toLocaleString("id-ID")}
                     </p>
-                    <span style={{
-                      padding: "3px 10px", borderRadius: "999px",
-                      fontSize: "0.68rem", fontWeight: 700,
-                      background: cfg.bg, color: cfg.color,
-                    }}>
+                    <span
+                      style={{
+                        padding: "3px 10px",
+                        borderRadius: "999px",
+                        fontSize: "0.68rem",
+                        fontWeight: 700,
+                        background: cfg.bg,
+                        color: cfg.color,
+                      }}
+                    >
                       {cfg.icon} {cfg.label}
                     </span>
                   </div>
@@ -221,25 +374,52 @@ export default function StudentInvoices({ student }) {
 
                 {/* Action area */}
                 {(canUpload || invoice.proof_url || invoice.notes) && (
-                  <div style={{ padding: "0.85rem 1.25rem", borderTop: "1px solid #F1F5F9", background: "#FAFAFA", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem" }}>
-
+                  <div
+                    style={{
+                      padding: "0.85rem 1.25rem",
+                      borderTop: "1px solid #F1F5F9",
+                      background: "#FAFAFA",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      flexWrap: "wrap",
+                      gap: "0.75rem",
+                    }}
+                  >
                     {/* Notes dari admin */}
                     {invoice.notes && (
-                      <p style={{ margin: 0, fontSize: "0.78rem", color: "#64748B", flex: 1 }}>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "0.78rem",
+                          color: "#64748B",
+                          flex: 1,
+                        }}
+                      >
                         💬 {invoice.notes}
                       </p>
                     )}
 
-                    <div style={{ display: "flex", gap: "0.5rem", marginLeft: "auto" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        marginLeft: "auto",
+                      }}
+                    >
                       {/* Lihat bukti yang sudah diupload */}
                       {invoice.proof_url && (
                         <button
                           onClick={() => setProofModal(invoice.proof_url)}
                           style={{
-                            padding: "0.5rem 1rem", borderRadius: 10,
-                            fontSize: "0.75rem", fontWeight: 600,
-                            background: "rgba(59,130,246,0.08)", color: "#1e40af",
-                            border: "1px solid rgba(59,130,246,0.2)", cursor: "pointer",
+                            padding: "0.5rem 1rem",
+                            borderRadius: 10,
+                            fontSize: "0.75rem",
+                            fontWeight: 600,
+                            background: "rgba(59,130,246,0.08)",
+                            color: "#1e40af",
+                            border: "1px solid rgba(59,130,246,0.2)",
+                            cursor: "pointer",
                           }}
                         >
                           Lihat Bukti
@@ -252,15 +432,22 @@ export default function StudentInvoices({ student }) {
                           onClick={() => handleUploadClick(invoice.id)}
                           disabled={isUploading}
                           style={{
-                            padding: "0.5rem 1.25rem", borderRadius: 10,
-                            fontSize: "0.75rem", fontWeight: 700,
+                            padding: "0.5rem 1.25rem",
+                            borderRadius: 10,
+                            fontSize: "0.75rem",
+                            fontWeight: 700,
                             background: isUploading ? "#94A3B8" : "#272925",
-                            color: "#F8F6ED", border: "none",
+                            color: "#F8F6ED",
+                            border: "none",
                             cursor: isUploading ? "not-allowed" : "pointer",
                             transition: "background 0.2s",
                           }}
                         >
-                          {isUploading ? "Mengupload…" : invoice.proof_url ? "Ganti Bukti" : "Upload Bukti Bayar"}
+                          {isUploading
+                            ? "Mengupload…"
+                            : invoice.proof_url
+                              ? "Ganti Bukti"
+                              : "Upload Bukti Bayar"}
                         </button>
                       )}
                     </div>

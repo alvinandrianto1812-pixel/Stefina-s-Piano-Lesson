@@ -234,6 +234,32 @@ export default function TeacherMaterials({ teacher, students }) {
     let file_url = null;
 
     if (!isLinkType && form.file) {
+      // Validasi tipe & ukuran
+      const ALLOWED_TYPES = [
+        "application/pdf",
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "video/mp4",
+        "audio/mpeg",
+        "audio/mp4",
+      ];
+      const MAX_SIZE = 50 * 1024 * 1024;
+
+      if (!ALLOWED_TYPES.includes(form.file.type)) {
+        setError(
+          "Tipe file tidak didukung. Gunakan PDF, gambar, video MP4, atau audio.",
+        );
+        setSaving(false);
+        setUploadProgress(null);
+        return;
+      }
+      if (form.file.size > MAX_SIZE) {
+        setError("Ukuran file maksimal 50MB.");
+        setSaving(false);
+        setUploadProgress(null);
+        return;
+      }
       const ext = form.file.name.split(".").pop();
       const fileName = `${teacher.id}/${Date.now()}.${ext}`;
 

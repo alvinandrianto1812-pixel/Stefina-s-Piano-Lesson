@@ -67,6 +67,22 @@ export default function EventRSVP() {
   };
 
   const uploadProof = async () => {
+    const ALLOWED_TYPES = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "application/pdf",
+    ];
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setError("Format tidak didukung. Gunakan JPG, PNG, WEBP, atau PDF.");
+      return;
+    }
+    if (file.size > MAX_SIZE) {
+      setError("Ukuran file maksimal 5MB.");
+      return;
+    }
     if (!proofFile) return null;
     const ext = proofFile.name.split(".").pop();
     const fileName = `event_${id}_${Date.now()}.${ext}`;
