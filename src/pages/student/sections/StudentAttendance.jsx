@@ -90,6 +90,7 @@ export default function StudentAttendance({ student }) {
     const { error } = await supabase.from("student_attendance").insert([
       {
         student_id: student.id,
+        teacher_id: student.teacher_id, // ← TAMBAH INI
         lesson_date: today,
         status: "hadir",
         checked_in_by: "student",
