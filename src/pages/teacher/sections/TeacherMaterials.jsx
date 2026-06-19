@@ -148,21 +148,19 @@ const P = {
 };
 
 const MATERIAL_TYPES = [
-  { value: "pdf", label: "📄 PDF", accept: ".pdf" },
+  { value: "document", label: "📄 PDF / Dokumen", accept: ".pdf,.doc,.docx" },
   { value: "video", label: "🎬 Video", accept: "video/*" },
   { value: "audio", label: "🎵 Audio", accept: "audio/*" },
   { value: "image", label: "🖼️ Gambar", accept: "image/*" },
   { value: "link", label: "🔗 Link Eksternal", accept: null },
-  { value: "other", label: "📎 Lainnya", accept: "*" },
 ];
 
 const TYPE_ICON = {
-  pdf: "📄",
+  document: "📄",
   video: "🎬",
   audio: "🎵",
   image: "🖼️",
   link: "🔗",
-  other: "📎",
 };
 
 export default function TeacherMaterials({ teacher, students }) {
@@ -181,7 +179,7 @@ export default function TeacherMaterials({ teacher, students }) {
     student_id: "",
     title: "",
     description: "",
-    material_type: "pdf",
+    material_type: "document",
     is_public: false,
     external_url: "",
     file: null,
@@ -261,7 +259,10 @@ export default function TeacherMaterials({ teacher, students }) {
         return;
       }
       const ext = form.file.name.split(".").pop();
-      const fileName = `${teacher.id}/${Date.now()}.${ext}`;
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      const fileName = `${user.id}/${Date.now()}.${ext}`;
 
       setUploadProgress("Mengupload file…");
       const { error: uploadErr } = await supabase.storage
