@@ -300,20 +300,6 @@ export default function StudentNotes({ student }) {
                       flexShrink: 0,
                     }}
                   >
-                    {mood && (
-                      <span
-                        style={{
-                          padding: "3px 10px",
-                          borderRadius: "999px",
-                          fontSize: "0.68rem",
-                          fontWeight: 700,
-                          background: mood.bg,
-                          color: mood.color,
-                        }}
-                      >
-                        {mood.label}
-                      </span>
-                    )}
                     <svg
                       viewBox="0 0 24 24"
                       fill="none"
