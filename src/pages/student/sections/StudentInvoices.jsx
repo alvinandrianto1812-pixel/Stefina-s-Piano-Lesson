@@ -1,6 +1,7 @@
 // src/pages/student/sections/StudentInvoices.jsx
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "../../../lib/supabaseClient";
+import Modal from "../../../components/Modal";
 import toast from "react-hot-toast";
 
 const STATUS_CONFIG = {
@@ -151,6 +152,10 @@ export default function StudentInvoices({ student }) {
     (i) => i.status === "unpaid" || i.status === "overdue",
   ).length;
 
+  const pendingCount = invoices.filter(
+    (i) => i.status === "pending_verification",
+  ).length;
+
   return (
     <div className="space-y-6">
       {/* Hidden file input */}
@@ -164,6 +169,7 @@ export default function StudentInvoices({ student }) {
 
       {/* Summary banner */}
       {unpaidCount > 0 ? (
+        // Banner merah — existing code, tidak berubah
         <div
           style={{
             background: "linear-gradient(135deg, #7f1d1d, #DC2626)",
@@ -213,7 +219,58 @@ export default function StudentInvoices({ student }) {
           </div>
           <div style={{ fontSize: "3rem" }}>💳</div>
         </div>
+      ) : pendingCount > 0 ? (
+        // Banner kuning — menunggu konfirmasi
+        <div
+          style={{
+            background: "linear-gradient(135deg, #78350f, #d97706)",
+            borderRadius: 20,
+            padding: "1.5rem 2rem",
+            boxShadow: "0 8px 32px rgba(217,119,6,0.2)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "1rem",
+          }}
+        >
+          <div>
+            <p
+              style={{
+                margin: "0 0 0.25rem",
+                fontSize: "0.65rem",
+                fontWeight: 800,
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                color: "rgba(248,246,237,0.6)",
+              }}
+            >
+              Menunggu Konfirmasi
+            </p>
+            <p
+              style={{
+                margin: 0,
+                fontSize: "1.2rem",
+                fontWeight: 800,
+                color: "#F8F6ED",
+              }}
+            >
+              Bukti pembayaran sedang diverifikasi 🔍
+            </p>
+            <p
+              style={{
+                margin: "0.25rem 0 0",
+                fontSize: "0.8rem",
+                color: "rgba(248,246,237,0.6)",
+              }}
+            >
+              {pendingCount} tagihan menunggu konfirmasi admin
+            </p>
+          </div>
+          <div style={{ fontSize: "3rem" }}>⏳</div>
+        </div>
       ) : (
+        // Banner hijau — semua lunas
         <div
           style={{
             background: "linear-gradient(135deg, #14532d, #15803d)",
@@ -461,60 +518,92 @@ export default function StudentInvoices({ student }) {
 
       {/* Modal bukti bayar */}
       {proofModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-          onClick={() => setProofModal(null)}
-        >
+        <Modal maxWidth={520} onClose={() => setProofModal(null)}>
           <div
-            className="bg-white rounded-2xl overflow-hidden shadow-2xl max-w-lg w-full"
-            onClick={(e) => e.stopPropagation()}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: "1rem",
+            }}
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b">
-              <h3 className="font-semibold text-slate-800">Bukti Pembayaran</h3>
-              <button
-                onClick={() => setProofModal(null)}
-                className="text-slate-400 hover:text-slate-600 text-xl"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="p-4">
-              {proofModal.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                <img
-                  src={proofModal}
-                  alt="Bukti pembayaran"
-                  className="w-full rounded-xl"
-                  style={{ maxHeight: "70vh", objectFit: "contain" }}
-                />
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-4xl mb-3">📄</p>
-                  <p className="text-slate-600 text-sm mb-4">
-                    File tidak bisa dipreview langsung.
-                  </p>
-                  <a
-                    href={proofModal}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 py-2 rounded-full bg-[#272925] text-[#F8F6ED] text-sm font-semibold"
-                  >
-                    Buka File →
-                  </a>
-                </div>
-              )}
-            </div>
-            <div className="px-4 pb-4 flex justify-end">
-              <a
-                href={proofModal}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 rounded-full border text-sm font-medium text-slate-600 hover:bg-slate-50 transition"
-              >
-                Buka di tab baru ↗
-              </a>
-            </div>
+            <h3
+              style={{
+                margin: 0,
+                fontWeight: 700,
+                fontSize: "0.95rem",
+                color: "#272925",
+              }}
+            >
+              Bukti Pembayaran
+            </h3>
           </div>
-        </div>
+          <div>
+            {proofModal.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+              <img
+                src={proofModal}
+                alt="Bukti pembayaran"
+                style={{
+                  width: "100%",
+                  borderRadius: 12,
+                  maxHeight: "65vh",
+                  objectFit: "contain",
+                }}
+              />
+            ) : (
+              <div style={{ textAlign: "center", padding: "2rem 0" }}>
+                <p style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}>
+                  📄
+                </p>
+                <p
+                  style={{
+                    color: "#64748B",
+                    fontSize: "0.85rem",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  File tidak bisa dipreview langsung.
+                </p>
+                <a
+                  href={proofModal}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    padding: "0.5rem 1.25rem",
+                    borderRadius: 999,
+                    background: "#272925",
+                    color: "#F8F6ED",
+                    fontSize: "0.8rem",
+                    fontWeight: 600,
+                    textDecoration: "none",
+                  }}
+                >
+                  Buka File →
+                </a>
+              </div>
+            )}
+          </div>
+          <div
+            style={{
+              marginTop: "1rem",
+              display: "flex",
+              justifyContent: "flex-end",
+            }}
+          >
+            <a
+              href={proofModal}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontSize: "0.8rem",
+                color: "#64748B",
+                textDecoration: "none",
+              }}
+            >
+              Buka di tab baru ↗
+            </a>
+          </div>
+        </Modal>
       )}
     </div>
   );

@@ -110,7 +110,7 @@ export default function StudentPortal() {
         .student-tabs::-webkit-scrollbar { display: none; }
         .student-tabs { -ms-overflow-style: none; scrollbar-width: none; }
         @keyframes studentFadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-        .student-fade-up { animation: studentFadeUp 0.35s ease both; }
+        .student-fade-up { animation: studentFadeUp 0.35s ease foward; }
         .stab-btn { transition: all 0.2s ease; }
         .stab-btn:hover:not(.stab-active) { background: rgba(80,85,60,0.07) !important; color: #50553C !important; }
       `}</style>

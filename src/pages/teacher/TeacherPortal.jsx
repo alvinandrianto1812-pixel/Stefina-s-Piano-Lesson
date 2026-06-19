@@ -139,7 +139,7 @@ export default function TeacherPortal() {
           from { opacity:0; transform:translateY(10px); }
           to   { opacity:1; transform:translateY(0); }
         }
-        .teacher-fade-up { animation: teacherFadeUp 0.35s ease both; }
+        .teacher-fade-up { animation: teacherFadeUp 0.35s ease forwards; }
         .ttab-btn { transition: all 0.2s ease; }
         .ttab-btn:hover:not(.ttab-active) {
           background: rgba(80,85,60,0.07) !important;
