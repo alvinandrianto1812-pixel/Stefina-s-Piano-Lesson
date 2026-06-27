@@ -47,10 +47,28 @@ export default function StudentAttendance({ student }) {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [checkingIn, setCheckingIn] = useState(false);
+  const [teacherId, setTeacherId] = useState(null); // ← BARU: ambil dari student_teachers
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   });
+
+  // ← BARU: fetch teacher_id dari junction table
+  useEffect(() => {
+    const fetchTeacherId = async () => {
+      const { data, error } = await supabase
+        .from("student_teachers")
+        .select("teacher_id")
+        .eq("student_id", student.id)
+        .eq("is_active", true)
+        .maybeSingle();
+
+      if (error) console.error("fetch teacher_id error:", error);
+      setTeacherId(data?.teacher_id ?? null);
+    };
+
+    fetchTeacherId();
+  }, [student.id]);
 
   useEffect(() => {
     fetchAttendance();
@@ -86,11 +104,17 @@ export default function StudentAttendance({ student }) {
       return;
     }
 
+    // ← BARU: guard jika teacher belum ke-fetch
+    if (!teacherId) {
+      toast.error("Data teacher belum tersedia. Coba lagi.");
+      return;
+    }
+
     setCheckingIn(true);
     const { error } = await supabase.from("student_attendance").insert([
       {
         student_id: student.id,
-        teacher_id: student.teacher_id, // ← TAMBAH INI
+        teacher_id: teacherId, // ← GANTI: pakai state, bukan student.teacher_id
         lesson_date: today,
         status: "hadir",
         checked_in_by: "student",
@@ -224,21 +248,24 @@ export default function StudentAttendance({ student }) {
               </p>
               <button
                 onClick={handleCheckIn}
-                disabled={checkingIn}
+                disabled={checkingIn || !teacherId}
                 style={{
                   padding: "0.85rem 2.5rem",
                   borderRadius: "999px",
-                  background: checkingIn ? "rgba(248,246,237,0.3)" : "#F8F6ED",
+                  background:
+                    checkingIn || !teacherId
+                      ? "rgba(248,246,237,0.3)"
+                      : "#F8F6ED",
                   color: "#272925",
                   fontWeight: 800,
                   fontSize: "1rem",
                   border: "none",
-                  cursor: checkingIn ? "not-allowed" : "pointer",
+                  cursor: checkingIn || !teacherId ? "not-allowed" : "pointer",
                   transition: "all 0.2s",
                   boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
                 }}
                 onMouseEnter={(e) => {
-                  if (!checkingIn)
+                  if (!checkingIn && teacherId)
                     e.currentTarget.style.transform = "translateY(-2px)";
                 }}
                 onMouseLeave={(e) => {

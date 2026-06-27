@@ -48,18 +48,24 @@ export default function StudentMaterials({ student }) {
   const fetchMaterials = async () => {
     setLoading(true);
 
+    // Ambil teacher_id aktif dari junction table
+    const { data: stData } = await supabase
+      .from("student_teachers")
+      .select("teacher_id")
+      .eq("student_id", student.id)
+      .eq("is_active", true)
+      .maybeSingle();
+
+    const teacherId = stData?.teacher_id ?? null;
+
+    const query = teacherId
+      ? `student_id.eq.${student.id},and(is_public.eq.true,teacher_id.eq.${teacherId})`
+      : `student_id.eq.${student.id}`;
+
     const { data, error } = await supabase
       .from("learning_materials")
-      .select(
-        `
-        *,
-        teacher:teachers(id, name, photo_url)
-      `,
-      )
-      .or(
-        // Materi khusus untuk student ini ATAU materi public dari teacher yang sama
-        `student_id.eq.${student.id},and(is_public.eq.true,teacher_id.eq.${student.teacher_id})`,
-      )
+      .select(`*, teacher:teachers(id, name, photo_url)`)
+      .or(query)
       .order("created_at", { ascending: false });
 
     if (error) console.error("fetch materials error:", error);

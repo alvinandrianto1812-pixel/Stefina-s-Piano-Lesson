@@ -59,17 +59,33 @@ export default function TeacherPortal() {
 
         setTeacher(teacherData);
 
-        // 2. Ambil semua murid yang assigned ke teacher ini
+        // 2. Ambil student_id list dari junction table
+        const { data: stData, error: stDataErr } = await supabase
+          .from("student_teachers")
+          .select("student_id")
+          .eq("teacher_id", teacherData.id)
+          .eq("is_active", true);
+
+        if (stDataErr) throw stDataErr;
+
+        const studentIds = stData?.map((r) => r.student_id) ?? [];
+
+        if (studentIds.length === 0) {
+          setStudents([]);
+          return;
+        }
+
+        // 3. Fetch students by id list
         const { data: studentData, error: studentErr } = await supabase
           .from("students")
           .select(
             "id, full_name, email, instrument, level, is_active, billing_date, monthly_fee",
           )
-          .eq("teacher_id", teacherData.id)
-          .eq("is_active", true)
-          .order("full_name");
+          .in("id", studentIds)
+          .eq("is_active", true);
 
         if (studentErr) throw studentErr;
+
         setStudents(studentData ?? []);
       } catch (err) {
         console.error("fetchTeacherData error:", err);

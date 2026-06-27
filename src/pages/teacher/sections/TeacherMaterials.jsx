@@ -202,7 +202,11 @@ export default function TeacherMaterials({ teacher, students }) {
       .eq("teacher_id", teacher.id)
       .order("created_at", { ascending: false });
 
-    if (filterStudent !== "all") q = q.eq("student_id", filterStudent);
+    if (filterStudent === "public") {
+      q = q.eq("is_public", true).is("student_id", null);
+    } else if (filterStudent !== "all") {
+      q = q.eq("student_id", filterStudent);
+    }
     if (filterType !== "all") q = q.eq("material_type", filterType);
 
     const { data, error: err } = await q;
@@ -352,7 +356,7 @@ export default function TeacherMaterials({ teacher, students }) {
             style={selectStyle}
           >
             <option value="all">Semua Murid</option>
-            <option value="">Publik (semua)</option>
+            <option value="public">Publik (semua)</option>
             {students.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.full_name}

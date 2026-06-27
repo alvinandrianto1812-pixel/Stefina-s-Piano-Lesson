@@ -39,21 +39,37 @@ export default function StudentPortal() {
 
   useEffect(() => {
     if (!user) return;
-    supabase
-      .from("students")
-      .select(
-        `
-        *,
-        teacher:teachers(id, name, instrument, photo_url)
-      `,
-      )
-      .eq("user_id", user.id)
-      .maybeSingle()
-      .then(({ data, error }) => {
-        if (error) console.error("fetch student error:", error);
-        setStudent(data);
+
+    const fetchStudent = async () => {
+      const { data: studentData, error: studentError } = await supabase
+        .from("students")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (studentError) console.error("fetch student error:", studentError);
+
+      if (!studentData) {
+        setStudent(null);
         setLoading(false);
+        return;
+      }
+
+      const { data: stData } = await supabase
+        .from("student_teachers")
+        .select("teacher:teachers(id, name, instrument, photo_url)")
+        .eq("student_id", studentData.id)
+        .eq("is_active", true)
+        .maybeSingle();
+
+      setStudent({
+        ...studentData,
+        teacher: stData?.teacher ?? null,
       });
+      setLoading(false);
+    };
+
+    fetchStudent();
   }, [user]);
 
   if (loading) {
