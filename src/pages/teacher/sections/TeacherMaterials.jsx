@@ -163,6 +163,32 @@ const TYPE_ICON = {
   link: "🔗",
 };
 
+const ALLOWED_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "video/mp4",
+  "audio/mpeg",
+  "audio/mp4",
+  "audio/wav",
+];
+
+const TYPE_ALLOWED_MIME = {
+  document: [
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ],
+  video: ["video/mp4", "video/webm", "video/ogg"],
+  audio: ["audio/mpeg", "audio/mp4", "audio/wav", "audio/ogg"],
+  image: ["image/jpeg", "image/png", "image/webp", "image/gif"],
+};
+
+const MAX_SIZE = 50 * 1024 * 1024;
+
 export default function TeacherMaterials({ teacher, students }) {
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -174,6 +200,11 @@ export default function TeacherMaterials({ teacher, students }) {
   const [deleteId, setDeleteId] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(null);
   const fileRef = useRef(null);
+
+  // ── EDIT state ──
+  const [editItem, setEditItem] = useState(null);
+  const [editForm, setEditForm] = useState(null);
+  const editFileRef = useRef(null);
 
   const emptyForm = {
     student_id: "",
@@ -225,6 +256,18 @@ export default function TeacherMaterials({ teacher, students }) {
     setShowForm(true);
   }
 
+  function openEdit(material) {
+    setEditItem(material);
+    setEditForm({
+      title: material.title,
+      description: material.description || "",
+      student_id: material.student_id || "",
+      external_url: material.external_url || "",
+      file: null,
+    });
+    if (editFileRef.current) editFileRef.current.value = "";
+  }
+
   async function handleSave() {
     if (!form.title.trim()) return;
     if (isLinkType && !form.external_url.trim()) return;
@@ -236,18 +279,7 @@ export default function TeacherMaterials({ teacher, students }) {
     let file_url = null;
 
     if (!isLinkType && form.file) {
-      // Validasi tipe & ukuran
-      const ALLOWED_TYPES = [
-        "application/pdf",
-        "image/jpeg",
-        "image/png",
-        "image/webp",
-        "video/mp4",
-        "audio/mpeg",
-        "audio/mp4",
-      ];
-      const MAX_SIZE = 50 * 1024 * 1024;
-
+      // handleSave — pakai form dan ALLOWED_TYPES biasa
       if (!ALLOWED_TYPES.includes(form.file.type)) {
         setError(
           "Tipe file tidak didukung. Gunakan PDF, gambar, video MP4, atau audio.",
@@ -294,7 +326,7 @@ export default function TeacherMaterials({ teacher, students }) {
       title: form.title.trim(),
       description: form.description.trim() || null,
       material_type: form.material_type,
-      is_public: form.student_id === "" ? true : form.is_public,
+      is_public: form.student_id === "" ? true : false,
       file_url,
       external_url: isLinkType ? form.external_url.trim() : null,
     };
@@ -305,6 +337,90 @@ export default function TeacherMaterials({ teacher, students }) {
     if (insertErr) setError(insertErr.message);
     else {
       setShowForm(false);
+      fetchMaterials();
+    }
+
+    setSaving(false);
+    setUploadProgress(null);
+  }
+
+  async function handleEditSave() {
+    if (!editForm.title.trim()) return;
+    if (editItem.material_type === "link" && !editForm.external_url.trim())
+      return;
+
+    setSaving(true);
+    setUploadProgress(null);
+
+    let file_url = editItem.file_url; // default pakai file lama
+
+    if (editForm.file) {
+      const allowedForType = TYPE_ALLOWED_MIME[editItem.material_type] ?? [];
+      if (!allowedForType.includes(editForm.file.type)) {
+        setError(
+          `File tidak sesuai tipe materi. Materi ini hanya menerima tipe ${editItem.material_type}.`,
+        );
+        setSaving(false);
+        return;
+      }
+      if (editForm.file.size > MAX_SIZE) {
+        setError("Ukuran file maksimal 50MB.");
+        setSaving(false);
+        return;
+      }
+
+      // Hapus file lama dari storage
+      if (editItem.file_url) {
+        const oldPath = editItem.file_url.split("/learning-materials/")[1];
+        if (oldPath)
+          await supabase.storage.from("learning-materials").remove([oldPath]);
+      }
+
+      const ext = editForm.file.name.split(".").pop();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      const fileName = `${user.id}/${Date.now()}.${ext}`;
+
+      setUploadProgress("Mengupload file baru…");
+      const { error: uploadErr } = await supabase.storage
+        .from("learning-materials")
+        .upload(fileName, editForm.file, { upsert: false });
+
+      if (uploadErr) {
+        setError(`Upload gagal: ${uploadErr.message}`);
+        setSaving(false);
+        setUploadProgress(null);
+        return;
+      }
+
+      const { data: urlData } = supabase.storage
+        .from("learning-materials")
+        .getPublicUrl(fileName);
+      file_url = urlData?.publicUrl ?? null;
+    }
+
+    setUploadProgress("Menyimpan perubahan…");
+
+    const payload = {
+      title: editForm.title.trim(),
+      description: editForm.description.trim() || null,
+      student_id: editForm.student_id || null,
+      is_public: editForm.student_id === "" ? true : false,
+      external_url:
+        editItem.material_type === "link" ? editForm.external_url.trim() : null,
+      file_url,
+    };
+
+    const { error: updateErr } = await supabase
+      .from("learning_materials")
+      .update(payload)
+      .eq("id", editItem.id);
+
+    if (updateErr) setError(updateErr.message);
+    else {
+      setEditItem(null);
+      setEditForm(null);
       fetchMaterials();
     }
 
@@ -383,7 +499,7 @@ export default function TeacherMaterials({ teacher, students }) {
 
       {error && <ErrorBanner msg={error} onClose={() => setError(null)} />}
 
-      {/* ▼▼▼ FORM MODAL — buka di sini ▼▼▼ */}
+      {/* FORM MODAL — upload baru */}
       {showForm && (
         <Modal maxWidth={500} onClose={() => setShowForm(false)}>
           <h3 style={{ margin: "0 0 1rem", fontSize: 16, fontWeight: 700 }}>
@@ -538,8 +654,129 @@ export default function TeacherMaterials({ teacher, students }) {
           </div>
         </Modal>
       )}
-      {/* ▲▲▲ FORM MODAL — tutup di atas (cuma 1 </Modal>) ▲▲▲ */}
 
+      {/* EDIT MODAL */}
+      {editItem && editForm && (
+        <Modal
+          maxWidth={500}
+          onClose={() => {
+            setEditItem(null);
+            setEditForm(null);
+          }}
+        >
+          <h3 style={{ margin: "0 0 1rem", fontSize: 16, fontWeight: 700 }}>
+            Edit Materi
+          </h3>
+
+          <label style={labelStyle}>Judul Materi *</label>
+          <input
+            value={editForm.title}
+            onChange={(e) =>
+              setEditForm((f) => ({ ...f, title: e.target.value }))
+            }
+            style={{ ...inputStyle, marginBottom: 12 }}
+          />
+
+          <label style={labelStyle}>Deskripsi (opsional)</label>
+          <textarea
+            value={editForm.description}
+            onChange={(e) =>
+              setEditForm((f) => ({ ...f, description: e.target.value }))
+            }
+            rows={2}
+            style={{ ...inputStyle, resize: "vertical", marginBottom: 12 }}
+          />
+
+          <label style={labelStyle}>Untuk Murid</label>
+          <select
+            value={editForm.student_id}
+            onChange={(e) =>
+              setEditForm((f) => ({ ...f, student_id: e.target.value }))
+            }
+            style={{ ...selectStyle, width: "100%", marginBottom: 12 }}
+          >
+            <option value="">Semua murid saya (publik)</option>
+            {students.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.full_name}
+              </option>
+            ))}
+          </select>
+
+          {editItem.material_type === "link" ? (
+            <>
+              <label style={labelStyle}>URL Eksternal *</label>
+              <input
+                value={editForm.external_url}
+                onChange={(e) =>
+                  setEditForm((f) => ({ ...f, external_url: e.target.value }))
+                }
+                placeholder="https://..."
+                style={{ ...inputStyle, marginBottom: 12 }}
+              />
+            </>
+          ) : (
+            <>
+              <label style={labelStyle}>Ganti File (opsional)</label>
+              <input
+                ref={editFileRef}
+                type="file"
+                accept={
+                  MATERIAL_TYPES.find((t) => t.value === editItem.material_type)
+                    ?.accept ?? "*"
+                }
+                onChange={(e) =>
+                  setEditForm((f) => ({
+                    ...f,
+                    file: e.target.files[0] ?? null,
+                  }))
+                }
+                style={{ ...inputStyle, padding: "8px", marginBottom: 4 }}
+              />
+              <p style={{ margin: "0 0 12px", fontSize: 11, color: P.muted }}>
+                {editForm.file
+                  ? `📎 File baru: ${editForm.file.name}`
+                  : "Kosongkan jika tidak ingin mengganti file"}
+              </p>
+            </>
+          )}
+
+          {uploadProgress && (
+            <p
+              style={{
+                margin: "0 0 12px",
+                fontSize: 13,
+                color: P.olive,
+                fontWeight: 600,
+              }}
+            >
+              ⏳ {uploadProgress}
+            </p>
+          )}
+
+          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+            <button
+              onClick={() => {
+                setEditItem(null);
+                setEditForm(null);
+              }}
+              disabled={saving}
+              style={btnSecondary}
+            >
+              Batal
+            </button>
+            <button
+              onClick={handleEditSave}
+              disabled={saving || !editForm.title.trim()}
+              style={btnPrimary}
+            >
+              {saving ? "Memproses…" : "Simpan Perubahan"}
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {/* DELETE MODAL */}
       {deleteId && (
         <Modal maxWidth={360} onClose={() => setDeleteId(null)}>
           <p style={{ margin: "0 0 1rem", fontWeight: 600 }}>
@@ -609,12 +846,25 @@ export default function TeacherMaterials({ teacher, students }) {
                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => setDeleteId({ id: m.id, fileUrl: m.file_url })}
-                  style={{ ...btnIcon, color: P.danger, flexShrink: 0 }}
-                >
-                  🗑️
-                </button>
+                {/* Tombol edit & delete */}
+                <div style={{ display: "flex", gap: 2, flexShrink: 0 }}>
+                  <button
+                    onClick={() => openEdit(m)}
+                    style={{ ...btnIcon, color: P.olive }}
+                    title="Edit materi"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={() =>
+                      setDeleteId({ id: m.id, fileUrl: m.file_url })
+                    }
+                    style={{ ...btnIcon, color: P.danger }}
+                    title="Hapus materi"
+                  >
+                    🗑️
+                  </button>
+                </div>
               </div>
 
               {m.description && (
