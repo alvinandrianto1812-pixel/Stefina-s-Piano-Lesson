@@ -100,11 +100,13 @@ export default function StudentInvoices({ student }) {
       const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
       if (!ALLOWED_TYPES.includes(file.type)) {
-        setError("Format tidak didukung. Gunakan JPG, PNG, WEBP, atau PDF.");
+        toast.error("Format tidak didukung. Gunakan JPG, PNG, WEBP, atau PDF.");
+        setUploading(null);
         return;
       }
       if (file.size > MAX_SIZE) {
-        setError("Ukuran file maksimal 5MB.");
+        toast.error("Ukuran file maksimal 5MB.");
+        setUploading(null);
         return;
       }
       const ext = file.name.split(".").pop();

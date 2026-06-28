@@ -38,42 +38,57 @@ function isLocked(lessonDate) {
   return new Date() > lockTime;
 }
 
-function isTodayCheckedIn(records) {
-  const today = new Date().toISOString().split("T")[0];
-  return records.find((r) => r.lesson_date === today);
-}
-
 export default function StudentAttendance({ student }) {
+  const [teachers, setTeachers] = useState([]); // list semua teacher aktif
+  const [selectedTeacherId, setSelectedTeacherId] = useState(null);
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [checkingIn, setCheckingIn] = useState(false);
-  const [teacherId, setTeacherId] = useState(null); // ← BARU: ambil dari student_teachers
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   });
 
-  // ← BARU: fetch teacher_id dari junction table
+  // Fetch semua teacher aktif dari student_teachers → teachers
   useEffect(() => {
-    const fetchTeacherId = async () => {
-      const { data, error } = await supabase
+    const fetchTeachers = async () => {
+      const { data: stData, error: stError } = await supabase
         .from("student_teachers")
         .select("teacher_id")
         .eq("student_id", student.id)
-        .eq("is_active", true)
-        .maybeSingle();
+        .eq("is_active", true);
 
-      if (error) console.error("fetch teacher_id error:", error);
-      setTeacherId(data?.teacher_id ?? null);
+      if (stError) {
+        console.error("fetch student_teachers error:", stError);
+        return;
+      }
+
+      const teacherIds = stData.map((r) => r.teacher_id);
+      if (teacherIds.length === 0) return;
+
+      const { data: tData, error: tError } = await supabase
+        .from("teachers")
+        .select("id, name")
+        .in("id", teacherIds);
+
+      if (tError) {
+        console.error("fetch teachers error:", tError);
+        return;
+      }
+
+      setTeachers(tData || []);
+      setSelectedTeacherId(tData?.[0]?.id ?? null); // default tab pertama
     };
 
-    fetchTeacherId();
+    fetchTeachers();
   }, [student.id]);
 
+  // Fetch absensi kalau selectedTeacherId atau selectedMonth berubah
   useEffect(() => {
+    if (!selectedTeacherId) return;
     fetchAttendance();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedMonth]);
+  }, [selectedTeacherId, selectedMonth]);
 
   const fetchAttendance = async () => {
     setLoading(true);
@@ -86,6 +101,7 @@ export default function StudentAttendance({ student }) {
       .from("student_attendance")
       .select("*")
       .eq("student_id", student.id)
+      .eq("teacher_id", selectedTeacherId)
       .gte("lesson_date", from)
       .lte("lesson_date", to)
       .order("lesson_date", { ascending: false });
@@ -97,16 +113,15 @@ export default function StudentAttendance({ student }) {
 
   const handleCheckIn = async () => {
     const today = new Date().toISOString().split("T")[0];
-    const existing = isTodayCheckedIn(records);
+    const alreadyIn = records.find((r) => r.lesson_date === today);
 
-    if (existing) {
-      toast.error("Kamu sudah check-in hari ini!");
+    if (alreadyIn) {
+      toast.error("Kamu sudah check-in untuk guru ini hari ini!");
       return;
     }
 
-    // ← BARU: guard jika teacher belum ke-fetch
-    if (!teacherId) {
-      toast.error("Data teacher belum tersedia. Coba lagi.");
+    if (!selectedTeacherId) {
+      toast.error("Pilih guru dulu sebelum check-in.");
       return;
     }
 
@@ -114,7 +129,7 @@ export default function StudentAttendance({ student }) {
     const { error } = await supabase.from("student_attendance").insert([
       {
         student_id: student.id,
-        teacher_id: teacherId, // ← GANTI: pakai state, bukan student.teacher_id
+        teacher_id: selectedTeacherId,
         lesson_date: today,
         status: "hadir",
         checked_in_by: "student",
@@ -131,7 +146,6 @@ export default function StudentAttendance({ student }) {
     setCheckingIn(false);
   };
 
-  // Hitung statistik bulan ini
   const stats = {
     hadir: records.filter((r) => r.status === "hadir").length,
     izin: records.filter((r) => r.status === "izin").length,
@@ -139,10 +153,9 @@ export default function StudentAttendance({ student }) {
     alpha: records.filter((r) => r.status === "alpha").length,
   };
 
-  const todayRecord = isTodayCheckedIn(records);
   const today = new Date().toISOString().split("T")[0];
+  const todayRecord = records.find((r) => r.lesson_date === today);
 
-  // Generate month options (6 bulan terakhir)
   const monthOptions = Array.from({ length: 6 }, (_, i) => {
     const d = new Date();
     d.setMonth(d.getMonth() - i);
@@ -154,8 +167,36 @@ export default function StudentAttendance({ student }) {
     return { val, label };
   });
 
+  const selectedTeacher = teachers.find((t) => t.id === selectedTeacherId);
+
   return (
     <div className="space-y-6">
+      {/* Tab per guru */}
+      {teachers.length > 1 && (
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          {teachers.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setSelectedTeacherId(t.id)}
+              style={{
+                padding: "0.5rem 1.25rem",
+                borderRadius: "999px",
+                border: "2px solid",
+                borderColor: selectedTeacherId === t.id ? "#50553C" : "#E2E8F0",
+                background: selectedTeacherId === t.id ? "#50553C" : "#fff",
+                color: selectedTeacherId === t.id ? "#F8F6ED" : "#64748B",
+                fontWeight: 700,
+                fontSize: "0.8rem",
+                cursor: "pointer",
+                transition: "all 0.15s",
+              }}
+            >
+              {t.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Check-in card */}
       <div
         style={{
@@ -196,6 +237,7 @@ export default function StudentAttendance({ student }) {
               month: "long",
               year: "numeric",
             })}
+            {selectedTeacher && ` · ${selectedTeacher.name}`}
           </p>
 
           {todayRecord ? (
@@ -248,24 +290,27 @@ export default function StudentAttendance({ student }) {
               </p>
               <button
                 onClick={handleCheckIn}
-                disabled={checkingIn || !teacherId}
+                disabled={checkingIn || !selectedTeacherId}
                 style={{
                   padding: "0.85rem 2.5rem",
                   borderRadius: "999px",
                   background:
-                    checkingIn || !teacherId
+                    checkingIn || !selectedTeacherId
                       ? "rgba(248,246,237,0.3)"
                       : "#F8F6ED",
                   color: "#272925",
                   fontWeight: 800,
                   fontSize: "1rem",
                   border: "none",
-                  cursor: checkingIn || !teacherId ? "not-allowed" : "pointer",
+                  cursor:
+                    checkingIn || !selectedTeacherId
+                      ? "not-allowed"
+                      : "pointer",
                   transition: "all 0.2s",
                   boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
                 }}
                 onMouseEnter={(e) => {
-                  if (!checkingIn && teacherId)
+                  if (!checkingIn && selectedTeacherId)
                     e.currentTarget.style.transform = "translateY(-2px)";
                 }}
                 onMouseLeave={(e) => {
@@ -348,7 +393,7 @@ export default function StudentAttendance({ student }) {
             color: "#94A3B8",
           }}
         >
-          Histori Absensi
+          Histori Absensi {selectedTeacher ? `· ${selectedTeacher.name}` : ""}
         </p>
         <select
           value={selectedMonth}

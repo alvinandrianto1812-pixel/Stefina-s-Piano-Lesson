@@ -1,15 +1,18 @@
 // src/pages/student/sections/StudentNotes.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 
 export default function StudentNotes({ student }) {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
-  const [activeTab, setActiveTab] = useState("teacher"); // "teacher" | "lesson"
+  const [activeTab, setActiveTab] = useState("teacher");
+  const [selectedTeacherId, setSelectedTeacherId] = useState("all");
 
   useEffect(() => {
     fetchNotes();
+    setExpanded(null);
+    setSelectedTeacherId("all");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
@@ -19,12 +22,7 @@ export default function StudentNotes({ student }) {
     if (activeTab === "teacher") {
       const { data, error } = await supabase
         .from("teacher_notes")
-        .select(
-          `
-          *,
-          teacher:teachers(id, name, photo_url)
-        `,
-        )
+        .select("*, teacher:teachers(id, name, photo_url)")
         .eq("student_id", student.id)
         .eq("is_private", false)
         .order("created_at", { ascending: false });
@@ -34,12 +32,7 @@ export default function StudentNotes({ student }) {
     } else {
       const { data, error } = await supabase
         .from("lesson_notes")
-        .select(
-          `
-          *,
-          teacher:teachers(id, name, photo_url)
-        `,
-        )
+        .select("*, teacher:teachers(id, name, photo_url)")
         .eq("student_id", student.id)
         .order("lesson_date", { ascending: false });
 
@@ -49,6 +42,21 @@ export default function StudentNotes({ student }) {
 
     setLoading(false);
   };
+
+  // Extract unique teachers dari notes yang ada
+  const teachers = useMemo(() => {
+    const map = new Map();
+    notes.forEach((n) => {
+      if (n.teacher?.id) map.set(n.teacher.id, n.teacher);
+    });
+    return Array.from(map.values());
+  }, [notes]);
+
+  // Filter notes by selected teacher
+  const filteredNotes = useMemo(() => {
+    if (selectedTeacherId === "all") return notes;
+    return notes.filter((n) => n.teacher?.id === selectedTeacherId);
+  }, [notes, selectedTeacherId]);
 
   const MOOD_CONFIG = {
     great: { label: "Great! 🔥", color: "#15803d", bg: "rgba(22,163,74,0.08)" },
@@ -139,12 +147,59 @@ export default function StudentNotes({ student }) {
         ))}
       </div>
 
+      {/* Filter guru — muncul kalau ada 2+ guru */}
+      {!loading && teachers.length > 1 && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            flexWrap: "wrap",
+          }}
+        >
+          <span
+            style={{
+              fontSize: "0.65rem",
+              fontWeight: 800,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "#94A3B8",
+            }}
+          >
+            Filter:
+          </span>
+          {[{ id: "all", name: "Semua Guru" }, ...teachers].map((t) => (
+            <button
+              key={t.id}
+              onClick={() => {
+                setSelectedTeacherId(t.id);
+                setExpanded(null);
+              }}
+              style={{
+                padding: "0.4rem 1rem",
+                borderRadius: "999px",
+                border: "2px solid",
+                borderColor: selectedTeacherId === t.id ? "#50553C" : "#E2E8F0",
+                background: selectedTeacherId === t.id ? "#50553C" : "#fff",
+                color: selectedTeacherId === t.id ? "#F8F6ED" : "#64748B",
+                fontWeight: 700,
+                fontSize: "0.78rem",
+                cursor: "pointer",
+                transition: "all 0.15s",
+              }}
+            >
+              {t.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Content */}
       {loading ? (
         <div style={{ padding: "3rem", textAlign: "center", color: "#94A3B8" }}>
           Memuat catatan…
         </div>
-      ) : notes.length === 0 ? (
+      ) : filteredNotes.length === 0 ? (
         <div
           style={{
             padding: "3rem",
@@ -165,9 +220,8 @@ export default function StudentNotes({ student }) {
         <div
           style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
         >
-          {notes.map((note) => {
+          {filteredNotes.map((note) => {
             const isExpanded = expanded === note.id;
-            const mood = note.mood ? MOOD_CONFIG[note.mood] : null;
 
             return (
               <div
@@ -292,32 +346,24 @@ export default function StudentNotes({ student }) {
                     </div>
                   </div>
 
-                  <div
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
+                      width: 14,
+                      height: 14,
+                      color: "#94A3B8",
+                      transition: "transform 0.2s",
+                      transform: isExpanded ? "rotate(180deg)" : "",
                       flexShrink: 0,
                     }}
                   >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      style={{
-                        width: 14,
-                        height: 14,
-                        color: "#94A3B8",
-                        transition: "transform 0.2s",
-                        transform: isExpanded ? "rotate(180deg)" : "",
-                      }}
-                    >
-                      <polyline points="6,9 12,15 18,9" />
-                    </svg>
-                  </div>
+                    <polyline points="6,9 12,15 18,9" />
+                  </svg>
                 </button>
 
                 {/* Expanded content */}
@@ -450,7 +496,6 @@ export default function StudentNotes({ student }) {
                         )}
                       </div>
                     )}
-
                     <p
                       style={{
                         margin: "0.75rem 0 0",

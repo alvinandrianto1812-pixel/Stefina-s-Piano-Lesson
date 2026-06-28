@@ -242,61 +242,70 @@ export default function StudentDashboard({ student }) {
         >
           Teacher Assigned
         </p>
-        {student.teacher ? (
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            {student.teacher.photo_url ? (
-              <img
-                src={student.teacher.photo_url}
-                alt={student.teacher.name}
-                style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                  flexShrink: 0,
-                  border: "2px solid #E2E8F0",
-                }}
-              />
-            ) : (
+        {student.teachers && student.teachers.length > 0 ? (
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+          >
+            {student.teachers.map((t) => (
               <div
-                style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: "50%",
-                  background: "linear-gradient(135deg, #272925, #50553C)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "1.4rem",
-                  flexShrink: 0,
-                }}
+                key={t.id}
+                style={{ display: "flex", alignItems: "center", gap: "1rem" }}
               >
-                👩‍🏫
+                {t.photo_url ? (
+                  <img
+                    src={t.photo_url}
+                    alt={t.name}
+                    style={{
+                      width: 56,
+                      height: 56,
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      flexShrink: 0,
+                      border: "2px solid #E2E8F0",
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: 56,
+                      height: 56,
+                      borderRadius: "50%",
+                      background: "linear-gradient(135deg, #272925, #50553C)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "1.4rem",
+                      flexShrink: 0,
+                    }}
+                  >
+                    👩‍🏫
+                  </div>
+                )}
+                <div>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontWeight: 700,
+                      fontSize: "1rem",
+                      color: "#272925",
+                    }}
+                  >
+                    {t.name}
+                  </p>
+                  {t.instrument && (
+                    <p
+                      style={{
+                        margin: "0.2rem 0 0",
+                        fontSize: "0.8rem",
+                        color: "#64748B",
+                      }}
+                    >
+                      🎵 {t.instrument}
+                    </p>
+                  )}
+                </div>
               </div>
-            )}
-            <div>
-              <p
-                style={{
-                  margin: 0,
-                  fontWeight: 700,
-                  fontSize: "1rem",
-                  color: "#272925",
-                }}
-              >
-                {student.teacher.name}
-              </p>
-              {student.teacher.instrument && (
-                <p
-                  style={{
-                    margin: "0.2rem 0 0",
-                    fontSize: "0.8rem",
-                    color: "#64748B",
-                  }}
-                >
-                  🎵 {student.teacher.instrument}
-                </p>
-              )}
-            </div>
+            ))}
           </div>
         ) : (
           <div

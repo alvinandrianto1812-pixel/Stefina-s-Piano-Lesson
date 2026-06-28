@@ -55,16 +55,29 @@ export default function StudentPortal() {
         return;
       }
 
-      const { data: stData } = await supabase
+      const { data: stData, error: stErr } = await supabase
         .from("student_teachers")
-        .select("teacher:teachers(id, name, instrument, photo_url)")
+        .select("teacher_id")
         .eq("student_id", studentData.id)
-        .eq("is_active", true)
-        .maybeSingle();
+        .eq("is_active", true);
+
+      if (stErr) console.error("fetch student_teachers error:", stErr);
+
+      const teacherIds = stData?.map((r) => r.teacher_id) ?? [];
+
+      let teachers = [];
+      if (teacherIds.length > 0) {
+        const { data: teacherData, error: tErr } = await supabase
+          .from("teachers")
+          .select("id, name, instrument, photo_url")
+          .in("id", teacherIds);
+        if (tErr) console.error("fetch teachers error:", tErr);
+        teachers = teacherData ?? [];
+      }
 
       setStudent({
         ...studentData,
-        teacher: stData?.teacher ?? null,
+        teachers,
       });
       setLoading(false);
     };

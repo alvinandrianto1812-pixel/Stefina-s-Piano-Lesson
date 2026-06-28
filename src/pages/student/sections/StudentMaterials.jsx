@@ -1,5 +1,5 @@
 // src/pages/student/sections/StudentMaterials.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 
 const TYPE_CONFIG = {
@@ -39,6 +39,7 @@ export default function StudentMaterials({ student }) {
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState("all");
+  const [selectedTeacherId, setSelectedTeacherId] = useState("all");
 
   useEffect(() => {
     fetchMaterials();
@@ -48,46 +49,76 @@ export default function StudentMaterials({ student }) {
   const fetchMaterials = async () => {
     setLoading(true);
 
-    // Ambil teacher_id aktif dari junction table
-    const { data: stData } = await supabase
+    // Step 1: ambil SEMUA teacher_id aktif
+    const { data: stData, error: stError } = await supabase
       .from("student_teachers")
       .select("teacher_id")
       .eq("student_id", student.id)
-      .eq("is_active", true)
-      .maybeSingle();
+      .eq("is_active", true);
 
-    const teacherId = stData?.teacher_id ?? null;
+    if (stError) console.error("fetch student_teachers error:", stError);
 
-    const query = teacherId
-      ? `student_id.eq.${student.id},and(is_public.eq.true,teacher_id.eq.${teacherId})`
-      : `student_id.eq.${student.id}`;
+    const teacherIds = stData?.map((r) => r.teacher_id) ?? [];
 
-    const { data, error } = await supabase
+    // Step 2: build query
+    // Tampilkan materi yang:
+    // - assigned khusus ke student ini (student_id = student.id), ATAU
+    // - publik dari salah satu teacher aktif (is_public = true AND teacher_id IN [...])
+    let query = supabase
       .from("learning_materials")
-      .select(`*, teacher:teachers(id, name, photo_url)`)
-      .or(query)
+      .select("*, teacher:teachers(id, name, photo_url)")
       .order("created_at", { ascending: false });
 
+    if (teacherIds.length > 0) {
+      // pakai filter manual karena .or() dengan IN agak tricky di postgrest
+      query = query.or(
+        `student_id.eq.${student.id},and(is_public.eq.true,teacher_id.in.(${teacherIds.join(",")}))`,
+      );
+    } else {
+      query = query.eq("student_id", student.id);
+    }
+
+    const { data, error } = await query;
     if (error) console.error("fetch materials error:", error);
     setMaterials(data || []);
     setLoading(false);
   };
 
-  const filtered =
-    filterType === "all"
-      ? materials
-      : materials.filter((m) => m.material_type === filterType);
+  // Extract unique teachers dari materials
+  const teachers = useMemo(() => {
+    const map = new Map();
+    materials.forEach((m) => {
+      if (m.teacher?.id) map.set(m.teacher.id, m.teacher);
+    });
+    return Array.from(map.values());
+  }, [materials]);
+
+  // Filter by guru dulu, baru by type
+  const filtered = useMemo(() => {
+    let result = materials;
+    if (selectedTeacherId !== "all")
+      result = result.filter((m) => m.teacher?.id === selectedTeacherId);
+    if (filterType !== "all")
+      result = result.filter((m) => m.material_type === filterType);
+    return result;
+  }, [materials, selectedTeacherId, filterType]);
+
+  // Count per type (dari filtered by guru, sebelum filter type)
+  const typeCounts = useMemo(() => {
+    const base =
+      selectedTeacherId === "all"
+        ? materials
+        : materials.filter((m) => m.teacher?.id === selectedTeacherId);
+    return base.reduce((acc, m) => {
+      acc[m.material_type] = (acc[m.material_type] || 0) + 1;
+      return acc;
+    }, {});
+  }, [materials, selectedTeacherId]);
 
   const handleOpen = (material) => {
     const url = material.file_url || material.external_url;
     if (url) window.open(url, "_blank", "noopener noreferrer");
   };
-
-  // Hitung count per type
-  const typeCounts = materials.reduce((acc, m) => {
-    acc[m.material_type] = (acc[m.material_type] || 0) + 1;
-    return acc;
-  }, {});
 
   return (
     <div className="space-y-6">
@@ -119,6 +150,53 @@ export default function StudentMaterials({ student }) {
         </p>
       </div>
 
+      {/* Filter guru — muncul kalau 2+ guru */}
+      {!loading && teachers.length > 1 && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            flexWrap: "wrap",
+          }}
+        >
+          <span
+            style={{
+              fontSize: "0.65rem",
+              fontWeight: 800,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "#94A3B8",
+            }}
+          >
+            Guru:
+          </span>
+          {[{ id: "all", name: "Semua" }, ...teachers].map((t) => (
+            <button
+              key={t.id}
+              onClick={() => {
+                setSelectedTeacherId(t.id);
+                setFilterType("all");
+              }}
+              style={{
+                padding: "0.4rem 1rem",
+                borderRadius: "999px",
+                border: "2px solid",
+                borderColor: selectedTeacherId === t.id ? "#50553C" : "#E2E8F0",
+                background: selectedTeacherId === t.id ? "#50553C" : "#fff",
+                color: selectedTeacherId === t.id ? "#F8F6ED" : "#64748B",
+                fontWeight: 700,
+                fontSize: "0.78rem",
+                cursor: "pointer",
+                transition: "all 0.15s",
+              }}
+            >
+              {t.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Filter type */}
       <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
         <button
@@ -136,7 +214,12 @@ export default function StudentMaterials({ student }) {
             transition: "all 0.2s",
           }}
         >
-          Semua ({materials.length})
+          Semua (
+          {selectedTeacherId === "all"
+            ? materials.length
+            : materials.filter((m) => m.teacher?.id === selectedTeacherId)
+                .length}
+          )
         </button>
         {Object.entries(TYPE_CONFIG).map(([key, cfg]) => {
           const count = typeCounts[key] || 0;
@@ -183,7 +266,7 @@ export default function StudentMaterials({ student }) {
           <p style={{ color: "#94A3B8", margin: 0 }}>
             {materials.length === 0
               ? "Belum ada materi dari teacher."
-              : "Tidak ada materi dengan tipe ini."}
+              : "Tidak ada materi dengan filter ini."}
           </p>
         </div>
       ) : (
@@ -227,7 +310,6 @@ export default function StudentMaterials({ student }) {
                     "0 2px 8px rgba(39,41,37,0.05)";
                 }}
               >
-                {/* Public badge */}
                 {material.is_public && (
                   <span
                     style={{
@@ -246,7 +328,6 @@ export default function StudentMaterials({ student }) {
                   </span>
                 )}
 
-                {/* Type icon */}
                 <div
                   style={{
                     width: 48,
@@ -263,7 +344,6 @@ export default function StudentMaterials({ student }) {
                   {cfg.icon}
                 </div>
 
-                {/* Title & desc */}
                 <p
                   style={{
                     margin: "0 0 0.35rem",
@@ -292,7 +372,6 @@ export default function StudentMaterials({ student }) {
                   </p>
                 )}
 
-                {/* Footer */}
                 <div
                   style={{
                     display: "flex",
@@ -355,7 +434,6 @@ export default function StudentMaterials({ student }) {
                   </span>
                 </div>
 
-                {/* Open indicator */}
                 {hasLink && (
                   <div
                     style={{
