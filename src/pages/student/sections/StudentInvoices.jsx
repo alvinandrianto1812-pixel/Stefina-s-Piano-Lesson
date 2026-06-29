@@ -170,147 +170,149 @@ export default function StudentInvoices({ student }) {
       />
 
       {/* Summary banner */}
-      {unpaidCount > 0 ? (
-        // Banner merah — existing code, tidak berubah
-        <div
-          style={{
-            background: "linear-gradient(135deg, #7f1d1d, #DC2626)",
-            borderRadius: 20,
-            padding: "1.5rem 2rem",
-            boxShadow: "0 8px 32px rgba(220,38,38,0.2)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: "1rem",
-          }}
-        >
-          <div>
-            <p
-              style={{
-                margin: "0 0 0.25rem",
-                fontSize: "0.65rem",
-                fontWeight: 800,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "rgba(248,246,237,0.6)",
-              }}
-            >
-              Tagihan Belum Lunas
-            </p>
-            <p
-              style={{
-                margin: 0,
-                fontSize: "1.6rem",
-                fontWeight: 800,
-                color: "#F8F6ED",
-                lineHeight: 1.2,
-              }}
-            >
-              Rp {totalUnpaid.toLocaleString("id-ID")}
-            </p>
-            <p
-              style={{
-                margin: "0.25rem 0 0",
-                fontSize: "0.8rem",
-                color: "rgba(248,246,237,0.6)",
-              }}
-            >
-              {unpaidCount} tagihan menunggu pembayaran
-            </p>
+      {!loading &&
+        invoices.length > 0 &&
+        (unpaidCount > 0 ? (
+          // Banner merah — existing code, tidak berubah
+          <div
+            style={{
+              background: "linear-gradient(135deg, #7f1d1d, #DC2626)",
+              borderRadius: 20,
+              padding: "1.5rem 2rem",
+              boxShadow: "0 8px 32px rgba(220,38,38,0.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: "1rem",
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  margin: "0 0 0.25rem",
+                  fontSize: "0.65rem",
+                  fontWeight: 800,
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: "rgba(248,246,237,0.6)",
+                }}
+              >
+                Tagihan Belum Lunas
+              </p>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "1.6rem",
+                  fontWeight: 800,
+                  color: "#F8F6ED",
+                  lineHeight: 1.2,
+                }}
+              >
+                Rp {totalUnpaid.toLocaleString("id-ID")}
+              </p>
+              <p
+                style={{
+                  margin: "0.25rem 0 0",
+                  fontSize: "0.8rem",
+                  color: "rgba(248,246,237,0.6)",
+                }}
+              >
+                {unpaidCount} tagihan menunggu pembayaran
+              </p>
+            </div>
+            <div style={{ fontSize: "3rem" }}>💳</div>
           </div>
-          <div style={{ fontSize: "3rem" }}>💳</div>
-        </div>
-      ) : pendingCount > 0 ? (
-        // Banner kuning — menunggu konfirmasi
-        <div
-          style={{
-            background: "linear-gradient(135deg, #78350f, #d97706)",
-            borderRadius: 20,
-            padding: "1.5rem 2rem",
-            boxShadow: "0 8px 32px rgba(217,119,6,0.2)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: "1rem",
-          }}
-        >
-          <div>
-            <p
-              style={{
-                margin: "0 0 0.25rem",
-                fontSize: "0.65rem",
-                fontWeight: 800,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "rgba(248,246,237,0.6)",
-              }}
-            >
-              Menunggu Konfirmasi
-            </p>
-            <p
-              style={{
-                margin: 0,
-                fontSize: "1.2rem",
-                fontWeight: 800,
-                color: "#F8F6ED",
-              }}
-            >
-              Bukti pembayaran sedang diverifikasi 🔍
-            </p>
-            <p
-              style={{
-                margin: "0.25rem 0 0",
-                fontSize: "0.8rem",
-                color: "rgba(248,246,237,0.6)",
-              }}
-            >
-              {pendingCount} tagihan menunggu konfirmasi admin
-            </p>
+        ) : pendingCount > 0 ? (
+          // Banner kuning — menunggu konfirmasi
+          <div
+            style={{
+              background: "linear-gradient(135deg, #78350f, #d97706)",
+              borderRadius: 20,
+              padding: "1.5rem 2rem",
+              boxShadow: "0 8px 32px rgba(217,119,6,0.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: "1rem",
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  margin: "0 0 0.25rem",
+                  fontSize: "0.65rem",
+                  fontWeight: 800,
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: "rgba(248,246,237,0.6)",
+                }}
+              >
+                Menunggu Konfirmasi
+              </p>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "1.2rem",
+                  fontWeight: 800,
+                  color: "#F8F6ED",
+                }}
+              >
+                Bukti pembayaran sedang diverifikasi 🔍
+              </p>
+              <p
+                style={{
+                  margin: "0.25rem 0 0",
+                  fontSize: "0.8rem",
+                  color: "rgba(248,246,237,0.6)",
+                }}
+              >
+                {pendingCount} tagihan menunggu konfirmasi admin
+              </p>
+            </div>
+            <div style={{ fontSize: "3rem" }}>⏳</div>
           </div>
-          <div style={{ fontSize: "3rem" }}>⏳</div>
-        </div>
-      ) : (
-        // Banner hijau — semua lunas
-        <div
-          style={{
-            background: "linear-gradient(135deg, #14532d, #15803d)",
-            borderRadius: 20,
-            padding: "1.5rem 2rem",
-            boxShadow: "0 8px 32px rgba(22,163,74,0.2)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div>
-            <p
-              style={{
-                margin: "0 0 0.25rem",
-                fontSize: "0.65rem",
-                fontWeight: 800,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "rgba(248,246,237,0.6)",
-              }}
-            >
-              Status Pembayaran
-            </p>
-            <p
-              style={{
-                margin: 0,
-                fontSize: "1.2rem",
-                fontWeight: 800,
-                color: "#F8F6ED",
-              }}
-            >
-              Semua tagihan lunas! 🎉
-            </p>
+        ) : (
+          // Banner hijau — semua lunas
+          <div
+            style={{
+              background: "linear-gradient(135deg, #14532d, #15803d)",
+              borderRadius: 20,
+              padding: "1.5rem 2rem",
+              boxShadow: "0 8px 32px rgba(22,163,74,0.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  margin: "0 0 0.25rem",
+                  fontSize: "0.65rem",
+                  fontWeight: 800,
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: "rgba(248,246,237,0.6)",
+                }}
+              >
+                Status Pembayaran
+              </p>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "1.2rem",
+                  fontWeight: 800,
+                  color: "#F8F6ED",
+                }}
+              >
+                Semua tagihan lunas! 🎉
+              </p>
+            </div>
+            <div style={{ fontSize: "3rem" }}>✅</div>
           </div>
-          <div style={{ fontSize: "3rem" }}>✅</div>
-        </div>
-      )}
+        ))}
 
       {/* Invoice list */}
       {loading ? (
